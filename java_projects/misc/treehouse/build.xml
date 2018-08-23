@@ -1,0 +1,100 @@
+<project default="test-make" basedir=".">
+
+  <property environment="env"/>
+
+  <!--========== javacc ==========-->
+  <target name="javacc">
+
+    <delete file="src/treehouse/haystack/io/ParseException.java"     />  
+    <delete file="src/treehouse/haystack/io/Parser.java"             />  
+    <delete file="src/treehouse/haystack/io/ParserConstants.java"    />  
+    <delete file="src/treehouse/haystack/io/ParserTokenManager.java" />  
+    <delete file="src/treehouse/haystack/io/SimpleCharStream.java"   />  
+    <delete file="src/treehouse/haystack/io/Token.java"              />  
+    <delete file="src/treehouse/haystack/io/TokenMgrError.java"      />  
+
+    <javacc
+      target="src/treehouse/haystack/io/Parser.jj"
+      outputdirectory="src/treehouse/haystack/io"
+      javacchome="/code/open_source/javacc-6.0/" />
+
+    <!-- get rid of public scoping for parser internals -->
+    <replace file="src/treehouse/haystack/io/ParseException.java"      token="public class" value="class"/>  
+    <replace file="src/treehouse/haystack/io/Parser.java"              token="public class" value="class"/>  
+    <replace file="src/treehouse/haystack/io/ParserConstants.java"     token="public interface" value="interface"/>  
+    <replace file="src/treehouse/haystack/io/ParserTokenManager.java"  token="public class" value="class"/>  
+    <replace file="src/treehouse/haystack/io/SimpleCharStream.java"    token="public class" value="class"/>  
+    <replace file="src/treehouse/haystack/io/Token.java"               token="public class" value="class"/>  
+    <replace file="src/treehouse/haystack/io/TokenMgrError.java"       token="public class" value="class"/>  
+
+  </target>
+
+  <!--========== make ==========-->
+  <target name="make">
+
+    <delete dir="staging"/>
+    <mkdir dir="staging"/>
+    <javac
+      srcdir="src"
+      destdir="staging"
+      debug="on"
+      encoding="UTF-8"
+      includeantruntime="false">
+        <!--compilerarg value="-Xlint:unchecked"/-->
+        <classpath>
+          <fileset dir="../treehouseLib"> 
+            <include name="*.jar" /> 
+          </fileset>
+        </classpath>
+    </javac>
+
+    <delete dir="dist"/>
+    <mkdir dir="dist"/>
+    <jar
+      destfile="dist/treehouse.jar"
+      basedir="staging" />
+
+  </target>
+
+  <!--========== test-make ==========-->
+  <target name="test-make" depends="make">
+
+    <delete dir="staging"/>
+    <mkdir dir="staging"/>
+    <javac
+      srcdir="test/src"
+      destdir="staging"
+      debug="on"
+      encoding="UTF-8"
+      includeantruntime="false">
+      <compilerarg value="-Xlint:deprecation"/>
+        <classpath>
+        <fileset dir="../treehouseLib"><include name="*.jar" /></fileset>
+        <fileset dir="dist"><include name="*.jar" /></fileset>
+        </classpath>
+    </javac>
+
+    <jar
+      destfile="dist/treehouse-test.jar"
+      basedir="staging" />
+
+  </target>
+
+  <!--========== test ==========-->
+
+  <!-- In order for BoneCP to run under ant,
+       I had to add the following entry to the 'grant' section of
+       JRE_HOME/jre/lib/security/java.policy:
+           permission javax.management.MBeanTrustPermission "register";
+  -->
+
+  <!--target name="test" depends="test-make">
+    <java classname="treehouse.test.TreehouseTest">
+      <classpath>
+        <fileset dir="../treehouseLib"><include name="*.jar" /></fileset>
+        <fileset dir="dist"><include name="*.jar" /></fileset>
+      </classpath>
+    </java>
+  </target--> 
+
+</project>

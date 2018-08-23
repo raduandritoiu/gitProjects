@@ -1,0 +1,35 @@
+<project default="make" basedir=".">
+
+  <property environment="env"/>
+
+  <!--========== make ==========-->
+  <target name="make">
+
+    <delete dir="staging"/>
+    <mkdir dir="staging"/>
+    <javac
+      srcdir="src"
+      destdir="staging"
+      debug="on"
+      encoding="UTF-8"
+      includeantruntime="false">
+      <compilerarg value="-Xlint:deprecation"/>
+        <classpath>
+          <fileset dir="../treehouseLib"><include name="*.jar" /></fileset>
+          <fileset dir="../treehouse/dist"><include name="*.jar" /></fileset>
+        </classpath>
+    </javac>
+
+    <copy todir="staging/treehouse/http/res">
+      <fileset dir="src/treehouse/http/res"/>
+    </copy>
+
+    <delete dir="dist"/>
+    <mkdir dir="dist"/>
+    <jar
+      destfile="dist/treehouseServer.jar"
+      basedir="staging" />
+
+  </target>
+
+</project>

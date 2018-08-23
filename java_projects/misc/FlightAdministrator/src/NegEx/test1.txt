@@ -1,0 +1,57 @@
+1	shortness of breath	"S_O_H  Counters Report Type Record Type Subgroup Classifier  1,01TdvtyYejbW DS DS 1504  E_O_H  [Report de-identified (Safe-harbor compliant) by De-ID v.6.14.02]         **INSTITUTION   CARDIOLOGY   DISCHARGE SUMMARY  PATIENT NAME:  **NAME[AAA, BBB M]  ACCOUNT #:  **ID-NUM   **ROOM   ATTENDING PHYSICIAN:  **NAME[YYY M ZZZ]  ADMISSION DATE:  **DATE[Sep 27 2007]  DISCHARGE DATE: **DATE[Oct 07 2007]  The patient is a **AGE[in 60s]-year-old gentleman who presented to **INSTITUTION   with complaints of SHORTNESS OF BREATH and was found to have staph   bacteremia."	Affirmed
+2	pulmonic regurgitation	There is trace PULMONIC REGURGITATION.	Affirmed
+3	air hunger	"Denies shortness of breath, stridor, or AIR HUNGER."	Negated
+4	nauseated	ED COURSE:    The patient was offered glucagon which she declined as she states this made   her severely NAUSEATED the last time she had it.	Affirmed
+5	There is no dog in my house but Radu is a stupid boy, although the apple is not red.
+6	multiple sclerosis	"She is a **AGE[in 70s]-year-old female who has a history of MULTIPLE SCLEROSIS   complicated by paralysis and urinary incontinence with chronic Foley, who was   brought in by ambulance today from **INSTITUTION in Mt."	Affirmed
+7	paralysis	"PAST MEDICAL HISTORY:     Her past medical history is significant for multiple sclerosis, pneumonia,   DVT of the lower extremity, hypothyroidism, hard of hearing, vitiligo, and   her PARALYSIS from her multiple sclerosis."	Affirmed
+8	clot at   the urethra	"GENITOURINARY:  Genitourinary exam performed by attending physician, Dr.   **NAME[ZZZ] had shown a Foley with 20 mL of fluid in the balloon, a CLOT AT   THE URETHRA consistent with Foley trauma."	Affirmed
+9	ALVEOLAR HEMOSIDEROSIS	C.     ALVEOLAR HEMOSIDEROSIS.	Affirmed
+10	pulmonary nodules	"PAST MEDICAL HISTORY:  Significant for Alzheimer disease, hypertension,   atrial fibrillation, history of DVTs, anticoagulation, coronary artery   disease, COPD, history of anemia, history of PULMONARY NODULES, and history   of cellulitis."	Affirmed
+11	pneumonia	She showed no clinical signs or symptoms of PNEUMONIA.	Negated
+12	trivial   pericardial effusion	There is a TRIVIAL   PERICARDIAL EFFUSION.	Affirmed
+13	headache	"He denies any   antecedent palpitations, shortness of breath, chest pain, HEADACHE, or   lightheadedness."	Negated
+14	arthralgias	Musculoskeletal - No ARTHRALGIAS or myalgias.	Negated
+15	acute   ischemic changes	EKG Interpretation - A 12-lead EKG shows normal sinus rhythm with no ACUTE   ISCHEMIC CHANGES.	Negated
+16	bone mineralization is normal	The BONE MINERALIZATION IS NORMAL.	Affirmed
+17	chronic SVC  occlusion	";    HISTORY:  The patient is a **AGE[in 60s]-year-old gentleman with a past medical history  significant for ESRD, HIV, chronic thoracic aortic aneurysm, CHRONIC SVC  OCCLUSION, and recent diagnosis of PE who was discharged on **DATE[Jul 2 2007]  after right groin AV fistula placement."	Affirmed
+18	aortic root   size is normal	The AORTIC ROOT   SIZE IS NORMAL.	Affirmed
+19	changes in vision	"In general, he denies any   CHANGES IN VISION or diplopia, no changes in hearing, no neck pain, no   meningismus, no chest pain, no palpitations, no shortness of breath, no   cough, no abdominal pain, no nausea, vomiting, or diarrhea, no hematuria or   dysuria, no myalgia or arthralgia, no paresthesias or paralysis, no rash."	Negated
+20	tobacco	"HIS SOCIAL HISTORY:  He denies any TOBACCO, alcohol, or drug abuse although   he occasionally drinks beer."	Negated
+21	meningitis	I was also concerned about the   possibility of him having MENINGITIS.	Affirmed
+22	pseudoaneurysm	"The patient   underwent bilateral upper extremity duplex scan on **DATE[Nov 16 2007], which   revealed no evidence of active PSEUDOANEURYSM, AVF, or hematoma in the right   neck and shoulder region."	Negated
+23	Segmental left ventricular function is abnormal	SEGMENTAL LEFT VENTRICULAR FUNCTION IS ABNORMAL.	Affirmed
+24	Thickened and calcified aortic valve with mild stenosis and mild  regurgitation	02) THICKENED AND CALCIFIED AORTIC VALVE WITH MILD STENOSIS AND MILD  REGURGITATION.	Affirmed
+25	arthritis	"MEDICAL HISTORY:   Atrial fibrillation, hypertension, ARTHRITIS, coronary artery disease, GERD,   cataracts, and cancer of the left eyelid."	Affirmed
+26	Alert	NEURO: ALERT and oriented.	Affirmed
+27	advanced facet   arthrosis	"Degenerative disc disease is present and there is ADVANCED FACET   ARTHROSIS, which appears to be most pronounced on the left at C7-T1   with evidence of erosions."	Affirmed
+28	Left ventricular size is normal	Wall Thickness:  1.4 cm (0.7-1.1 cm)      REFERRING DIAGNOSIS: Aortic Valve Disease; Hypertension 401.9  TWO DIMENSIONAL ECHOCARDIOLOGY:   LEFT VENTRICULAR SIZE IS NORMAL.	Affirmed
+29	trace pulmonic   regurgitation	There is TRACE PULMONIC   REGURGITATION.	Affirmed
+30	Borderline personality disorder	BORDERLINE PERSONALITY DISORDER.	Affirmed
+31	chronic pain syndrome	Altered mental status was likely secondary to high dose of   opioids at home for CHRONIC PAIN SYNDROME.	Affirmed
+32	lethargic	The patient was not LETHARGIC or agitated during the   hospitalization.	Negated
+33	Overall left ventricular function is normal	"OVERALL LEFT VENTRICULAR FUNCTION IS NORMAL, with an estimated ejection   fraction of 55-60 %."	Affirmed
+34	alcohol	"SOCIAL HISTORY:     Denies any ALCOHOL, tobacco or illicit drug use."	Negated
+35	On his right-hand the patient has open wounds on   the distal most aspect of his third and fourth digits and an open wound on   his thenar eminence	ON HIS RIGHT-HAND THE PATIENT HAS OPEN WOUNDS ON   THE DISTAL MOST ASPECT OF HIS THIRD AND FOURTH DIGITS AND AN OPEN WOUND ON   HIS THENAR EMINENCE.	Affirmed
+36	hypertension	"LABORATORY, RADIOGRAPHIC, AND OTHER DIAGNOSTIC STUDY FINDINGS:    HPI AND HOSPITAL COURSE:    Ms. **NAME[AAA] is a very pleasant **AGE[in 80s]-year-old female with a history of HYPERTENSION   who was transferred to **INSTITUTION from an outside hospital because of necrotizing   pancreatitis."	Affirmed
+37	DVT	"She did have lower extremity swelling, left greater than   right, and therefore, we did lower extremity Dopplers to evaluate for DVT."	Affirmed
+38	pulmonary artery size is normal	The PULMONARY ARTERY SIZE IS NORMAL.	Affirmed
+39	scrape up her knees	"She did SCRAPE UP HER KNEES, but she was   able to ambulate."	Affirmed
+40	new tingling	"If she has any NEW TINGLING, any   weakness, increasing pain, or change in color of her finger, she should   immediately return to the department, otherwise, I feel she is safe for   discharge at this time."	Affirmed
+41	LEFT FEMORAL NECK FRACTURE	PRIOR ORIF OF A LEFT FEMORAL NECK FRACTURE.	Affirmed
+42	Right ventricular wall thickness is normal	RIGHT VENTRICULAR WALL THICKNESS IS NORMAL.	Affirmed
+43	depression	"HISTORY OF PRESENT ILLNESS:    This is a **AGE[in 60s]-year-old male with a past history of diabetes, dementia,   hypertension, hypercholesterolemia, anemia, anxiety, and DEPRESSION who   presents with a chief complaint of having fallen."	Affirmed
+44	Bilateral  transplanted lungs appears clear	BILATERAL  TRANSPLANTED LUNGS APPEARS CLEAR.	Affirmed
+45	alert	"He was awake, ALERT, and oriented."	Affirmed
+46	Left ventricular size is normal	Wall Thickness:  1.3 cm (0.7-1.1 cm)      REFERRING DIAGNOSIS: Chronic Airway Obstruction 496; Systolic Heart Failure;  Obesity 278.0; Hypertension 401.9  TWO DIMENSIONAL ECHOCARDIOLOGY:   LEFT VENTRICULAR SIZE IS NORMAL.	Affirmed
+47	Nondilated right ventricle with hypertrophy and grossly normal function	02) NONDILATED RIGHT VENTRICLE WITH HYPERTROPHY AND GROSSLY NORMAL FUNCTION.	Affirmed
+48	colon polyps	The indication for this procedure is family  history of COLON POLYPS and screening.	Affirmed
+49	increased   temperature	Her postoperative course was remarkable for an INCREASED   TEMPERATURE and leukocytosis.	Affirmed
+50	Right ventricular wall thickness is increased	"RIGHT VENTRICULAR WALL THICKNESS IS INCREASED, consistent with right   ventricular hypertrophy."	Affirmed
+51	fever	"HISTORY OF PRESENT ILLNESS:  Ms. **NAME[AAA] is a **AGE[in 40s]-year-old, African-American   female with a two-day history of FEVER, body aches, and nausea, vomiting, and   diarrhea."	Affirmed
+52	rubs	"Heart - Regular rate and rhythm, no   murmurs, gallops, or RUBS."	Negated
+53	VIRAL SYNDROME	VIRAL SYNDROME.	Affirmed
+54	abdominal hysterectomy with bilateral   salpingooophorectomy 	Status post total ABDOMINAL HYSTERECTOMY WITH BILATERAL   SALPINGOOOPHORECTOMY in 1996.	Affirmed
+55	Left atrial   size is mildly enlarged	LEFT ATRIAL   SIZE IS MILDLY ENLARGED.	Affirmed
+56	headache	"S_O_H  Counters Report Type Record Type Subgroup Classifier  92,681OwhV0ZFnK ER ER 1001  E_O_H  [Report de-identified (Safe-harbor compliant) by De-ID v.6.14.02]         **INSTITUTION   EMERGENCY DEPARTMENT  PATIENT NAME:  **NAME[AAA, BBB]  ACCOUNT #:  **ID-NUM  DATE OF SERVICE:  **DATE[Aug 13 07]  PRIMARY CARE PHYSICIAN: **NAME[YYY M ZZZ]  ATTENDING PHYSICIAN ADDENDUM:    CHIEF COMPLAINT:  Weakness and HEADACHE."	Affirmed
+57	"mild lower quadrant   tenderness on palpation with no rebound, no guarding, and no masses"	"There is MILD LOWER QUADRANT   TENDERNESS ON PALPATION WITH NO REBOUND, NO GUARDING, AND NO MASSES palpated."	Affirmed

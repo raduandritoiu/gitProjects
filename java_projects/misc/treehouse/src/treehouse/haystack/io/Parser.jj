@@ -1,0 +1,441 @@
+options {
+    STATIC = false;
+    UNICODE_INPUT = true;
+}
+
+PARSER_BEGIN(Parser)
+
+package treehouse.haystack.io;
+
+import java.util.*;
+import java.io.*;
+import java.nio.charset.*;
+
+import org.projecthaystack.*;
+import org.projecthaystack.io.*;
+
+import treehouse.haystack.*;
+
+class Parser 
+{
+    private boolean isEscaped(String str)
+    {
+        int len = str.length();
+        for (int i = 0; i < len; i++)
+            if (str.charAt(i) == '\\')
+                return true;
+        return false;
+    }
+
+    private String unescape(String str)
+    {
+        StringBuffer sb = new StringBuffer();
+        int n = 0;
+        int len = str.length();
+        while (n < len)
+        {
+            char ch = str.charAt(n++);
+            if (ch == '\\')
+            {
+                ch = str.charAt(n++);
+
+                switch (ch)
+                {
+                    case 'b':   sb.append('\b'); break; 
+                    case 'f':   sb.append('\f'); break;
+                    case 'n':   sb.append('\n'); break;
+                    case 'r':   sb.append('\r'); break;
+                    case 't':   sb.append('\t'); break;
+                    case '\\':  sb.append('\\'); break;
+                    case '/':   sb.append('/');  break;
+                    case '"':   sb.append('"');  break;
+
+                    case 'u':
+                        int n3 = fromHex(str.charAt(n++)); 
+                        int n2 = fromHex(str.charAt(n++)); 
+                        int n1 = fromHex(str.charAt(n++)); 
+                        int n0 = fromHex(str.charAt(n++)); 
+                        char uc = (char) ((n3 << 12) | (n2 << 8) | (n1 << 4) | (n0));
+
+                        sb.append(uc);
+                        break;
+
+                    default:
+                        throw new IllegalStateException(
+                            "Invalid escape sequence: \\" + (char) ch);
+                }
+            }
+            else
+            {
+                sb.append(ch);
+            }
+        }
+        return sb.toString();
+    }
+
+    private int fromHex(int c)
+    {
+      if ('0' <= c && c <= '9') return c - '0';
+      if ('a' <= c && c <= 'f') return c - 'a' + 10;
+      if ('A' <= c && c <= 'F') return c - 'A' + 10;
+      throw new IllegalStateException(
+          "Invalid hex char: " + ((char) c));
+    }
+
+    private static final HNum NEG_ONE = HNum.make(-1);
+    private static final HNum ZERO    = HNum.make(0);
+    private static final HNum ONE     = HNum.make(1);
+    private static final HNum TWO     = HNum.make(2);
+    private static final HNum THREE   = HNum.make(3);
+    private static final HNum FOUR    = HNum.make(4);
+    private static final HNum FIVE    = HNum.make(5);
+
+    private static final int MARKER = 0x2713;
+}
+
+PARSER_END(Parser)
+
+SKIP: { " " | "\t" | "\n" | "\r" | "\f" }
+
+TOKEN: {
+    <TRUE:  "true">  
+|   <FALSE: "false"> 
+|   <NULL:  "null">
+}
+
+TOKEN: {
+    <LBRACE:   "{">
+|   <RBRACE:   "}">
+|   <LBRACKET: "[">
+|   <RBRACKET: "]">
+|   <COMMA:    ",">
+|   <COLON:    ":">
+}
+
+TOKEN: {
+    <#DIGIT: ["0"-"9"] >
+|   <#EXP: ["e", "E"] ("+"|"-")? >
+
+|   <INTEGER: ("-")? ( "0" | ["1"-"9"] (<DIGIT>)* ) >
+
+|   <FLOAT: 
+        ("-")? ( "0" | ["1"-"9"] (<DIGIT>)* ) 
+        ("." (<DIGIT>)+ )?
+        (<EXP> (<DIGIT>)+ )?
+    >
+}
+
+
+  /** Encode as "YYYY-MM-DD'T'hh:mm:ss.FFFz zzzz" */
+TOKEN: {
+    <#TZ: [ "A"-"Z", "a"-"z", "0"-"9", "_", "/", "+", "-" ] >
+|   <DATE_TIME: 
+      "\""
+      <DIGIT> <DIGIT> <DIGIT> <DIGIT> "-" <DIGIT> <DIGIT> "-" <DIGIT> <DIGIT>
+      "T"
+      <DIGIT> <DIGIT> ":" <DIGIT> <DIGIT> ":" <DIGIT> <DIGIT> ("." <DIGIT> <DIGIT> <DIGIT>)?
+      ("Z" | (["+","-"] <DIGIT> <DIGIT> ":" <DIGIT> <DIGIT>))
+      " "
+      (<TZ>)+
+      "\""
+    >
+|   <DATE: 
+      "\""
+      <DIGIT> <DIGIT> <DIGIT> <DIGIT> "-" <DIGIT> <DIGIT> "-" <DIGIT> <DIGIT>
+      "\""
+    >
+|   <TIME: 
+      "\""
+      <DIGIT> <DIGIT> ":" <DIGIT> <DIGIT> ":" <DIGIT> <DIGIT> ("." <DIGIT> <DIGIT> <DIGIT>)?
+      "\""
+    >
+}
+
+TOKEN: {
+    <#HEX: ["0"-"9","a"-"f", "A"-"F"] >
+|   <STRING:
+      "\""
+      ( (~["\"","\\","\n","\t","\b","\r","\f"])
+        | ("\\"
+              (( ["n","t","b","r","f","\\","/","\""] )
+            | ( "u" <HEX> <HEX> <HEX> <HEX> ))
+          )
+      )*
+      "\""
+  >
+}
+
+////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
+
+TOKEN: {
+    <ARROW: "->" >
+
+|   <LPAREN: "(" >
+|   <RPAREN: ")" >
+
+|   <EQ:  "=="  >
+|   <NE:  "!="  >
+|   <LT:  "<"   >
+|   <LE:  "<="  >
+|   <GT:  ">"   >
+|   <GE:  ">="  >
+
+|   <HAS: "has" >
+|   <NOT: "not" >
+|   <AND: "and" >
+|   <OR:  "or"  >
+}
+
+TOKEN :
+{
+  < TAG: [ "a"-"z" ] ([ "_", "A"-"Z", "a"-"z", "0"-"9" ])* >
+}
+
+////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
+
+Filter parseFilter():
+{ Filter f; }
+{
+    f=expr() <EOF> 
+    { return f; }
+}
+
+Filter expr():
+{ Filter f; }
+{
+    f=or() 
+    { return f; }
+}
+
+Filter or() :
+{ 
+    Filter a; 
+    Filter b; 
+}
+{
+    a=and() ( "or" b=and() { a = a.or(b); } )*
+    { return a; }
+}
+
+Filter and() :
+{ 
+    Filter a; 
+    Filter b; 
+}
+{
+    a=not() ( "and" b=not() { a = a.and(b); } )*
+    { return a; }
+}
+
+Filter not() :
+{
+    boolean not = false;
+    Filter f;
+}
+{
+    [ "not" { not = true; } ] f=eq()
+    { return not ? Filter.not(f) : f; }
+}
+
+Filter eq() :
+{
+    Path p;
+    HVal obj;
+    Filter f;
+}
+{
+    p=path() 
+    [("has" (obj=object() | obj=array()) { return Filter.has(p,obj); }) | 
+     ("==" obj=primitive() { return Filter.eq(p,obj); }) | 
+     ("!=" obj=primitive() { return Filter.not(Filter.eq(p,obj)); }) |
+     ("<"  obj=primitive() { return Filter.lt(p,obj); }) |
+     ("<=" obj=primitive() { return Filter.le(p,obj); }) |
+     (">"  obj=primitive() { return Filter.gt(p,obj); }) |
+     (">=" obj=primitive() { return Filter.ge(p,obj); }) ]
+
+    { return Filter.contains(p); }
+
+|  "(" f=expr() ")" { return f; }
+
+}
+
+Path path():
+{
+    List<String> tags = new ArrayList<String>();
+    Token t;
+}
+{
+    (LOOKAHEAD(2) t=<TAG> {tags.add(t.image);} "->" )*
+    t=<TAG> {tags.add(t.image);} 
+    { return new Path(tags.toArray(new String[tags.size()])); }
+}
+
+////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
+
+HVal parseJson():
+{
+    HVal obj;
+}
+{
+    obj = value() <EOF>
+    {
+        return obj;
+    }
+}
+
+HVal object():
+{
+    HDictBuilder hdb = new HDictBuilder();
+    HVal val;
+}
+{
+    "{" [ pair(hdb) ( "," pair(hdb) )* ] "}"
+    {
+        return hdb.toDict();
+    }
+}
+
+void pair(HDictBuilder hdb):
+{
+    Token t;
+    HVal val;
+}
+{
+    t=<STRING> ":" val=value() 
+    { 
+        int len = t.image.length();
+        String key = t.image.substring(1, len-1);
+        hdb.add(key, val); 
+    }
+}
+
+HVal array():
+{
+    HListBuilder hlb = new HListBuilder();
+    HVal elem;
+}
+{
+    "[" [ 
+        elem=value() { hlb.add(elem); } 
+        ( "," elem=value() { hlb.add(elem); } )* 
+    ] "]"
+    {
+        return hlb.toList();
+    }
+}
+
+HVal value():
+{
+    HVal obj;
+}
+{
+    (obj = object() | obj = array() | obj = primitive())
+    {
+        return obj;
+    }
+}
+
+HVal primitive():
+{
+    Token t;
+    HVal obj;
+}
+{
+    (  
+        "null"  { obj = null; } 
+    |   "true"  { obj = HBool.TRUE;  }
+    |   "false" { obj = HBool.FALSE; }
+
+    |   t=<DATE_TIME> 
+        {
+            int len = t.image.length();
+            String str = t.image.substring(1,len-1);
+            obj = HDateTime.make(str);
+        }
+    |   t=<DATE> 
+        {
+            int len = t.image.length();
+            String str = t.image.substring(1,len-1);
+            obj = HDate.make(str);
+        }
+    |   t=<TIME> 
+        {
+            int len = t.image.length();
+            String str = t.image.substring(1,len-1);
+            obj = HTime.make(str);
+        }
+
+    |   t=<STRING> 
+        {
+            int len = t.image.length();
+            String str = t.image.substring(1,len-1);
+            if (isEscaped(str)) str = unescape(str);
+
+            // marker
+            if ((str.length() == 1) && (str.charAt(0) == MARKER))
+            {
+                obj = HMarker.VAL;
+            }
+            // ref
+            else if (str.startsWith("@"))
+            {
+                int n = str.indexOf(" ");
+
+                // there is no 'dis'
+                if (n == -1)
+                    obj = HRef.make(str.substring(1));
+                // there is a 'dis'
+                else
+                    obj = HRef.make(str.substring(1,n), str.substring(n+1));
+            }
+            // uri
+            else if (str.startsWith("`") && str.endsWith("`"))
+            {
+                obj = HUri.make(str.substring(1,str.length()-1));
+            }
+            // str
+            else
+            {
+                obj = HStr.make(str);
+            }
+        }
+ 
+     |  t=<INTEGER>
+        {
+            if (t.image.length() < 10)
+            {
+                int n = Integer.parseInt(t.image);
+                switch (n)
+                {
+                    case -1: obj = NEG_ONE; break;
+                    case  0: obj = ZERO;    break;
+                    case  1: obj = ONE;     break;
+                    case  2: obj = TWO;     break;
+                    case  3: obj = THREE;   break;
+                    case  4: obj = FOUR;    break;
+                    case  5: obj = FIVE;    break;
+ 
+                    default: obj = HNum.make(n);
+                }
+            }
+            else
+            {
+                obj = HNum.make(Long.parseLong(t.image));
+            }
+        }
+
+    |   t=<FLOAT> 
+        { 
+            obj = HNum.make(Double.valueOf(t.image)); 
+        }
+    )
+    {
+        return obj;
+    }
+}

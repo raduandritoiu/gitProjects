@@ -1,0 +1,13 @@
+
+.scroll-table {  
+  height: 400px !important;
+  overflow: scroll;
+}
+
+.table-hover tbody tr:hover td {
+  background-color: #ddffdd;
+}
+
+.row-padded {
+  padding: 10px;
+}

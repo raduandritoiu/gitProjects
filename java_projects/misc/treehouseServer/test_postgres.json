@@ -1,0 +1,23 @@
+{
+    "db": { 
+        "type": "postgres",
+        "host": "localhost",
+        "port": 5432, 
+        "database": "treehouse",
+        "username": "treehouse_user",
+        "password": "treehouse_user",
+
+        "tables": [
+            { "name":"aaa" },
+            { "name":"bbb" }
+        ],
+
+        "archives": [
+            { "name":"ccc", "parent":"aaa" }
+        ]
+    },
+
+    "server": { 
+        "port": 90 
+    }
+}

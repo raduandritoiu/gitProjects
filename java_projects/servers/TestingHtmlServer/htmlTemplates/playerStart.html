@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Player Page</title>
+	</head>
+	<body>
+		<h1>Hello again {$__user}</h1>
+		Your session Id is <b>{$__sessionId}</b>, but you do not have a session info
+		
+		<form method="GET" action="player.html">
+			Set up info: <input type="text" name="session_info"/>
+			<input type="submit" value="Submit"/>
+		</form>
+		
+		<br/> <br/> <hr/>
+		<b>Options:</b>
+		<button type="button" onclick="window.location.href='welcome.html'"> Go back to start! </button>
+		<br/> <br/> 		
+		<button type="button" onclick="window.location.href='logout.html'"> Log out of session! </button>
+	</body>
+</html>

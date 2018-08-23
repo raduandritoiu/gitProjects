@@ -1,0 +1,15 @@
+{
+    "db": { 
+        "type": "sqlite",
+        "fileName": "test_sqlite.db",
+
+        "tables": [
+            { "name":"aaa" },
+            { "name":"bbb" }
+        ]
+    },
+
+    "server": { 
+        "port": 90 
+    }
+}

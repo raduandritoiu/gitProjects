@@ -1,0 +1,39 @@
+<!doctype html>
+<html ng-app>
+
+  <head>
+    <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="treehouse.css" rel="stylesheet">
+
+    <script src="jquery/jquery-1.11.1.min.js"></script>
+    <script src="underscore/underscore.js"></script>
+    <script src="treehouse.js"></script>
+  </head>
+
+  <body>
+    <div class="container">
+
+      <div class="page-header">
+        <h3>Treehouse</h3>
+      </div>
+
+      <div class="input-group">
+        <span class="input-group-addon">&gt;</span>
+        <input id="command" type="text" class="form-control" placeholder="Enter a command">
+      </div>
+
+      <div class="row row-padded">
+        <span id="rowCount" class="pull-right"></span>
+      </div>
+
+      <div class="table-responsive scroll-table">
+          <table id="rows" class="table table-striped table-bordered table-condensed table-hover">
+              <tr><th>empty</th></tr>
+              <tr><td>&nbsp;</td></tr>
+          </table>
+      </div>
+
+    <div>
+
+  </body>
+</html>
