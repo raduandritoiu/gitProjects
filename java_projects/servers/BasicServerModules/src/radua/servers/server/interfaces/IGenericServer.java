@@ -8,9 +8,9 @@ public interface IGenericServer
 	
 	
 	SocketAddress getLocalAddr();
-	boolean isRunning();
 	
 	boolean start();
 	boolean stop();
 	boolean stopWait();
+	boolean isRunning();
 }
