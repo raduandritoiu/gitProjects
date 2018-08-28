@@ -2,45 +2,83 @@ package radua.servers.server.udp;
 
 import java.net.DatagramPacket;
 
-public class GenericUdpHandler implements IUdpHandler 
+import radua.utils.errors.generic.ImmutableVariable;
+
+
+public abstract class GenericUdpHandler implements IUdpHandler 
 {
+	IUdpNotifier notifier;
+	boolean isRunning;
 	
-	public boolean isRunning()
+	
+	public final void setNotifier(IUdpNotifier nNotifier) throws ImmutableVariable
+	{ 
+		if (notifier != null) throw new ImmutableVariable(this, "notifier");
+		notifier = nNotifier; 
+	}
+	
+	
+	public final boolean isRunning() { return  isRunning; }
+	public final boolean start()
 	{
-		return false;
+		// bubble to notifier
+		notifier.startNotifier();
+		// do local
+		boolean ret = !isRunning;
+		if (ret) { privateStart(); }
+		isRunning = true;
+		return ret;
 	}
-
-	public boolean start()
+	public final boolean stop()
 	{
-		return false;
+		// bubble to notifier
+		notifier.stopNotifier();
+		// do local
+		boolean ret = isRunning;
+		isRunning = false; // reset running before stopping
+		if (ret) { privateStop(); }
+		return ret;
 	}
-
-	public boolean stop()
+	public final boolean stopWait()
 	{
-		return false;
+		// bubble to notifier
+		notifier.stopWaitNotifier();
+		// do local
+		boolean ret = isRunning;
+		isRunning = false; // reset running before stopping
+		if (ret) { privateStopWait(); }
+		return ret;
 	}
-
-	public boolean stopWait(){
-		return false;
-	}
-
-	public boolean startHandler(){
-		return false;
-	}
-
-	public boolean stopHandler(){
-		return false;
-	}
-
-	public boolean stopWaitHandler(){
-		return false;
-	}
-
-	public void setNotifier(IUdpNotifier notifier)
+	
+	
+	public final boolean startHandler()
 	{
+		boolean ret = !isRunning;
+		if (ret) { privateStart(); }
+		isRunning = true;
+		return ret;
+	}
+	public final boolean stopHandler()
+	{
+		// do local
+		boolean ret = isRunning;
+		isRunning = false; // reset running before stopping
+		if (ret) { privateStop(); }
+		return ret;
+	}
+	public final boolean stopWaitHandler()
+	{
+		// do local
+		boolean ret = isRunning;
+		isRunning = false; // reset running before stopping
+		if (ret) { privateStopWait(); }
+		return ret;
 	}
 
-	public void handlePacket(DatagramPacket packet)
-	{
-	}
+	
+	protected abstract void privateStart();
+	protected abstract void privateStop();
+	protected abstract void privateStopWait();
+	
+	public abstract void handlePacket(DatagramPacket packet);
 }

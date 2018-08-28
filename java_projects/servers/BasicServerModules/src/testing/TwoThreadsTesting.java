@@ -9,8 +9,10 @@ public class TwoThreadsTesting
 {
 	public static void run() throws Exception
 	{
-		SocketAddress addr1 = new InetSocketAddress("192.168.100.3", 3333);
-		SocketAddress addr2 = new InetSocketAddress("192.168.100.3", 4444);
+//		String ipAddr = "192.168.100.3";
+		String ipAddr = "10.114.197.141";
+		SocketAddress addr1 = new InetSocketAddress(ipAddr, 3333);
+		SocketAddress addr2 = new InetSocketAddress(ipAddr, 4444);
 		
 		TestUdpConnect cl1 = new TestUdpConnect(addr1);
 		cl1.connect(addr2);

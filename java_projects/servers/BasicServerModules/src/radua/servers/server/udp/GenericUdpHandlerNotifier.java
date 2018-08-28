@@ -6,84 +6,132 @@ import java.net.SocketAddress;
 
 import radua.utils.errors.generic.ImmutableVariable;
 
-public class GenericUdpHandlerNotifier implements IUdpHandler, IUdpNotifier
+public abstract class GenericUdpHandlerNotifier implements IUdpHandler, IUdpNotifier
 {
-	private IUdpNotifier notifier;
-	private IUdpHandler handler;
-	private boolean isRunning;
+	IUdpNotifier notifier;
+	IUdpHandler handler;
+	boolean isRunning;
 	
-	public void setNotifier(IUdpNotifier nNotifier) throws ImmutableVariable { 
+	
+	public final void setNotifier(IUdpNotifier nNotifier) throws ImmutableVariable
+	{ 
 		if (notifier != null) throw new ImmutableVariable(this, "notifier");
 		notifier = nNotifier; 
-		}
-	public void setHandler(IUdpHandler nHandler) { handler = nHandler; }
-	
-	
-	public boolean isRunning() { return  isRunning; }
-	public boolean start()
-	{
-		if (isRunning) return false;
-		return true;
 	}
-	public boolean stop()
-	public boolean stopWait()
+	public final void setHandler(IUdpHandler nHandler) throws ImmutableVariable
+	{ 
+		if (handler != null) throw new ImmutableVariable(this, "handler");
+		handler = nHandler; 
+	}
 	
 	
-	public boolean startNotifier()
+	public final boolean isRunning() { return  isRunning; }
+	public final boolean start()
 	{
-		boolean ret;
+		// bubble to notifier
 		notifier.startNotifier();
-		privateStart();
+		// do local
+		boolean ret = !isRunning;
+		if (ret) { privateStart(); }
+		isRunning = true;
+		// bubble to handler
+		handler.startHandler();
 		return ret;
 	}
-	public boolean stopNotifier()
+	public final boolean stop()
 	{
-		boolean ret;
+		// bubble to notifier
 		notifier.stopNotifier();
-		privateStop();
+		// do local
+		boolean ret = isRunning;
+		isRunning = false; // reset running before stopping
+		if (ret) { privateStop(); }
+		// bubble to handler
+		handler.stopHandler();
 		return ret;
 	}
-	public boolean stopWaitNotifier()
+	public final boolean stopWait()
 	{
-		boolean ret;
+		// bubble to notifier
 		notifier.stopWaitNotifier();
-		privateStopWait();
+		// do local
+		boolean ret = isRunning;
+		isRunning = false; // reset running before stopping
+		if (ret) { privateStopWait(); }
+		// bubble to handler
+		handler.stopWaitHandler();
+		return ret;
+	}
+	
+	
+	public final boolean startNotifier()
+	{
+		// bubble to notifier
+		notifier.startNotifier();
+		// do local
+		boolean ret = !isRunning;
+		if (ret) { privateStart(); }
+		isRunning = true;
+		return ret;
+	}
+	public final boolean stopNotifier()
+	{
+		// bubble to notifier
+		notifier.stopNotifier();
+		boolean ret = isRunning;
+		isRunning = false; // reset running before stopping
+		if (ret) { privateStop(); }
+		return ret;
+	}
+	public final boolean stopWaitNotifier()
+	{
+		// bubble to notifier
+		notifier.stopWaitNotifier();
+		// do local
+		boolean ret = isRunning;
+		isRunning = false; // reset running before stopping
+		if (ret) { privateStopWait(); }
 		return ret;
 	}
 
 	
-	public boolean startHandler()
+	public final boolean startHandler()
 	{
+		// do local
 		boolean ret = !isRunning;
-		if (!isRunning) { privateStart(); }
+		if (ret) { privateStart(); }
 		isRunning = true;
+		// bubble to handler
 		handler.startHandler();
 		return ret;
 	}
 	
-	public boolean stopHandler()
+	public final boolean stopHandler()
 	{
+		// do local
 		boolean ret = isRunning;
-		if (isRunning) { privateStop(); }
-		isRunning = false;
+		isRunning = false; // reset running before stopping
+		if (ret) { privateStop(); }
+		// bubble to handler
 		handler.stopHandler();
 		return ret;
 	}
-	public boolean stopWaitHandler()
+	public final boolean stopWaitHandler()
 	{
+		// do local
 		boolean ret = isRunning;
-		if (isRunning) { privateStopWait(); }
-		isRunning = false;
+		isRunning = false; // reset running before stopping
+		if (ret) { privateStopWait(); }
+		// bubble to handler
 		handler.stopWaitHandler();
 		return ret;
 	}
 
 	
-	private void privateStart() { }
-	private void privateStop() { }
-	private void privateStopWait() { }
+	protected abstract void privateStart();
+	protected abstract void privateStop();
+	protected abstract void privateStopWait();
 	
-	
-	public  void handlePacket(DatagramPacket packet);
-	public  void sendPacket(byte[] data, SocketAddress remoteAddr) throws IOException;
+	public abstract void handlePacket(DatagramPacket packet);
+	public abstract void sendPacket(byte[] data, SocketAddress remoteAddr) throws IOException;
 }
