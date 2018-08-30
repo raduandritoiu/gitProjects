@@ -7,6 +7,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import radua.servers.client.interfaces.IUdpClient;
+import testing.providers.two.Aaaa;
+import testing.providers.two.Bbbb;
 
 public class TestUdpStandard implements IUdpClient
 {

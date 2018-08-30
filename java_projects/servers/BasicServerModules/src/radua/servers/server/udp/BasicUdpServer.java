@@ -5,19 +5,21 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketAddress;
 
-import radua.servers.server.interfaces.IGenericServer;
+import radua.servers.server.generics.IPacketHandler;
+import radua.servers.server.generics.IPacketProvider;
+import radua.servers.server.generics.IServer;
 
 
-public class GenericUdpServer implements IGenericServer, IUdpNotifier
+public class BasicUdpServer implements IServer, IPacketProvider
 {
 	private final DatagramSocket listenSock;
 	private final SocketAddress localAddr;
 	private final ListenThread listenThread;
-	private IUdpHandler handler;
+	private IPacketHandler handler;
 	private boolean isRunning;
 	
 	
-	public GenericUdpServer(IUdpHandler nHandler, SocketAddress nLocalAddr)
+	public BasicUdpServer(IPacketHandler nHandler, SocketAddress nLocalAddr)
 	{
 		DatagramSocket tmpSock = null;
 		SocketAddress tmpAddr = nLocalAddr;
@@ -37,14 +39,14 @@ public class GenericUdpServer implements IGenericServer, IUdpNotifier
 	
 	public SocketAddress getLocalAddr() { return localAddr; }
 	public boolean isRunning() { return isRunning; }
-	public void setHandler(IUdpHandler nHandler) { handler = nHandler; }
+	public void setHandler(IPacketHandler nHandler) { handler = nHandler; }
 	
 	
 	public boolean start()
 	{
 		if (isRunning) return false;
 		handler.startHandler();
-		startNotifier();
+		startProvider();
 		return true;
 	}
 	
@@ -52,7 +54,7 @@ public class GenericUdpServer implements IGenericServer, IUdpNotifier
 	{
 		if (!isRunning) return false;
 		handler.stopHandler();
-		stopNotifier();
+		stopProvider();
 		return true;
 	}
 	
@@ -60,11 +62,11 @@ public class GenericUdpServer implements IGenericServer, IUdpNotifier
 	{
 		if (!isRunning) return false;
 		handler.stopWaitHandler();
-		stopWaitNotifier();
+		stopWaitProvider();
 		return true;
 	}
 	
-	public boolean startNotifier()
+	public boolean startProvider()
 	{
 		if (isRunning) return false;
 		isRunning = true;
@@ -72,7 +74,7 @@ public class GenericUdpServer implements IGenericServer, IUdpNotifier
 		return true;
 	}
 	
-	public boolean stopNotifier()
+	public boolean stopProvider()
 	{
 		if (!isRunning) return false;
 		listenSock.close();
@@ -80,10 +82,10 @@ public class GenericUdpServer implements IGenericServer, IUdpNotifier
 		return true;
 	}
 	
-	public boolean stopWaitNotifier()
+	public boolean stopWaitProvider()
 	{
 		if (!isRunning) return false;
-		stopNotifier();
+		stopProvider();
 		try { listenThread.join(); }
 		catch (Exception ex) {
 			//
@@ -92,7 +94,7 @@ public class GenericUdpServer implements IGenericServer, IUdpNotifier
 	}
 	
 	
-	/*should be package_protected*/ 
+	/*should be protected*/ 
 	public final void sendPacket(byte[] data, SocketAddress remoteAddr) throws IOException
 	{
 		DatagramPacket packet = new DatagramPacket(data, data.length, remoteAddr);
@@ -100,7 +102,7 @@ public class GenericUdpServer implements IGenericServer, IUdpNotifier
 	}
 
 	
-	/*package_protected*/ void internalHandlePacket(DatagramPacket packet)
+	protected void receivedPacket(DatagramPacket packet)
 	{
 		handler.handlePacket(packet);
 	}
@@ -131,7 +133,7 @@ public class GenericUdpServer implements IGenericServer, IUdpNotifier
 				}
 	
 				// handle the received packet
-				internalHandlePacket(packet);
+				receivedPacket(packet);
 			 }
 		}
 	}
