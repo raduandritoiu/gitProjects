@@ -8,8 +8,7 @@ import testing.providers.two.TestProvidersDoi;
 public class Main {
 	public static void main(String[] args) throws Exception
 	{
-		System.out.println("asdadassdsa");
-//		TwoThreadsTesting.run_2();
+//		TwoThreadsTesting.run_1();
 		ServerTesting.run();
 		
 //		TestProvidersUnu.run();

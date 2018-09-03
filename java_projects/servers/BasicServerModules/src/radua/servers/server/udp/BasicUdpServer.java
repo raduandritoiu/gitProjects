@@ -10,6 +10,7 @@ import radua.servers.server.generics.IPacketHandler;
 import radua.servers.server.generics.IPacketProvider;
 import radua.servers.server.generics.IServer;
 import radua.utils.errors.generic.ImmutableVariable;
+import radua.utils.logs.Log;
 
 
 public class BasicUdpServer extends ARunPacketProvider implements IServer, IPacketProvider
@@ -46,7 +47,7 @@ public class BasicUdpServer extends ARunPacketProvider implements IServer, IPack
 	
 	protected void internalStart()
 	{
-		System.out.println("Basic UDP Server started on address " + localAddr);
+		Log._out("Basic UDP Server started on address " + localAddr);
 		listenThread.start();
 	}
 	protected void internalStop()

@@ -10,30 +10,10 @@ import radua.servers.client.interfaces.IUdpClient;
 import radua.servers.server.generics.IServer;
 import radua.servers.server.udp.BasicUdpServer;
 import radua.servers.server.udp.EchoPacketHandler;
+import radua.utils.logs.Log;
 
 public class TwoThreadsTesting 
 {
-	public static void run_2() throws Exception
-	{
-		String ipAddr = "192.168.100.3";
-//		String ipAddr = "10.114.197.141";
-		SocketAddress addr1 = new InetSocketAddress(ipAddr, 3333);
-		SocketAddress srvAddr = new InetSocketAddress(ipAddr, 4444);
-		
-		
-		IServer srv = new BasicUdpServer(new EchoPacketHandler(), srvAddr);
-		srv.start();
-		
-		
-		ClientThread one = new ClientThread("\tClient_1", addr1, srvAddr);
-		one.start();
-		one.join();
-		
-		srv.stopWait();
-	}
-
-	
-	
 	public static void run_1() throws Exception
 	{
 		String ipAddr = "192.168.100.3";
@@ -66,29 +46,29 @@ public class TwoThreadsTesting
 		
 		public void run()
 		{
-			System.out.println(getName() + " Start");
+			Log._out(getName() + " Start");
 			
 		    
 		    String msg = "Buna eu sunt One. tu cine esti?";
-			System.out.println(getName() + " sends: " + msg);
+			Log._out(getName() + " sends: " + msg);
 			write(msg);
 			msg = read();
-			System.out.println(getName() + " received: " + msg);
+			Log._out(getName() + " received: " + msg);
 			
 			msg = "Ce mai faci?";
-			System.out.println(getName() + " sends: " + msg);
+			Log._out(getName() + " sends: " + msg);
 			write(msg);
 			msg = read();
-			System.out.println(getName() + " received: " + msg);
+			Log._out(getName() + " received: " + msg);
 			
 			msg = "Cati ani ai?";
-			System.out.println(getName() + " sends: " + msg);
+			Log._out(getName() + " sends: " + msg);
 			write(msg);
 			msg = read();
-			System.out.println(getName() + " received: " + msg);
+			Log._out(getName() + " received: " + msg);
 			
 			
-			System.out.println(getName() + " Stop");
+			Log._out(getName() + " Stop");
 		}
 		
 		
@@ -102,7 +82,7 @@ public class TwoThreadsTesting
 		    	return str;
 		    }
 		    catch (Exception ex) {
-		    	System.out.println("Error reading SOCKET: " + ex);
+		    	Log._out("Error reading SOCKET: " + ex);
 		    }
 		    return null;
 		}
@@ -112,7 +92,7 @@ public class TwoThreadsTesting
 			DatagramPacket packet = new DatagramPacket(msg.getBytes(), msg.getBytes().length);
 			try { sock.send(packet); }
 			catch (Exception ex) {
-				System.out.println("Error reading SOCKET: " + ex);
+				Log._out("Error reading SOCKET: " + ex);
 		    }
 		}
 	}
@@ -131,28 +111,28 @@ public class TwoThreadsTesting
 		
 		public void run()
 		{
-			System.out.println(getName() + " Start");
+			Log._out(getName() + " Start");
 			
 			String msg = "Buna eu sunt One. tu cine esti?";
-			System.out.println(getName() + " sends: " + msg);
+			Log._out(getName() + " sends: " + msg);
 			cl.write(msg);
 			msg = cl.read();
-			System.out.println(getName() + " received: " + msg);
+			Log._out(getName() + " received: " + msg);
 			
 			msg = "Ce mai faci?";
-			System.out.println(getName() + " sends: " + msg);
+			Log._out(getName() + " sends: " + msg);
 			cl.write(msg);
 			msg = cl.read();
-			System.out.println(getName() + " received: " + msg);
+			Log._out(getName() + " received: " + msg);
 			
 			msg = "Cati ani ai?";
-			System.out.println(getName() + " sends: " + msg);
+			Log._out(getName() + " sends: " + msg);
 			cl.write(msg);
 			msg = cl.read();
-			System.out.println(getName() + " received: " + msg);
+			Log._out(getName() + " received: " + msg);
 			
 			
-			System.out.println(getName() + " Stop");
+			Log._out(getName() + " Stop");
 		}
 	}
 	
@@ -170,28 +150,28 @@ public class TwoThreadsTesting
 		
 		public void run()
 		{
-			System.out.println("Thread Two Start");
+			Log._out("Thread Two Start");
 			
 			String msg = cl.read();
-			System.out.println("Thread Two received: " + msg);
+			Log._out("Thread Two received: " + msg);
 			msg = "Buna eu sunt Two.";
-			System.out.println("Thread Two sends: " + msg);
+			Log._out("Thread Two sends: " + msg);
 			cl.write(msg, destAddr);
 			
 			msg = cl.read();
-			System.out.println("Thread Two received: " + msg);
+			Log._out("Thread Two received: " + msg);
 			msg = "Fac bine, multumesc.";
-			System.out.println("Thread Two sends: " + msg);
+			Log._out("Thread Two sends: " + msg);
 			cl.write(msg, destAddr);
 			
 			msg = cl.read();
-			System.out.println("Thread Two received: " + msg);
+			Log._out("Thread Two received: " + msg);
 			msg = "12.";
-			System.out.println("Thread Two sends: " + msg);
+			Log._out("Thread Two sends: " + msg);
 			cl.write(msg, destAddr);
 			
 			
-			System.out.println("Thread Two Stop");
+			Log._out("Thread Two Stop");
 		}
 	}
 

@@ -8,7 +8,11 @@ import java.net.SocketException;
 
 import radua.servers.server.generics.IServer;
 import radua.servers.server.udp.BasicUdpServer;
+import radua.servers.server.udp.EchoPacketHandler;
+import radua.servers.server.udp.LogPacketProviderHandler;
 import radua.servers.server.udp.SMPacketHandler;
+import radua.utils.logs.Log;
+import radua.utils.logs.SilentLog;
 
 public class ServerTesting 
 {
@@ -22,13 +26,14 @@ public class ServerTesting
 		SocketAddress addr3 = new InetSocketAddress(ipAddr, 6000);
 		
 		
-//		IServer srv = new BasicUdpServer(new EchoPacketHandler(), srvAddr);
-		IServer srv = new BasicUdpServer(new SMPacketHandler(), srvAddr);
+//		IServer srv = new BasicUdpServer(new LogPacketProviderHandler(new Log("\t\t"), new EchoPacketHandler()), srvAddr);
+//		IServer srv = new BasicUdpServer(new LogPacketProviderHandler(new Log("\t\t\t\t\t"), new SMPacketHandler()), srvAddr);
+		IServer srv = new BasicUdpServer(new LogPacketProviderHandler(new SilentLog	(), new SMPacketHandler()), srvAddr);
 		srv.start();
 		
 		
-		ClientThread cl1 = new ClientThread("\tClient_1", addr1, srvAddr);
-		ClientThread cl2 = new ClientThread("\tClient_2", addr2, srvAddr);
+		ClientThread cl1 = new ClientThread(new Log("\t"), "Client_1", addr1, srvAddr);
+		ClientThread cl2 = new ClientThread(new Log("\t\t"), "Client_2", addr2, srvAddr);
 		cl1.start();
 		cl2.start();
 		cl1.join();
@@ -41,41 +46,40 @@ public class ServerTesting
 	public static class ClientThread extends Thread
 	{
 		private DatagramSocket sock;
-
-		public ClientThread(String NName, SocketAddress nLocalAddr, SocketAddress nDestAddr) throws SocketException
+		private Log log;
+		
+		public ClientThread(Log nlog, String nName, SocketAddress nLocalAddr, SocketAddress nDestAddr) throws SocketException
 		{
+			log = nlog;
 			sock = new DatagramSocket(nLocalAddr);
 			sock.connect(nDestAddr);
-			setName(NName);
+			setName(nName);
 		}
 		
 		public void run()
 		{
-			System.out.println(getName() + " Start");
-			
+			log.out(getName() + " Start");
 		    
 		    String msg = "Buna eu sunt " + getName() + ". tu cine esti?";
-			System.out.println("\n" + getName() + " sends: " + msg);
-			write(msg);
-			msg = read();
-			System.out.println(getName() + " received: " + msg);
+			runStep(msg);
 			
 			msg = "Ce mai faci?";
-			System.out.println("\n" + getName() + " sends: " + msg);
-			write(msg);
-			msg = read();
-			System.out.println(getName() + " received: " + msg);
+			runStep(msg);
 			
 			msg = "Cati ani ai?";
-			System.out.println("\n" + getName() + " sends: " + msg);
-			write(msg);
-			msg = read();
-			System.out.println(getName() + " received: " + msg);
+			runStep(msg);
 			
-			
-			System.out.println(getName() + " Stop");
+			log.out(getName() + " Stop");
 		}
 		
+		
+		private void runStep(String msg)
+		{
+			log.out(getName() + " sends: " + msg);
+			write(msg);
+			msg = read();
+			log.out(getName() + " received: " + msg);
+		}
 		
 		private String read()
 		{
@@ -86,7 +90,7 @@ public class ServerTesting
 		    	String str = new String(packet.getData(), 0, packet.getLength());
 		    	return str;
 		    }
-		    catch (Exception ex) { System.out.println("Error reading SOCKET: " + ex); }
+		    catch (Exception ex) { log.err("Error reading SOCKET", ex); }
 		    return null;
 		}
 		
@@ -94,7 +98,7 @@ public class ServerTesting
 		{
 			DatagramPacket packet = new DatagramPacket(msg.getBytes(), msg.getBytes().length);
 			try { sock.send(packet); }
-			catch (Exception ex) { System.out.println("Error reading SOCKET: " + ex); }
+			catch (Exception ex) { log.err("Error reading SOCKET", ex); }
 		}
 	}
 }
