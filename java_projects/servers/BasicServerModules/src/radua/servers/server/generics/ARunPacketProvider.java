@@ -6,7 +6,7 @@ public abstract class ARunPacketProvider extends APacketProvider implements IRun
 	public final boolean start()
 	{
 		// bubble to handler
-		handler.startHandler();
+		((ARunnableBase) handler).startHandler();
 		// do local
 		boolean ret = !isRunning;
 		if (ret) { internalStart(); }
@@ -20,7 +20,7 @@ public abstract class ARunPacketProvider extends APacketProvider implements IRun
 		isRunning = false; // reset running before stopping
 		if (ret) { internalStop(); }
 		// bubble to handler
-		handler.stopHandler();
+		((ARunnableBase) handler).stopHandler();
 		return ret;
 	}
 	public final boolean stopWait()
@@ -30,7 +30,7 @@ public abstract class ARunPacketProvider extends APacketProvider implements IRun
 		isRunning = false; // reset running before stopping
 		if (ret) { internalStopWait(); }
 		// bubble to handler
-		handler.stopWaitHandler();
+		((ARunnableBase) handler).stopWaitHandler();
 		return ret;
 	}
 }

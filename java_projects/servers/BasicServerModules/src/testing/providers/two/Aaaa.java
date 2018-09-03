@@ -3,9 +3,9 @@ package testing.providers.two;
 import java.io.IOException;
 import java.net.SocketAddress;
 
-import radua.servers.server.general.A_RunPacketProvider;
+import radua.servers.server.generics.ARunPacketProvider;
 
-public class Aaaa extends A_RunPacketProvider
+public class Aaaa extends ARunPacketProvider
 {
 	protected void internalStart() { System.out.println("Aaaa - start!"); }
 	protected void internalStop() { System.out.println("Aaaa - stop!"); }
@@ -17,7 +17,7 @@ public class Aaaa extends A_RunPacketProvider
 		getHandler().handlePacket(null);
 	}
 
-	public void sendPacket(byte[] data, SocketAddress remoteAddr) throws IOException
+	public void transmitPacket(byte[] data, SocketAddress remoteAddr) throws IOException
 	{
 		System.out.println("Aaaa - Send Packet!");
 	}

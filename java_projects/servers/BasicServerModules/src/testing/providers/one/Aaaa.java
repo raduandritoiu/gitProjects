@@ -3,7 +3,7 @@ package testing.providers.one;
 import java.io.IOException;
 import java.net.SocketAddress;
 
-import radua.servers.server.generics.ARunPacketProvider;
+import radua.servers.server.generics.old.ARunPacketProvider;
 
 public class Aaaa extends ARunPacketProvider
 {
@@ -17,7 +17,7 @@ public class Aaaa extends ARunPacketProvider
 		handler.handlePacket(null);
 	}
 
-	public void sendPacket(byte[] data, SocketAddress remoteAddr) throws IOException
+	public void transmitPacket(byte[] data, SocketAddress remoteAddr) throws IOException
 	{
 		System.out.println("Aaaa - Send Packet!");
 	}

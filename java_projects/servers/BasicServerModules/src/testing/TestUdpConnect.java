@@ -46,6 +46,22 @@ public class TestUdpConnect implements IUdpClient
     }
   }
   
+  public TestUdpConnect(SocketAddress nLocalAddr, SocketAddress nRemoteAddr)
+  {
+	    try
+	    {
+	      sock = new DatagramSocket(nLocalAddr);
+	      localAddr = sock.getLocalSocketAddress();
+	      sock.connect(nRemoteAddr);
+	      remoteAddr = sock.getRemoteSocketAddress();
+	    }
+	    catch (Exception ex)
+	    {
+	      if (log.isLoggable(Level.SEVERE))
+	        log.severe("Error creating SOCKET: " + ex);
+	    }
+	  }
+  
   
   public SocketAddress getLocalAddr()
   {
@@ -108,7 +124,5 @@ public class TestUdpConnect implements IUdpClient
     }
   }
   
-  public void write(String msg, SocketAddress destAddr) 
-  {
-  }
+  public void write(String msg, SocketAddress destAddr) { }
 }

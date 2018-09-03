@@ -1,38 +1,38 @@
-package radua.servers.server.general;
+package radua.servers.server.generics.old;
 
 import radua.servers.server.generics.IRunnable;
 
-public abstract class A_RunPacketHandler extends A_PacketHandler implements IRunnable
+public abstract class ARunPacketProvider extends APacketProvider_old implements IRunnable
 {
 	public final boolean isRunning() { return  isRunning; }
 	public final boolean start()
 	{
+		// bubble to handler
+		handler.startHandler();
 		// do local
 		boolean ret = !isRunning;
 		if (ret) { internalStart(); }
 		isRunning = true;
-		// bubble to provider
-		((A_General) provider).startProvider();
 		return ret;
 	}
 	public final boolean stop()
 	{
-		// bubble to provider
-		((A_General) provider).stopProvider();
 		// do local
 		boolean ret = isRunning;
 		isRunning = false; // reset running before stopping
 		if (ret) { internalStop(); }
+		// bubble to handler
+		handler.stopHandler();
 		return ret;
 	}
 	public final boolean stopWait()
 	{
-		// bubble to provider
-		((A_General) provider).stopWaitProvider();
 		// do local
 		boolean ret = isRunning;
 		isRunning = false; // reset running before stopping
 		if (ret) { internalStopWait(); }
+		// bubble to handler
+		handler.stopWaitHandler();
 		return ret;
 	}
 }

@@ -4,13 +4,13 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.SocketAddress;
 
-import radua.servers.server.generics.ARunPacketProviderHandler;
-import radua.servers.server.generics.IPacketHandler;
+import radua.servers.server.generics.old.ARunPacketProviderHandler_old;
+import radua.servers.server.generics.old.IPacketHandler_old;
 import radua.utils.errors.generic.ImmutableVariable;
 
-public class Trei extends ARunPacketProviderHandler
+public class Trei extends ARunPacketProviderHandler_old
 {
-	public Trei(IPacketHandler nHandler) throws ImmutableVariable
+	public Trei(IPacketHandler_old nHandler) throws ImmutableVariable
 	{
 		setHandler(nHandler);
 		nHandler.setProvider(this);
@@ -25,9 +25,9 @@ public class Trei extends ARunPacketProviderHandler
 		System.out.println("Trei - Handle Packet!");
 		handler.handlePacket(packet);
 	}
-	public void sendPacket(byte[] data, SocketAddress remoteAddr) throws IOException
+	public void transmitPacket(byte[] data, SocketAddress remoteAddr) throws IOException
 	{
 		System.out.println("Trei - Send packet!");
-		provider.sendPacket(data, remoteAddr);
+		provider.transmitPacket(data, remoteAddr);
 	}
 }

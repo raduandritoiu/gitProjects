@@ -3,13 +3,13 @@ package testing.providers.two;
 import java.io.IOException;
 import java.net.DatagramPacket;
 
-import radua.servers.server.general.A_RunPacketHandler;
-import radua.servers.server.general.I_PacketProvider;
+import radua.servers.server.generics.ARunPacketHandler;
+import radua.servers.server.generics.IPacketProvider;
 import radua.utils.errors.generic.ImmutableVariable;
 
-public class Eeee extends A_RunPacketHandler
+public class Eeee extends ARunPacketHandler
 {
-	public Eeee(I_PacketProvider nProvider) throws ImmutableVariable
+	public Eeee(IPacketProvider nProvider) throws ImmutableVariable
 	{
 		setProvider(nProvider);
 		nProvider.setHandler(this);
@@ -23,13 +23,13 @@ public class Eeee extends A_RunPacketHandler
 	{
 		System.out.println("Eeee - Handle Packet!");
 		System.out.println("Eeee - prepare a Reply!");
-		try { getProvider().sendPacket(null, null); }
+		try { getProvider().transmitPacket(null, null); }
 		catch (IOException ex) {}
 	}
 	
 	public void tick() throws IOException
 	{
 		System.out.println("Eeee - Send packet DOWN!");
-		getProvider().sendPacket(null, null);
+		getProvider().transmitPacket(null, null);
 	}
 }

@@ -1,25 +1,23 @@
-package radua.servers.server.udp;
+package radua.servers.server.generics.old;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketAddress;
 
-import radua.servers.server.generics.ARunPacketProvider;
-import radua.servers.server.generics.IPacketHandler;
-import radua.servers.server.generics.IPacketProvider;
 import radua.servers.server.generics.IServer;
-import radua.utils.errors.generic.ImmutableVariable;
 
 
-public class BasicUdpServer extends ARunPacketProvider implements IServer, IPacketProvider
+public class BasicUdpServer_old implements IServer, IPacketProvider_old
 {
 	private final DatagramSocket listenSock;
 	private final SocketAddress localAddr;
 	private final ListenThread listenThread;
+	private IPacketHandler_old handler;
+	private boolean isRunning;
 	
 	
-	public BasicUdpServer(IPacketHandler nHandler, SocketAddress nLocalAddr)
+	public BasicUdpServer_old(IPacketHandler_old nHandler, SocketAddress nLocalAddr)
 	{
 		DatagramSocket tmpSock = null;
 		SocketAddress tmpAddr = nLocalAddr;
@@ -30,47 +28,83 @@ public class BasicUdpServer extends ARunPacketProvider implements IServer, IPack
 		catch (Exception ex) {
 			//
 		}
+		handler = nHandler;
 		listenSock = tmpSock;
 		localAddr = tmpAddr;
 		listenThread = new ListenThread();
-		try { 
-			setHandler(nHandler);
-			nHandler.setProvider(this);
-		}
-		catch (ImmutableVariable ex) { /* */ }
 	}
 	
 	
 	public SocketAddress getLocalAddr() { return localAddr; }
+	public boolean isRunning() { return isRunning; }
+	public void setHandler(IPacketHandler_old nHandler) { handler = nHandler; }
 	
 	
-	protected void internalStart()
+	public boolean start()
 	{
-		System.out.println("Basic UDP Server started on address " + localAddr);
+		if (isRunning) return false;
+		handler.startHandler();
+		startProvider();
+		return true;
+	}
+	
+	public boolean stop()
+	{
+		if (!isRunning) return false;
+		handler.stopHandler();
+		stopProvider();
+		return true;
+	}
+	
+	public boolean stopWait()
+	{
+		if (!isRunning) return false;
+		handler.stopWaitHandler();
+		stopWaitProvider();
+		return true;
+	}
+	
+	public boolean startProvider()
+	{
+		if (isRunning) return false;
+		isRunning = true;
 		listenThread.start();
+		return true;
 	}
-	protected void internalStop()
+	
+	public boolean stopProvider()
 	{
+		if (!isRunning) return false;
 		listenSock.close();
+		isRunning = false;
+		return true;
 	}
-	protected void internalStopWait()
+	
+	public boolean stopWaitProvider()
 	{
-		internalStop();
+		if (!isRunning) return false;
+		stopProvider();
 		try { listenThread.join(); }
-		catch (Exception ex) { /* */ }
+		catch (Exception ex) {
+			//
+		}
+		return true;
 	}
 	
 	
+	/*should be protected*/ 
 	public final void transmitPacket(byte[] data, SocketAddress remoteAddr) throws IOException
 	{
 		DatagramPacket packet = new DatagramPacket(data, data.length, remoteAddr);
 		listenSock.send(packet);
 	}
 
-	private void receivedPacket(DatagramPacket packet)
+	
+	protected void receivedPacket(DatagramPacket packet)
 	{
-		getHandler().handlePacket(packet);
+		handler.handlePacket(packet);
 	}
+	
 	
 	
 //==========================================================================
@@ -83,7 +117,7 @@ public class BasicUdpServer extends ARunPacketProvider implements IServer, IPack
 		public void run()
 		{
 			setName("ListenThread");
-			while (isRunning)
+			while(isRunning)
 			{
 				// read
 				byte[] buf = new byte[MAX_PDU];

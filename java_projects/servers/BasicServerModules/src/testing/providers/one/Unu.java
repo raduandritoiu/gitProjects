@@ -3,13 +3,13 @@ package testing.providers.one;
 import java.io.IOException;
 import java.net.SocketAddress;
 
-import radua.servers.server.generics.ARunPacketProvider;
-import radua.servers.server.generics.IPacketHandler;
+import radua.servers.server.generics.old.ARunPacketProvider;
+import radua.servers.server.generics.old.IPacketHandler_old;
 import radua.utils.errors.generic.ImmutableVariable;
 
 public class Unu extends ARunPacketProvider
 {
-	public Unu(IPacketHandler nHandler) throws ImmutableVariable
+	public Unu(IPacketHandler_old nHandler) throws ImmutableVariable
 	{
 		setHandler(nHandler);
 		nHandler.setProvider(this);
@@ -25,7 +25,7 @@ public class Unu extends ARunPacketProvider
 		handler.handlePacket(null);
 	}
 
-	public void sendPacket(byte[] data, SocketAddress remoteAddr) throws IOException
+	public void transmitPacket(byte[] data, SocketAddress remoteAddr) throws IOException
 	{
 		System.out.println("Unu - Send Packet!");
 	}

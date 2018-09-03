@@ -17,6 +17,8 @@ public class TestProvidersBbb
 		test_5();
 		
 		test_final();
+		
+		aaa.internalStop();
 	}
 
 	private static void init() throws Exception

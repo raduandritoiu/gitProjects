@@ -3,9 +3,9 @@ package testing.providers.two;
 import java.io.IOException;
 import java.net.DatagramPacket;
 
-import radua.servers.server.general.A_RunPacketHandler;
+import radua.servers.server.generics.ARunPacketHandler;
 
-public class Cinci extends A_RunPacketHandler
+public class Cinci extends ARunPacketHandler
 {
 	protected void internalStart() { System.out.println("Cinci - start!"); }
 	protected void internalStop() { System.out.println("Cinci - stop!"); }
@@ -15,13 +15,13 @@ public class Cinci extends A_RunPacketHandler
 	{
 		System.out.println("Cinci - Handle Packet!");
 		System.out.println("Cinci - prepare a Reply!");
-		try { getProvider().sendPacket(null, null); }
+		try { getProvider().transmitPacket(null, null); }
 		catch (IOException ex) {}
 	}
 	
 	public void tick() throws IOException
 	{
 		System.out.println("Cinci - Send packet DOWN!");
-		getProvider().sendPacket(null, null);
+		getProvider().transmitPacket(null, null);
 	}
 }

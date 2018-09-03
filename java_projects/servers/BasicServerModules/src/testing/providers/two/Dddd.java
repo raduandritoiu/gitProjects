@@ -4,13 +4,13 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.SocketAddress;
 
-import radua.servers.server.general.A_RunPacketProviderHandler;
-import radua.servers.server.general.I_PacketProvider;
+import radua.servers.server.generics.ARunPacketProviderHandler;
+import radua.servers.server.generics.IPacketProvider;
 import radua.utils.errors.generic.ImmutableVariable;
 
-public class Dddd extends A_RunPacketProviderHandler
+public class Dddd extends ARunPacketProviderHandler
 {
-	public Dddd(I_PacketProvider nProvider) throws ImmutableVariable
+	public Dddd(IPacketProvider nProvider) throws ImmutableVariable
 	{
 		setProvider(nProvider);
 		nProvider.setHandler(this);
@@ -25,9 +25,9 @@ public class Dddd extends A_RunPacketProviderHandler
 		System.out.println("Dddd - Handle Packet!");
 		getHandler().handlePacket(packet);
 	}
-	public void sendPacket(byte[] data, SocketAddress remoteAddr) throws IOException
+	public void transmitPacket(byte[] data, SocketAddress remoteAddr) throws IOException
 	{
 		System.out.println("Dddd - Send packet!");
-		getProvider().sendPacket(data, remoteAddr);
+		getProvider().transmitPacket(data, remoteAddr);
 	}
 }

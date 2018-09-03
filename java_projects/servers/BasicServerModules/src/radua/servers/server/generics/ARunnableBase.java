@@ -1,11 +1,11 @@
-package radua.servers.server.general;
+package radua.servers.server.generics;
 
-abstract class A_General 
+abstract class ARunnableBase 
 {
 	protected boolean isRunning;
-	protected abstract void internalStart();
-	protected abstract void internalStop();
-	protected abstract void internalStopWait();
+	protected void internalStart() {}
+	protected void internalStop() {}
+	protected void internalStopWait() {}
 	
 	
 	/*package_p*/ boolean startProvider() { return false; }

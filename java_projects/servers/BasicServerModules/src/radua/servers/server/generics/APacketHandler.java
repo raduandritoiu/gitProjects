@@ -1,51 +1,42 @@
 package radua.servers.server.generics;
 
-import java.net.DatagramPacket;
-
 import radua.utils.errors.generic.ImmutableVariable;
 
 
-public abstract class APacketHandler implements IPacketHandler 
+public abstract class APacketHandler extends ARunnableBase implements IPacketHandler
 {
-	protected IPacketProvider provider;
-	protected boolean isRunning;
-	
+	/*package_p*/ IPacketProvider provider;
 	
 	public final void setProvider(IPacketProvider nProvider) throws ImmutableVariable
 	{ 
 		if (provider != null) throw new ImmutableVariable(this, "provider");
 		provider = nProvider; 
 	}
+	protected final IPacketProvider getProvider() { return provider; }
 	
 	
-	public final boolean startHandler()
+//===================================================================================================
+//===================================================================================================
+	
+	/*package_p*/ final boolean startHandler()
 	{
 		boolean ret = !isRunning;
 		if (ret) { internalStart(); }
 		isRunning = true;
 		return ret;
 	}
-	public final boolean stopHandler()
+	/*package_p*/ final boolean stopHandler()
 	{
-		// do local
 		boolean ret = isRunning;
 		isRunning = false; // reset running before stopping
 		if (ret) { internalStop(); }
 		return ret;
 	}
-	public final boolean stopWaitHandler()
+	/*package_p*/ final boolean stopWaitHandler()
 	{
-		// do local
 		boolean ret = isRunning;
 		isRunning = false; // reset running before stopping
 		if (ret) { internalStopWait(); }
 		return ret;
 	}
-
-	
-	protected abstract void internalStart();
-	protected abstract void internalStop();
-	protected abstract void internalStopWait();
-	
-	public abstract void handlePacket(DatagramPacket packet);
 }

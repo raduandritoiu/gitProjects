@@ -1,100 +1,90 @@
 package radua.servers.server.generics;
 
-import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.SocketAddress;
-
 import radua.utils.errors.generic.ImmutableVariable;
 
-
-public abstract class APacketProviderHandler implements IPacketHandler, IPacketProvider
+public abstract class APacketProviderHandler extends ARunnableBase implements IPacketProvider, IPacketHandler
 {
-	protected IPacketProvider provider;
-	protected IPacketHandler handler;
-	protected boolean isRunning;
-	
+	/*package_p*/ IPacketProvider provider;
+	/*package_p*/ IPacketHandler handler;
 	
 	public final void setProvider(IPacketProvider nProvider) throws ImmutableVariable
 	{ 
 		if (provider != null) throw new ImmutableVariable(this, "provider");
 		provider = nProvider; 
 	}
+	protected final IPacketProvider getProvider() { return provider; }
+
+	
 	public final void setHandler(IPacketHandler nHandler) throws ImmutableVariable
 	{ 
 		if (handler != null) throw new ImmutableVariable(this, "handler");
 		handler = nHandler; 
 	}
+	protected final IPacketHandler getHandler() { return (IPacketHandler) handler; }
 	
 	
-	public final boolean startProvider()
+//===================================================================================================
+//===================================================================================================
+
+	/*package_p*/ final boolean startProvider()
 	{
 		// do local
 		boolean ret = !isRunning;
 		if (ret) { internalStart(); }
 		isRunning = true;
 		// bubble to provider
-		provider.startProvider();
+		((ARunnableBase) provider).startProvider();
 		return ret;
 	}
-	public final boolean stopProvider()
+	/*package_p*/ final boolean stopProvider()
 	{
 		// bubble to provider
-		provider.stopProvider();
+		((ARunnableBase) provider).stopProvider();
 		// do local
 		boolean ret = isRunning;
 		isRunning = false; // reset running before stopping
 		if (ret) { internalStop(); }
 		return ret;
 	}
-	public final boolean stopWaitProvider()
+	/*package_p*/ final boolean stopWaitProvider()
 	{
 		// bubble to provider
-		provider.stopWaitProvider();
+		((ARunnableBase) provider).stopWaitProvider();
 		// do local
 		boolean ret = isRunning;
 		isRunning = false; // reset running before stopping
 		if (ret) { internalStopWait(); }
 		return ret;
 	}
-
 	
-	public final boolean startHandler()
+	/*package_p*/ final boolean startHandler()
 	{
 		// bubble to handler
-		handler.startHandler();
+		((ARunnableBase) handler).startHandler();
 		// do local
 		boolean ret = !isRunning;
 		if (ret) { internalStart(); }
 		isRunning = true;
 		return ret;
 	}
-	
-	public final boolean stopHandler()
+	/*package_p*/ final boolean stopHandler()
 	{
 		// do local
 		boolean ret = isRunning;
 		isRunning = false; // reset running before stopping
 		if (ret) { internalStop(); }
 		// bubble to handler
-		handler.stopHandler();
+		((ARunnableBase) handler).stopHandler();
 		return ret;
 	}
-	public final boolean stopWaitHandler()
+	/*package_p*/ final boolean stopWaitHandler()
 	{
 		// do local
 		boolean ret = isRunning;
 		isRunning = false; // reset running before stopping
 		if (ret) { internalStopWait(); }
 		// bubble to handler
-		handler.stopWaitHandler();
+		((ARunnableBase) handler).stopWaitHandler();
 		return ret;
 	}
-
-	
-	protected abstract void internalStart();
-	protected abstract void internalStop();
-	protected abstract void internalStopWait();
-	
-	public abstract void handlePacket(DatagramPacket packet);
-	public abstract void sendPacket(byte[] data, SocketAddress remoteAddr) throws IOException;
 }
