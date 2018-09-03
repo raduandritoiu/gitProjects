@@ -9,7 +9,9 @@ import java.net.SocketException;
 import radua.servers.server.generics.IServer;
 import radua.servers.server.udp.BasicUdpServer;
 import radua.servers.server.udp.EchoPacketHandler;
+import radua.servers.server.udp.HostSessionPacketProviderHandler;
 import radua.servers.server.udp.LogPacketProviderHandler;
+import radua.servers.server.udp.ParallelPacketProviderHandler;
 import radua.servers.server.udp.SMPacketHandler;
 import radua.utils.logs.Log;
 import radua.utils.logs.SilentLog;
@@ -25,15 +27,23 @@ public class ServerTesting
 		SocketAddress addr2 = new InetSocketAddress(ipAddr, 5000);
 		SocketAddress addr3 = new InetSocketAddress(ipAddr, 6000);
 		
+//		Log log = new Log();
+		Log log = new SilentLog();
 		
-//		IServer srv = new BasicUdpServer(new LogPacketProviderHandler(new Log("\t\t"), new EchoPacketHandler()), srvAddr);
-//		IServer srv = new BasicUdpServer(new LogPacketProviderHandler(new Log("\t\t\t\t\t"), new SMPacketHandler()), srvAddr);
-		IServer srv = new BasicUdpServer(new LogPacketProviderHandler(new SilentLog	(), new SMPacketHandler()), srvAddr);
+//		IServer srv = new BasicUdpServer(new LogPacketProviderHandler(log, new EchoPacketHandler()), srvAddr);
+//		IServer srv = new BasicUdpServer(new LogPacketProviderHandler(log, new SMPacketHandler()), srvAddr);
+//		IServer srv = new BasicUdpServer(new ParallelPacketProviderHandler(2, 
+//				new LogPacketProviderHandler(log, new SMPacketHandler())), srvAddr);
+
+		IServer srv = new BasicUdpServer(new ParallelPacketProviderHandler(2, new HostSessionPacketProviderHandler(
+				new LogPacketProviderHandler(log, new SMPacketHandler()))), srvAddr);
+
+		
 		srv.start();
 		
 		
-		ClientThread cl1 = new ClientThread(new Log("\t"), "Client_1", addr1, srvAddr);
-		ClientThread cl2 = new ClientThread(new Log("\t\t"), "Client_2", addr2, srvAddr);
+		ClientThread cl1 = new ClientThread(new Log(""), "Client_1", addr1, srvAddr);
+		ClientThread cl2 = new ClientThread(new Log("\t\t\t\t\t"), "Client_2", addr2, srvAddr);
 		cl1.start();
 		cl2.start();
 		cl1.join();
