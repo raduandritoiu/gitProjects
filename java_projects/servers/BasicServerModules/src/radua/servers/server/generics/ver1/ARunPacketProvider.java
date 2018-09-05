@@ -1,4 +1,6 @@
-package radua.servers.server.generics;
+package radua.servers.server.generics.ver1;
+
+import radua.servers.server.generics.IRunnable;
 
 public abstract class ARunPacketProvider extends APacketProvider implements IRunnable
 {
@@ -6,8 +8,7 @@ public abstract class ARunPacketProvider extends APacketProvider implements IRun
 	public final boolean start()
 	{
 		// bubble to handler
-		if (handler != null && handler instanceof A_LinkingBase)
-			((A_LinkingBase) handler).startHandler();
+		handler.startHandler();
 		// do local
 		boolean ret = !isRunning;
 		if (ret) { internalStart(); }
@@ -21,8 +22,7 @@ public abstract class ARunPacketProvider extends APacketProvider implements IRun
 		isRunning = false; // reset running before stopping
 		if (ret) { internalStop(); }
 		// bubble to handler
-		if (handler != null && handler instanceof A_LinkingBase)
-			((A_LinkingBase) handler).stopHandler();
+		handler.stopHandler();
 		return ret;
 	}
 	public final boolean stopWait()
@@ -32,8 +32,7 @@ public abstract class ARunPacketProvider extends APacketProvider implements IRun
 		isRunning = false; // reset running before stopping
 		if (ret) { internalStopWait(); }
 		// bubble to handler
-		if (handler != null && handler instanceof A_LinkingBase)
-			((A_LinkingBase) handler).stopWaitHandler();
+		handler.stopWaitHandler();
 		return ret;
 	}
 }

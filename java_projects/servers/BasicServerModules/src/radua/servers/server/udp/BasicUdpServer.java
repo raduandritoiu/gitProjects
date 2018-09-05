@@ -28,9 +28,7 @@ public class BasicUdpServer extends ARunPacketProvider implements IServer, IPack
 			tmpSock = new DatagramSocket(nLocalAddr);
 			tmpAddr = tmpSock.getLocalSocketAddress();
 		}
-		catch (Exception ex) {
-			//
-		}
+		catch (Exception ex) { /* */ }
 		listenSock = tmpSock;
 		localAddr = tmpAddr;
 		listenThread = new ListenThread();
@@ -62,6 +60,7 @@ public class BasicUdpServer extends ARunPacketProvider implements IServer, IPack
 	}
 	
 	
+	/*should be protected*/ 
 	public final void transmitPacket(byte[] data, SocketAddress remoteAddr) throws IOException
 	{
 		DatagramPacket packet = new DatagramPacket(data, data.length, remoteAddr);
@@ -84,7 +83,7 @@ public class BasicUdpServer extends ARunPacketProvider implements IServer, IPack
 		public void run()
 		{
 			setName("ListenThread");
-			while (isRunning)
+			while (isRunning())
 			{
 				// read
 				byte[] buf = new byte[MAX_PDU];

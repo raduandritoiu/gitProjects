@@ -3,14 +3,26 @@ package radua.servers.server.generics;
 import radua.utils.errors.generic.ImmutableVariable;
 
 
-public abstract class APacketHandler extends ARunnableBase implements IPacketHandler
+public abstract class APacketHandler extends A_LinkingBase implements IPacketHandler
 {
 	/*package_p*/ IPacketProvider provider;
+	/*package_p*/ boolean isRunning;
+
 	
+	public final IPacketProviderHandler linkProvider(IPacketProvider provider) throws ImmutableVariable
+	{
+		provider.setHandler(this);
+		setProvider(provider);
+		if (provider instanceof IPacketProviderHandler)
+			return (IPacketProviderHandler) provider;
+		return null;
+	}
 	public final void setProvider(IPacketProvider nProvider) throws ImmutableVariable
 	{ 
 		if (provider != null) throw new ImmutableVariable(this, "provider");
-		provider = nProvider; 
+		provider = nProvider;
+		if (isRunning && provider != null && provider instanceof A_LinkingBase)
+			((A_LinkingBase) provider).startProvider();
 	}
 	protected final IPacketProvider getProvider() { return provider; }
 	

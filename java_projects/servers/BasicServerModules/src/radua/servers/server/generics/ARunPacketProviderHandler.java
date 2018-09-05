@@ -1,42 +1,48 @@
 package radua.servers.server.generics;
 
-public abstract class ARunPacketProviderHandler extends APacketProviderHandler
+public abstract class ARunPacketProviderHandler extends APacketProviderHandler implements IRunnable
 {
 	public final boolean isRunning() { return  isRunning; }
 	public final boolean start()
 	{
 		// bubble to handler
-		((ARunnableBase) handler).startHandler();
+		if (handler != null && handler instanceof A_LinkingBase)
+			((A_LinkingBase) handler).startHandler();
 		// do local
 		boolean ret = !isRunning;
 		if (ret) { internalStart(); }
 		isRunning = true;
 		// bubble to provider
-		((ARunnableBase) provider).startProvider();
+		if (provider != null && provider instanceof A_LinkingBase)
+			((A_LinkingBase) provider).startProvider();
 		return ret;
 	}
 	public final boolean stop()
 	{
 		// bubble to provider
-		((ARunnableBase) provider).stopProvider();
+		if (provider != null && provider instanceof A_LinkingBase)
+			((A_LinkingBase) provider).stopProvider();
 		// do local
 		boolean ret = isRunning;
 		isRunning = false; // reset running before stopping
 		if (ret) { internalStop(); }
 		// bubble to handler
-		((ARunnableBase) handler).stopHandler();
+		if (handler != null && handler instanceof A_LinkingBase)
+			((A_LinkingBase) handler).stopHandler();
 		return ret;
 	}
 	public final boolean stopWait()
 	{
 		// bubble to provider
-		((ARunnableBase) provider).stopWaitProvider();
+		if (provider != null && provider instanceof A_LinkingBase)
+			((A_LinkingBase) provider).stopWaitProvider();
 		// do local
 		boolean ret = isRunning;
 		isRunning = false; // reset running before stopping
 		if (ret) { internalStopWait(); }
 		// bubble to handler
-		((ARunnableBase) handler).stopWaitHandler();
+		if (handler != null && handler instanceof A_LinkingBase)
+			((A_LinkingBase) handler).stopWaitHandler();
 		return ret;
 	}
 }

@@ -10,13 +10,15 @@ public abstract class ARunPacketHandler extends APacketHandler implements IRunna
 		if (ret) { internalStart(); }
 		isRunning = true;
 		// bubble to provider
-		((ARunnableBase) provider).startProvider();
+		if (provider != null && provider instanceof A_LinkingBase)
+			((A_LinkingBase) provider).startProvider();
 		return ret;
 	}
 	public final boolean stop()
 	{
 		// bubble to provider
-		((ARunnableBase) provider).stopProvider();
+		if (provider != null && provider instanceof A_LinkingBase)
+			((A_LinkingBase) provider).stopProvider();
 		// do local
 		boolean ret = isRunning;
 		isRunning = false; // reset running before stopping
@@ -26,7 +28,8 @@ public abstract class ARunPacketHandler extends APacketHandler implements IRunna
 	public final boolean stopWait()
 	{
 		// bubble to provider
-		((ARunnableBase) provider).stopWaitProvider();
+		if (provider != null && provider instanceof A_LinkingBase)
+			((A_LinkingBase) provider).stopWaitProvider();
 		// do local
 		boolean ret = isRunning;
 		isRunning = false; // reset running before stopping
