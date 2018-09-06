@@ -20,25 +20,34 @@ public class ServerTesting
 {
 	public static void run() throws Exception
 	{
-		String ipAddr = "192.168.100.3";
+//		String ipAddr = "192.168.100.3";
 //		String ipAddr = "10.114.197.141";
+		String ipAddr = "10.22.216.137";
 		SocketAddress srvAddr = new InetSocketAddress(ipAddr, 3333);
 		SocketAddress addr1 = new InetSocketAddress(ipAddr, 4000);
 		SocketAddress addr2 = new InetSocketAddress(ipAddr, 5000);
 		SocketAddress addr3 = new InetSocketAddress(ipAddr, 6000);
 		
+		
+		BasicUdpServer tmpSrv = new BasicUdpServer(srvAddr);
+		
+		
 //		Log log = new Log();
 		Log log = new SilentLog();
 		
-//		IServer srv = new BasicUdpServer(new LogPacketProviderHandler(log, new EchoPacketHandler()), srvAddr);
-//		IServer srv = new BasicUdpServer(new LogPacketProviderHandler(log, new SMPacketHandler()), srvAddr);
-//		IServer srv = new BasicUdpServer(new ParallelPacketProviderHandler(2, 
-//				new LogPacketProviderHandler(log, new SMPacketHandler())), srvAddr);
-
-		IServer srv = new BasicUdpServer(new ParallelPacketProviderHandler(2, new HostSessionPacketProviderHandler(
-				new LogPacketProviderHandler(log, new SMPacketHandler()))), srvAddr);
+//		tmpSrv.linkHandler(new LogPacketProviderHandler(log)).linkHandler(new EchoPacketHandler());
+//		tmpSrv.linkHandler(new LogPacketProviderHandler(log)).linkHandler(new SMPacketHandler());
+//		tmpSrv.linkHandler(new ParallelPacketProviderHandler(2)).linkHandler(new LogPacketProviderHandler(log)).
+//				linkHandler(new SMPacketHandler());
 
 		
+//		IServer srv = new BasicUdpServer(new ParallelPacketProviderHandler(2, new HostSessionPacketProviderHandler(
+//		new LogPacketProviderHandler(log, new SMPacketHandler()))), srvAddr);
+		tmpSrv.linkHandler(new ParallelPacketProviderHandler(2)).linkHandler(new HostSessionPacketProviderHandler()).
+				linkHandler(new LogPacketProviderHandler(log)).linkHandler(new SMPacketHandler());
+
+		
+		IServer srv = tmpSrv;
 		srv.start();
 		
 		

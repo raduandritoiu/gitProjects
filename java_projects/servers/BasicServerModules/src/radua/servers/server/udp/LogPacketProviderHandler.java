@@ -5,24 +5,20 @@ import java.net.DatagramPacket;
 import java.net.SocketAddress;
 
 import radua.servers.server.generics.APacketProviderHandler;
-import radua.servers.server.generics.IPacketHandler;
-import radua.utils.errors.generic.ImmutableVariable;
 import radua.utils.logs.Log;
 
 public class LogPacketProviderHandler extends APacketProviderHandler
 {
 	private Log log;
 	
-	public LogPacketProviderHandler(IPacketHandler nHandler) throws ImmutableVariable
+	public LogPacketProviderHandler()
 	{
-		this(new Log(), nHandler);
+		this(new Log());
 	}
 	
-	public LogPacketProviderHandler(Log nLog, IPacketHandler nHandler) throws ImmutableVariable
+	public LogPacketProviderHandler(Log nLog)
 	{
 		log = nLog;
-		setHandler(nHandler);
-		nHandler.setProvider(this);
 	}
 	
 	public void transmitPacket(byte[] data, SocketAddress remoteAddr) throws IOException 

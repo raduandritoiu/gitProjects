@@ -6,10 +6,8 @@ import java.net.DatagramSocket;
 import java.net.SocketAddress;
 
 import radua.servers.server.generics.ARunPacketProvider;
-import radua.servers.server.generics.IPacketHandler;
 import radua.servers.server.generics.IPacketProvider;
 import radua.servers.server.generics.IServer;
-import radua.utils.errors.generic.ImmutableVariable;
 import radua.utils.logs.Log;
 
 
@@ -20,7 +18,7 @@ public class BasicUdpServer extends ARunPacketProvider implements IServer, IPack
 	private final ListenThread listenThread;
 	
 	
-	public BasicUdpServer(IPacketHandler nHandler, SocketAddress nLocalAddr)
+	public BasicUdpServer(SocketAddress nLocalAddr)
 	{
 		DatagramSocket tmpSock = null;
 		SocketAddress tmpAddr = nLocalAddr;
@@ -32,11 +30,6 @@ public class BasicUdpServer extends ARunPacketProvider implements IServer, IPack
 		listenSock = tmpSock;
 		localAddr = tmpAddr;
 		listenThread = new ListenThread();
-		try { 
-			setHandler(nHandler);
-			nHandler.setProvider(this);
-		}
-		catch (ImmutableVariable ex) { /* */ }
 	}
 	
 	

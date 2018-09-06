@@ -8,8 +8,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import radua.servers.server.generics.APacketProviderHandler;
-import radua.servers.server.generics.IPacketHandler;
-import radua.utils.errors.generic.ImmutableVariable;
 import radua.utils.logs.Log;
 
 
@@ -19,11 +17,9 @@ public class ParallelPacketProviderHandler extends APacketProviderHandler
 	private ExecutorService pool;
 	
 	
-	public ParallelPacketProviderHandler(int nNumThreads, IPacketHandler nHandler) throws ImmutableVariable
+	public ParallelPacketProviderHandler(int nNumThreads)
 	{
 		numThreads = nNumThreads;
-		setHandler(nHandler);
-		nHandler.setProvider(this);
 	}
 	
 	

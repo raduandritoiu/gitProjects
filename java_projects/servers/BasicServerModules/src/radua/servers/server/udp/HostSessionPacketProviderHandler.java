@@ -6,8 +6,6 @@ import java.net.SocketAddress;
 import java.util.concurrent.ConcurrentHashMap;
 
 import radua.servers.server.generics.APacketProviderHandler;
-import radua.servers.server.generics.IPacketHandler;
-import radua.utils.errors.generic.ImmutableVariable;
 import radua.utils.logs.Log;
 
 public class HostSessionPacketProviderHandler extends APacketProviderHandler
@@ -15,11 +13,9 @@ public class HostSessionPacketProviderHandler extends APacketProviderHandler
 	private final ConcurrentHashMap<SocketAddress, HostSession> sessionsMap;
 	
 	
-	public HostSessionPacketProviderHandler(IPacketHandler nHandler) throws ImmutableVariable
+	public HostSessionPacketProviderHandler()
 	{
 		sessionsMap = new ConcurrentHashMap<>();
-		setHandler(nHandler);
-		nHandler.setProvider(this);
 	}
 	
 	
@@ -55,7 +51,7 @@ public class HostSessionPacketProviderHandler extends APacketProviderHandler
 		
 		public void f()
 		{
-			Log._out("HostSession f()");
+			Log._out("HostSession f() " + hostAddress);
 		}
 	}
 }
