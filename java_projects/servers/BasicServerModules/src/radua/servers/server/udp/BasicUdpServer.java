@@ -53,7 +53,7 @@ public class BasicUdpServer extends ARunPacketProvider implements IServer, IPack
 	}
 	
 	
-	/*should be protected*/ 
+	/*should be protected*/
 	public final void transmitPacket(byte[] data, SocketAddress remoteAddr) throws IOException
 	{
 		DatagramPacket packet = new DatagramPacket(data, data.length, remoteAddr);
