@@ -30,7 +30,7 @@ public class HostSessionPacketProviderHandler extends APacketProviderHandler
 		HostSession newSession = new HostSession(hostAddress);
 		HostSession session = sessionsMap.put(hostAddress, newSession);
 		if (session == null) {
-			Log._out("HostSession: new session from host >" + hostAddress + ">");
+			Log._out("HostSession: new session from host <" + hostAddress + ">");
 			session = newSession;
 		}
 		
