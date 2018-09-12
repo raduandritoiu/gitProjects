@@ -1,9 +1,9 @@
 package testing.providers.simple;
 
 import java.io.IOException;
-import java.net.DatagramPacket;
 
-import radua.servers.server.generics.ARunPacketHandler;
+import radua.servers.packetProcs.IPacket;
+import radua.servers.packetProcs.basics.ARunPacketHandler;
 
 public class Sapte extends ARunPacketHandler
 {
@@ -12,17 +12,17 @@ public class Sapte extends ARunPacketHandler
 	protected void internalStopWait() { System.out.println("Sapte - stop wait!"); }
 	
 	
-	public void handlePacket(DatagramPacket packet) 
+	public void handlePacket(IPacket packet) 
 	{
 		System.out.println("Sapte - Handle Packet!");
 		System.out.println("Sapte - prepare a Reply!");
-		try { getProvider().transmitPacket(null, null); }
+		try { getProvider().transmitPacket(null); }
 		catch (IOException ex) {}
 	}
 	public void tick() throws IOException
 	{
 		System.out.println("Sapte - Send packet DOWN!");
 		if (getProvider() != null)
-			getProvider().transmitPacket(null, null);
+			getProvider().transmitPacket(null);
 	}
 }

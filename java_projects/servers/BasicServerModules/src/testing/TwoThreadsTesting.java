@@ -7,9 +7,8 @@ import java.net.SocketAddress;
 import java.net.SocketException;
 
 import radua.servers.client.interfaces.IUdpClient;
-import radua.servers.server.generics.IServer;
+import radua.servers.server.IServer;
 import radua.servers.server.udp.BasicUdpServer;
-import radua.servers.server.udp.EchoPacketHandler;
 import radua.utils.logs.Log;
 
 public class TwoThreadsTesting 

@@ -1,11 +1,13 @@
 package radua.servers.server.udp;
 
 import java.io.IOException;
-import java.net.DatagramPacket;
 import java.net.SocketAddress;
-import java.util.concurrent.ConcurrentHashMap;
 
-import radua.servers.server.generics.APacketProviderHandler;
+import radua.servers.packetProcs.GenericPacket;
+import radua.servers.packetProcs.IPacket;
+import radua.servers.session.ISession;
+import radua.servers.session.ISessionKey;
+import radua.servers.session.SessionFactoryPacketProviderHandler;
 
 public class SendSessionPacketProviderHandler extends SessionFactoryPacketProviderHandler
 {
@@ -18,8 +20,9 @@ public class SendSessionPacketProviderHandler extends SessionFactoryPacketProvid
 	
 	public ISession send(byte[] data, SocketAddress remoteAddr, boolean hasReplay) throws IOException
 	{
+		GenericPacket packet = new GenericPacket(data.length, data, remoteAddr);
 		if (!hasReplay) {
-			transmitPacket(data, remoteAddr);
+			transmitPacket(packet);
 			return null;
 		}
 		
@@ -27,14 +30,14 @@ public class SendSessionPacketProviderHandler extends SessionFactoryPacketProvid
 		ISession oldSession = sendMap.putIfAbsent(session.getKey(), session);
 		if (oldSession != null) session = oldSession;
 		
-		getProvider().transmitPacket(data, remoteAddr);
+		getProvider().transmitPacket(packet);
 		return session;
 	}
 	
 	
 	@Override
-	public void transmitPacket(byte[] data, SocketAddress remoteAddr) throws IOException
+	public void transmitPacket(IPacket packet) throws IOException
 	{
-		getProvider().transmitPacket(data, remoteAddr);
+		getProvider().transmitPacket(packet);
 	}
 }

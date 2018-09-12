@@ -1,11 +1,10 @@
 package testing.providers.advanced;
 
 import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.SocketAddress;
 
-import radua.servers.server.generics.ARunPacketProviderHandler;
-import radua.servers.server.generics.IPacketProvider;
+import radua.servers.packetProcs.IPacket;
+import radua.servers.packetProcs.IPacketProvider;
+import radua.servers.packetProcs.basics.ARunPacketProviderHandler;
 import radua.utils.errors.generic.ImmutableVariable;
 
 public class Gamma extends ARunPacketProviderHandler
@@ -20,14 +19,14 @@ public class Gamma extends ARunPacketProviderHandler
 	protected void internalStop() { System.out.println("Cccc - stop!"); }
 	protected void internalStopWait() { System.out.println("Cccc - stop wait!"); }
 
-	public void handlePacket(DatagramPacket packet)
+	public void handlePacket(IPacket packet)
 	{
 		System.out.println("Cccc - Handle Packet!");
 		getHandler().handlePacket(packet);
 	}
-	public void transmitPacket(byte[] data, SocketAddress remoteAddr) throws IOException
+	public void transmitPacket(IPacket packet) throws IOException
 	{
 		System.out.println("Cccc - Send packet!");
-		getProvider().transmitPacket(data, remoteAddr);
+		getProvider().transmitPacket(packet);
 	}
 }

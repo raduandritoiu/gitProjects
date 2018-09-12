@@ -1,10 +1,10 @@
 package testing.providers.advanced;
 
 import java.io.IOException;
-import java.net.SocketAddress;
 
-import radua.servers.server.generics.ARunPacketProvider;
-import radua.servers.server.generics.IPacketHandler;
+import radua.servers.packetProcs.IPacket;
+import radua.servers.packetProcs.IPacketHandler;
+import radua.servers.packetProcs.basics.ARunPacketProvider;
 import radua.utils.errors.generic.ImmutableVariable;
 
 public class Unu extends ARunPacketProvider
@@ -26,7 +26,7 @@ public class Unu extends ARunPacketProvider
 		getHandler().handlePacket(null);
 	}
 
-	public void transmitPacket(byte[] data, SocketAddress remoteAddr) throws IOException
+	public void transmitPacket(IPacket packet) throws IOException
 	{
 		System.out.println("Unu - Send Packet!");
 	}

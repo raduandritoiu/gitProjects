@@ -1,9 +1,9 @@
 package testing.providers.advanced;
 
 import java.io.IOException;
-import java.net.SocketAddress;
 
-import radua.servers.server.generics.ARunPacketProvider;
+import radua.servers.packetProcs.IPacket;
+import radua.servers.packetProcs.basics.ARunPacketProvider;
 
 public class Alpha extends ARunPacketProvider
 {
@@ -17,7 +17,7 @@ public class Alpha extends ARunPacketProvider
 		getHandler().handlePacket(null);
 	}
 
-	public void transmitPacket(byte[] data, SocketAddress remoteAddr) throws IOException
+	public void transmitPacket(IPacket packet) throws IOException
 	{
 		System.out.println("Aaaa - Send Packet!");
 	}

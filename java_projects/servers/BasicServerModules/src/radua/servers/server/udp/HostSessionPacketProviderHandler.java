@@ -1,11 +1,11 @@
 package radua.servers.server.udp;
 
 import java.io.IOException;
-import java.net.DatagramPacket;
 import java.net.SocketAddress;
 import java.util.concurrent.ConcurrentHashMap;
 
-import radua.servers.server.generics.APacketProviderHandler;
+import radua.servers.packetProcs.IPacket;
+import radua.servers.packetProcs.basics.APacketProviderHandler;
 import radua.utils.logs.Log;
 
 public class HostSessionPacketProviderHandler extends APacketProviderHandler
@@ -19,14 +19,14 @@ public class HostSessionPacketProviderHandler extends APacketProviderHandler
 	}
 	
 	
-	public void transmitPacket(byte[] data, SocketAddress remoteAddr) throws IOException
+	public void transmitPacket(IPacket packet) throws IOException
 	{
-		getProvider().transmitPacket(data, remoteAddr);
+		getProvider().transmitPacket(packet);
 	}
 
-	public void handlePacket(DatagramPacket packet)
+	public void handlePacket(IPacket packet)
 	{
-		SocketAddress hostAddress = packet.getSocketAddress();
+		SocketAddress hostAddress = packet.remoteAddr();
 		HostSession newSession = new HostSession(hostAddress);
 		HostSession session = sessionsMap.put(hostAddress, newSession);
 		if (session == null) {

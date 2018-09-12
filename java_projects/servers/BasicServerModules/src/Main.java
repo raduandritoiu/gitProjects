@@ -1,7 +1,7 @@
 import java.util.concurrent.ConcurrentHashMap;
 
-import radua.servers.server.udp.ISession;
-import radua.servers.server.udp.ISessionKey;
+import radua.servers.session.ISession;
+import radua.servers.session.ISessionKey;
 import testing.ServerTesting;
 import testing.providers.simple.TestNumbers;
 

@@ -1,10 +1,10 @@
 package testing.providers.advanced;
 
 import java.io.IOException;
-import java.net.DatagramPacket;
 
-import radua.servers.server.generics.ARunPacketHandler;
-import radua.servers.server.generics.IPacketProvider;
+import radua.servers.packetProcs.IPacket;
+import radua.servers.packetProcs.IPacketProvider;
+import radua.servers.packetProcs.basics.ARunPacketHandler;
 import radua.utils.errors.generic.ImmutableVariable;
 
 public class Epsilon extends ARunPacketHandler
@@ -19,17 +19,17 @@ public class Epsilon extends ARunPacketHandler
 	protected void internalStop() { System.out.println("Eeee - stop!"); }
 	protected void internalStopWait() { System.out.println("Eeee - stop wait!"); }
 
-	public void handlePacket(DatagramPacket packet) 
+	public void handlePacket(IPacket packet) 
 	{
 		System.out.println("Eeee - Handle Packet!");
 		System.out.println("Eeee - prepare a Reply!");
-		try { getProvider().transmitPacket(null, null); }
+		try { getProvider().transmitPacket(null); }
 		catch (IOException ex) {}
 	}
 	
 	public void tick() throws IOException
 	{
 		System.out.println("Eeee - Send packet DOWN!");
-		getProvider().transmitPacket(null, null);
+		getProvider().transmitPacket(null);
 	}
 }

@@ -5,9 +5,11 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketAddress;
 
-import radua.servers.server.generics.ARunPacketProvider;
-import radua.servers.server.generics.IPacketProvider;
-import radua.servers.server.generics.IServer;
+import radua.servers.packetProcs.GenericPacket;
+import radua.servers.packetProcs.IPacket;
+import radua.servers.packetProcs.IPacketProvider;
+import radua.servers.packetProcs.basics.ARunPacketProvider;
+import radua.servers.server.IServer;
 import radua.utils.logs.Log;
 
 
@@ -54,15 +56,15 @@ public class BasicUdpServer extends ARunPacketProvider implements IServer, IPack
 	
 	
 	/*should be protected*/
-	public final void transmitPacket(byte[] data, SocketAddress remoteAddr) throws IOException
+	public final void transmitPacket(IPacket packet) throws IOException
 	{
-		DatagramPacket packet = new DatagramPacket(data, data.length, remoteAddr);
-		listenSock.send(packet);
+		DatagramPacket dp = new DatagramPacket(packet.data(), packet.data().length, packet.remoteAddr());
+		listenSock.send(dp);
 	}
 
 	private void receivedPacket(DatagramPacket packet)
 	{
-		getHandler().handlePacket(packet);
+		getHandler().handlePacket(new GenericPacket(packet.getLength(), packet.getData(), packet.getSocketAddress()));
 	}
 	
 	
