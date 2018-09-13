@@ -1,9 +1,9 @@
 package radua.servers.session;
 
-import java.net.SocketAddress;
+import radua.servers.packetProcs.IPacket;
 
 public interface ISession
 {
-	ISessionKey getKey();
-	boolean poke(byte[] data, SocketAddress remoteAddr);
+	ISessionKey key();
+	boolean handlePacket(IPacket packet);
 }

@@ -4,7 +4,8 @@ import java.net.SocketAddress;
 
 public interface IPacket 
 {
-	int dataLen();
 	byte[] data();
+	int dataLen();
 	SocketAddress remoteAddr();
+	PacketDirection direction();
 }

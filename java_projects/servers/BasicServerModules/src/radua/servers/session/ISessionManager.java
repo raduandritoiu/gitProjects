@@ -1,13 +1,15 @@
 package radua.servers.session;
 
-import java.net.SocketAddress;
+import radua.servers.packetProcs.IPacket;
+import radua.utils.errors.generic.UniqueKeyValue;
 
 public interface ISessionManager 
 {
-	void addSession(ISession session);
-	void removeSession(ISession session);
-	void removeSession(ISessionKey sessionKey);
-	ISession getSession(ISessionKey sessionKey);
+	ISession addNewSession(IPacket packet);
+	ISession addNewSession(ISessionKey session, IPacket packet);
+	ISession addUniqueSession(IPacket packet) throws UniqueKeyValue;
+	ISession addUniqueSession(ISessionKey sessionKey, IPacket packet) throws UniqueKeyValue;
 	
-	boolean shouldCreate(byte[] data, SocketAddress remoteAddr);
+	ISession removeSession(ISessionKey sessionKey);
+	ISession getSession(ISessionKey sessionKey);
 }

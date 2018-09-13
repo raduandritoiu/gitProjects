@@ -9,6 +9,7 @@ import java.net.SocketException;
 import radua.servers.packetProcs.helpers.EchoPacketHandler;
 import radua.servers.packetProcs.helpers.LogPacketProviderHandler;
 import radua.servers.packetProcs.helpers.ParallelPacketProviderHandler;
+import radua.servers.packetProcs.helpers.RequestSessionFactory;
 import radua.servers.packetProcs.helpers.SMPacketHandler;
 import radua.servers.server.IServer;
 import radua.servers.server.udp.BasicUdpServer;
@@ -43,9 +44,12 @@ public class ServerTesting
 		
 //		IServer srv = new BasicUdpServer(new ParallelPacketProviderHandler(2, new HostSessionPacketProviderHandler(
 //		new LogPacketProviderHandler(log, new SMPacketHandler()))), srvAddr);
-		tmpSrv.linkHandler(new ParallelPacketProviderHandler(2)).linkHandler(new HostSessionPacketProviderHandler()).
-				linkHandler(new LogPacketProviderHandler(log)).linkHandler(new SMPacketHandler());
+//		tmpSrv.linkHandler(new ParallelPacketProviderHandler(2)).linkHandler(new HostSessionPacketProviderHandler()).
+//				linkHandler(new LogPacketProviderHandler(log)).linkHandler(new SMPacketHandler());
 
+		RequestSessionFactory ss = new RequestSessionFactory();
+		RequestSessionFactory.RequestSession r = ss.sendRequest(null, addr1, true);
+		r.getResponse();
 		
 		IServer srv = tmpSrv;
 		srv.start();

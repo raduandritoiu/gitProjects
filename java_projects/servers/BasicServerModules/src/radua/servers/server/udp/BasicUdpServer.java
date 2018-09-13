@@ -5,9 +5,10 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketAddress;
 
-import radua.servers.packetProcs.GenericPacket;
+import radua.servers.packetProcs.Packet;
 import radua.servers.packetProcs.IPacket;
 import radua.servers.packetProcs.IPacketProvider;
+import radua.servers.packetProcs.PacketDirection;
 import radua.servers.packetProcs.basics.ARunPacketProvider;
 import radua.servers.server.IServer;
 import radua.utils.logs.Log;
@@ -64,7 +65,7 @@ public class BasicUdpServer extends ARunPacketProvider implements IServer, IPack
 
 	private void receivedPacket(DatagramPacket packet)
 	{
-		getHandler().handlePacket(new GenericPacket(packet.getLength(), packet.getData(), packet.getSocketAddress()));
+		getHandler().handlePacket(new UdpPacket(packet));
 	}
 	
 	
@@ -94,6 +95,15 @@ public class BasicUdpServer extends ARunPacketProvider implements IServer, IPack
 				// handle the received packet
 				receivedPacket(packet);
 			 }
+		}
+	}
+	
+	
+	private class UdpPacket extends Packet
+	{
+		public UdpPacket(DatagramPacket packet)
+		{
+			super(packet.getData(), packet.getLength(), packet.getSocketAddress(), PacketDirection.INCOMING);
 		}
 	}
 }

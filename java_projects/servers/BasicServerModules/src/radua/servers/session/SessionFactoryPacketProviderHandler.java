@@ -1,41 +1,88 @@
 package radua.servers.session;
 
-import java.net.SocketAddress;
+import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
 
 import radua.servers.packetProcs.IPacket;
 import radua.servers.packetProcs.basics.APacketProviderHandler;
+import radua.utils.errors.generic.UniqueKeyValue;
 
-public abstract class SessionFactoryPacketProviderHandler extends APacketProviderHandler implements ISessionFactory
+
+public abstract class SessionFactoryPacketProviderHandler extends APacketProviderHandler implements ISessionFactory, ISessionManager
 {
-	protected final ConcurrentHashMap<ISessionKey, ISession> sendMap;
+	protected final ConcurrentHashMap<ISessionKey, ISession> sendMap = new ConcurrentHashMap<>();
 
 	
-	public SessionFactoryPacketProviderHandler() 
+	public ISession addNewSession(IPacket packet) 
 	{
-		sendMap = new ConcurrentHashMap<>();
+		// creates session and key at the same time
+		ISession session = createSession(packet);
+		if (session != null) {
+			ISession oldSession = sendMap.putIfAbsent(session.key(), session);
+			if (oldSession != null) session = oldSession;
+		}
+		return session;
+	}
+	
+	public ISession addNewSession(ISessionKey sessionKey, IPacket packet) 
+	{
+		// creates session using pre-created key
+		ISession session = createSession(sessionKey, packet);
+		if (session != null) {
+			ISession oldSession = sendMap.putIfAbsent(session.key(), session);
+			if (oldSession != null) session = oldSession;
+		}
+		return session;
+	}
+	
+	public ISession addUniqueSession(IPacket packet) throws UniqueKeyValue 
+	{
+		// creates session and key at the same time
+		ISession session = createSession(packet);
+		if (session != null) {
+			ISession oldSession = sendMap.putIfAbsent(session.key(), session);
+			if (oldSession != null) throw new UniqueKeyValue(session.key(), session);
+		}
+		return session;
+	}
+	
+	public ISession addUniqueSession(ISessionKey sessionKey, IPacket packet) throws UniqueKeyValue 
+	{
+		// creates session using pre-created key
+		ISession session = createSession(sessionKey, packet);
+		if (session != null) {
+			ISession oldSession = sendMap.putIfAbsent(session.key(), session);
+			if (oldSession != null) throw new UniqueKeyValue(session.key(), session);
+		}
+		return session;
+	}
+	
+	public ISession removeSession(ISessionKey sessionKey) 
+	{
+		return sendMap.remove(sessionKey);
+	}
+	
+	public ISession getSession(ISessionKey sessionKey) 
+	{
+		return sendMap.get(sessionKey);
 	}
 	
 	
-	protected abstract boolean shouldCreate(byte[] data, SocketAddress remoteAddr);
-	
-	
 	@Override
-	public void handlePacket(IPacket packet) 
+	public void handlePacket(IPacket packet)
 	{
-		byte[] data = packet.data();
-		SocketAddress remoteAddr = packet.remoteAddr();
 		ISession session = null;
 		
 		// map not empty so search for session
 		if (!sendMap.isEmpty()) {
-			ISessionKey sessionKey = createSessionKey(data, remoteAddr);
+			ISessionKey sessionKey = createSessionKey(packet);
 			session = sendMap.get(sessionKey);
 			// no session and may create so try to create and add it
-			if (session == null && shouldCreate(data, remoteAddr)) {
-				session = createSession(sessionKey, data, remoteAddr); // creates session using pre-created key
+			if (session == null && shouldCreate(packet)) {
+				// creates and adds a session using pre-created key 
+				session = createSession(sessionKey, packet);
 				if (session != null) {
-					ISession oldSession = sendMap.putIfAbsent(session.getKey(), session);
+					ISession oldSession = sendMap.putIfAbsent(session.key(), session);
 					if (oldSession != null) session = oldSession;
 				}
 			}
@@ -43,22 +90,30 @@ public abstract class SessionFactoryPacketProviderHandler extends APacketProvide
 		// map is empty
 		else {
 			// may create session so try to create and add it
-			if (session == null && shouldCreate(data, remoteAddr)) {
-				session = createSession(data, remoteAddr); // creates session and key at the same time
+			if (session == null && shouldCreate(packet)) {
+				// creates and adds a session and key at the same time
+				session = createSession(packet); 
 				if (session != null) {
-					ISession oldSession = sendMap.putIfAbsent(session.getKey(), session);
+					ISession oldSession = sendMap.putIfAbsent(session.key(), session);
 					if (oldSession != null) session = oldSession;
 				}
 			}
 		}
 		
 		if (session != null) {
-			if (session.poke(data, remoteAddr)) {
-				sendMap.remove(session.getKey());
+			if (session.handlePacket(packet)) {
+				sendMap.remove(session.key());
 			}
 		}
 		else if (getHandler() != null) {
 			getHandler().handlePacket(packet);
 		}
+	}
+	
+	
+	@Override
+	public void transmitPacket(IPacket packet) throws IOException
+	{
+		getProvider().transmitPacket(packet);
 	}
 }
