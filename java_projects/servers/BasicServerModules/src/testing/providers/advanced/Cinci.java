@@ -3,7 +3,7 @@ package testing.providers.advanced;
 import java.io.IOException;
 
 import radua.servers.packetProcs.IPacket;
-import radua.servers.packetProcs.basics.ARunPacketHandler;
+import radua.servers.packetProcs.linking.ARunPacketHandler;
 
 public class Cinci extends ARunPacketHandler
 {

@@ -3,7 +3,7 @@ package testing.providers.advanced;
 import java.io.IOException;
 
 import radua.servers.packetProcs.IPacket;
-import radua.servers.packetProcs.basics.ARunPacketProvider;
+import radua.servers.packetProcs.linking.ARunPacketProvider;
 
 public class Alpha extends ARunPacketProvider
 {

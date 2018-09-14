@@ -25,10 +25,10 @@ public class TestLetters
 	{
 		alpha = null; beta = null; gama = null; delta = null; epsilon = null;
 		alpha = new Alpha();
-		beta = new Beta(alpha);
-		gama = new Gamma(beta);
-		delta = new Delta(gama);
-		epsilon = new Epsilon(delta);
+		beta = new Beta();
+		gama = new Gamma();
+		delta = new Delta();
+		epsilon = new Epsilon();
 		System.out.println("\n\n======================================");
 	}
 	

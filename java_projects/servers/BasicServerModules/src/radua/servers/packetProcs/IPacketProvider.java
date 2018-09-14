@@ -2,14 +2,11 @@ package radua.servers.packetProcs;
 
 import java.io.IOException;
 
-import radua.utils.errors.generic.ImmutableVariable;
-
-public interface IPacketProvider 
+public interface IPacketProvider extends IPacketProcess
 {
-	IPacketProviderHandler linkHandler(IPacketHandler handler) throws ImmutableVariable;
-	void setHandler(IPacketHandler handler) throws ImmutableVariable;
+//	void setHandler(IPacketHandler handler);
+//	IPacketHandler getHandler();
 	
-	//TODO: need to rename this function
 	/** This function should not be used outside of Provider / Handler context. */
 	void transmitPacket(IPacket packet) throws IOException;
 }

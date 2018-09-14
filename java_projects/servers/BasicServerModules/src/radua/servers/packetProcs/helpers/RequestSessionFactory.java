@@ -7,10 +7,10 @@ import radua.servers.packetProcs.Packet;
 import radua.servers.packetProcs.IPacket;
 import radua.servers.session.ISession;
 import radua.servers.session.ISessionKey;
-import radua.servers.session.SessionFactoryPacketProviderHandler;
+import radua.servers.session.PacketSessionFactory;
 import radua.utils.errors.generic.UniqueKeyValue;
 
-public class RequestSessionFactory extends SessionFactoryPacketProviderHandler
+public class RequestSessionFactory extends PacketSessionFactory
 {
 	public RequestSession sendRequest(byte[] data, SocketAddress remoteAddr, boolean hasReplay) throws IOException, UniqueKeyValue
 	{

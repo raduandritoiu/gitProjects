@@ -3,7 +3,7 @@ package testing.providers.simple;
 import java.io.IOException;
 
 import radua.servers.packetProcs.IPacket;
-import radua.servers.packetProcs.basics.ARunPacketHandler;
+import radua.servers.packetProcs.linking.ARunPacketHandler;
 
 public class Sapte extends ARunPacketHandler
 {

@@ -3,9 +3,9 @@ package testing.providers.simple;
 import java.io.IOException;
 
 import radua.servers.packetProcs.IPacket;
-import radua.servers.packetProcs.basics.ARunPacketProviderHandler;
+import radua.servers.packetProcs.linking.ARunPacketHandlerProvider;
 
-public class Sase extends ARunPacketProviderHandler
+public class Sase extends ARunPacketHandlerProvider
 {
 	protected void internalStart() { System.out.println("Sase - start!"); }
 	protected void internalStop() { System.out.println("Sase - stop!"); }

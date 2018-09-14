@@ -3,9 +3,9 @@ package testing.providers.simple;
 import java.io.IOException;
 
 import radua.servers.packetProcs.IPacket;
-import radua.servers.packetProcs.basics.ARunPacketProviderHandler;
+import radua.servers.packetProcs.linking.ARunPacketHandlerProvider;
 
-public class Cinci extends ARunPacketProviderHandler
+public class Cinci extends ARunPacketHandlerProvider
 {
 	protected void internalStart() { System.out.println("Cinci - start!"); }
 	protected void internalStop() { System.out.println("Cinci - stop!"); }

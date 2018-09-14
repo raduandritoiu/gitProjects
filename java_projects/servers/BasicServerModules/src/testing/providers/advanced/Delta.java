@@ -3,18 +3,10 @@ package testing.providers.advanced;
 import java.io.IOException;
 
 import radua.servers.packetProcs.IPacket;
-import radua.servers.packetProcs.IPacketProvider;
-import radua.servers.packetProcs.basics.ARunPacketProviderHandler;
-import radua.utils.errors.generic.ImmutableVariable;
+import radua.servers.packetProcs.linking.ARunPacketHandlerProvider;
 
-public class Delta extends ARunPacketProviderHandler
+public class Delta extends ARunPacketHandlerProvider
 {
-	public Delta(IPacketProvider nProvider) throws ImmutableVariable
-	{
-		setProvider(nProvider);
-		nProvider.setHandler(this);
-	}
-
 	protected void internalStart() { System.out.println("Dddd - start!"); }
 	protected void internalStop() { System.out.println("Dddd - stop!"); }
 	protected void internalStopWait() { System.out.println("Dddd - stop wait!"); }

@@ -10,7 +10,7 @@ public class TestNumbers
 	
 	public static void run() throws Exception
 	{
-//		test_normal();
+		test_normal();
 		test_links();
 	}
 	
@@ -27,10 +27,10 @@ public class TestNumbers
 	{
 		unu = null; doi = null; trei = null; patru = null; cinci = null;
 		cinci = new Cinci();
-		patru = new Patru(cinci);
-		trei = new Trei(patru);
-		doi  = new Doi(trei);
-		unu = new Unu(doi);
+		patru = new Patru();
+		trei = new Trei();
+		doi  = new Doi();
+		unu = new Unu();
 		System.out.println("\n\n/======================================/");
 	}
 	
@@ -150,7 +150,8 @@ public class TestNumbers
 		unu.linkHandler(new Doi()).linkHandler(trei);
 		unu.start();
 		System.out.println("======================================");
-		patru = new Patru(new Cinci());
+		patru = new Patru();
+		patru.linkHandler(new Cinci());
 		trei.linkHandler(patru);
 		System.out.println("======================================");
 		unu.stop();
