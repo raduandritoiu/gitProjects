@@ -99,7 +99,7 @@ public class TestNumbers
 	{
 		System.out.println("\n\n======================================");
 		Cinci cinci = new Cinci();
-		cinci.linkProvider(new Patru()).linkProvider(new Trei()).linkProvider(new Doi()).linkProvider(new Unu());
+		cinci.linkOuter(new Patru()).linkOuter(new Trei()).linkOuter(new Doi()).linkOuter(new Unu());
 		cinci.start();
 		System.out.println("======================================");
 		cinci.stop();
@@ -109,7 +109,7 @@ public class TestNumbers
 	{
 		System.out.println("\n\n======================================");
 		Unu unu = new Unu();
-		unu.linkHandler(new Doi()).linkHandler(new Trei()).linkHandler(new Patru()).linkHandler(new Cinci());
+		unu.linkInner(new Doi()).linkInner(new Trei()).linkInner(new Patru()).linkInner(new Cinci());
 		unu.start();
 		System.out.println("======================================");
 		unu.stop();
@@ -120,8 +120,8 @@ public class TestNumbers
 		System.out.println("\n\n======================================");
 		Unu unu = new Unu();
 		Trei trei = new Trei();
-		unu.linkHandler(new Doi()).linkHandler(trei);
-		trei.linkHandler(new Patru()).linkHandler(new Cinci());
+		unu.linkInner(new Doi()).linkInner(trei);
+		trei.linkInner(new Patru()).linkInner(new Cinci());
 		trei.start();
 		System.out.println("======================================");
 		unu.stop();
@@ -134,10 +134,10 @@ public class TestNumbers
 		System.out.println("\n\n======================================");
 		Unu unu = new Unu();
 		Trei trei = new Trei();
-		unu.linkHandler(new Doi()).linkHandler(trei);
+		unu.linkInner(new Doi()).linkInner(trei);
 		unu.start();
 		System.out.println("======================================");
-		trei.linkHandler(new Patru()).linkHandler(new Cinci());
+		trei.linkInner(new Patru()).linkInner(new Cinci());
 		System.out.println("======================================");
 		unu.stop();
 	}
@@ -147,12 +147,12 @@ public class TestNumbers
 		System.out.println("\n\n======================================");
 		Unu unu = new Unu();
 		Trei trei = new Trei();
-		unu.linkHandler(new Doi()).linkHandler(trei);
+		unu.linkInner(new Doi()).linkInner(trei);
 		unu.start();
 		System.out.println("======================================");
 		patru = new Patru();
-		patru.linkHandler(new Cinci());
-		trei.linkHandler(patru);
+		patru.linkInner(new Cinci());
+		trei.linkInner(patru);
 		System.out.println("======================================");
 		unu.stop();
 	}

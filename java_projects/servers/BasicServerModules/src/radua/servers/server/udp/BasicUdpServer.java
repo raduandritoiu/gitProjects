@@ -7,14 +7,14 @@ import java.net.SocketAddress;
 
 import radua.servers.packetProcs.Packet;
 import radua.servers.packetProcs.IPacket;
-import radua.servers.packetProcs.IPacketProvider;
 import radua.servers.packetProcs.PacketDirection;
 import radua.servers.packetProcs.linking.ARunPacketProvider;
+import radua.servers.packetProcs.linking.IOuter;
 import radua.servers.server.IServer;
 import radua.utils.logs.Log;
 
 
-public class BasicUdpServer extends ARunPacketProvider implements IServer, IPacketProvider
+public class BasicUdpServer extends ARunPacketProvider implements IServer, IOuter
 {
 	private final DatagramSocket listenSock;
 	private final SocketAddress localAddr;

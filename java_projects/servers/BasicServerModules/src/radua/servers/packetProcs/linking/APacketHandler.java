@@ -1,19 +1,17 @@
 package radua.servers.packetProcs.linking;
 
-import radua.servers.packetProcs.IPacketProvider;
-
-public abstract class APacketHandler extends A_Linking_Base implements I_Linking_Handler
+public abstract class APacketHandler extends A_Linking_Base implements I_Linking_Inner
 {
-	public final void setProvider(IPacketProvider nProvider) { provider = nProvider; }
-	public final IPacketProvider getProvider() { return provider; }
+	public final void setProvider(IOuter outer) { mOuter = outer; }
+	public final IOuter getProvider() { return mOuter; }
 	
-	public ILinkHandlerProvider linkProvider(IPacketProvider provider) { return super.pp_linkProvider(provider); }
-	public IPacketProvider unlinkProvider(IPacketProvider provider) { return super.pp_unlinkProvider(provider); }
-	public IPacketProvider unlinkProvider() { return super.pp_unlinkProvider(); }
+	public ILinkInnerOuter linkOuter(IOuter outer) { return super.pp_linkOuter(outer); }
+	public IOuter unlinkOuter(IOuter outer) { return super.pp_unlinkOuter(outer); }
+	public IOuter unlinkOuter() { return super.pp_unlinkOuter(); }
 	
 	
 	
-	public ILinkHandlerProvider insertProvider(ILinkHandlerProvider provider) { return null; }
-	public ILinkHandlerProvider takeoutProvider(ILinkHandlerProvider provider) { return null; }
-	public ILinkHandlerProvider takeoutProvider() { return null; }
+	public ILinkInnerOuter insertOuter(ILinkInnerOuter outer) { return null; }
+	public ILinkInnerOuter takeoutOuter(ILinkInnerOuter outer) { return null; }
+	public ILinkInnerOuter takeoutOuter() { return null; }
 }

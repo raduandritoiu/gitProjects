@@ -1,5 +1,5 @@
 package radua.servers.packetProcs;
 
-public interface IPacketProcess 
+public interface IPacketProcessor 
 {
 }

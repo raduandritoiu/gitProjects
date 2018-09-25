@@ -44,7 +44,7 @@ public class TestNumbers
 	private static void test_1() throws Exception
 	{
 		init();
-		unu.linkHandler(doi).linkHandler(trei).linkHandler(patru).linkHandler(cinci).linkHandler(sase).linkHandler(sapte);
+		unu.linkInner(doi).linkInner(trei).linkInner(patru).linkInner(cinci).linkInner(sase).linkInner(sapte);
 		trei.start();
 		System.out.println("======================================");
 		doi.start();
@@ -56,7 +56,7 @@ public class TestNumbers
 	{
 		
 		init();
-		sapte.linkProvider(sase).linkProvider(cinci).linkProvider(patru).linkProvider(trei).linkProvider(doi).linkProvider(unu);
+		sapte.linkOuter(sase).linkOuter(cinci).linkOuter(patru).linkOuter(trei).linkOuter(doi).linkOuter(unu);
 		doi.start();
 		System.out.println("======================================");
 		cinci.stop();
@@ -68,7 +68,7 @@ public class TestNumbers
 	{
 		reset();
 		unu = new Unu();
-		unu.linkHandler(new Doi()).linkHandler(new Trei()).linkHandler(new Patru()).linkHandler(new Cinci()).linkHandler(new Sase()).linkHandler(new Sapte());
+		unu.linkInner(new Doi()).linkInner(new Trei()).linkInner(new Patru()).linkInner(new Cinci()).linkInner(new Sase()).linkInner(new Sapte());
 		unu.start();
 		System.out.println("======================================");
 		unu.packetReceived();
@@ -80,7 +80,7 @@ public class TestNumbers
 	{
 		reset();
 		sapte = new Sapte();
-		sapte.linkProvider(new Sase()).linkProvider(new Cinci()).linkProvider(new Patru()).linkProvider(new  Trei()).linkProvider(new Doi()).linkProvider(new  Unu());
+		sapte.linkOuter(new Sase()).linkOuter(new Cinci()).linkOuter(new Patru()).linkOuter(new  Trei()).linkOuter(new Doi()).linkOuter(new  Unu());
 		sapte.start();
 		System.out.println("======================================");
 		sapte.tick();
@@ -103,7 +103,7 @@ public class TestNumbers
 	{
 		reset();
 		unu = new Unu();
-		unu.linkHandler(new Trei()).linkHandler(new Cinci()).linkHandler(new Sapte());
+		unu.linkInner(new Trei()).linkInner(new Cinci()).linkInner(new Sapte());
 		unu.start();
 		System.out.println("======================================");
 		unu.packetReceived();
@@ -115,7 +115,7 @@ public class TestNumbers
 	{
 		reset();
 		sapte = new Sapte();
-		sapte.linkProvider(new Sase()).linkProvider(new Patru()).linkProvider(new  Unu());
+		sapte.linkOuter(new Sase()).linkOuter(new Patru()).linkOuter(new  Unu());
 		sapte.start();
 		System.out.println("======================================");
 		sapte.tick();
@@ -127,7 +127,7 @@ public class TestNumbers
 	{
 		reset();
 		doi = new Doi();
-		doi.linkHandler(new Patru()).linkHandler(new Cinci());
+		doi.linkInner(new Patru()).linkInner(new Cinci());
 		doi.start();
 		System.out.println("======================================");
 		doi.stop();
@@ -137,7 +137,7 @@ public class TestNumbers
 	{
 		reset();
 		unu = new Unu();
-		unu.linkHandler(new Doi()).linkHandler(new Cinci()).linkHandler(new Sase());
+		unu.linkInner(new Doi()).linkInner(new Cinci()).linkInner(new Sase());
 		unu.start();
 		System.out.println("======================================");
 		unu.packetReceived();
@@ -149,7 +149,7 @@ public class TestNumbers
 	{
 		reset();
 		sapte = new Sapte();
-		sapte.linkProvider(new Sase()).linkProvider(new Cinci()).linkProvider(new  Trei());
+		sapte.linkOuter(new Sase()).linkOuter(new Cinci()).linkOuter(new  Trei());
 		sapte.start();
 		System.out.println("======================================");
 		sapte.tick();
@@ -169,8 +169,8 @@ public class TestNumbers
 	{
 		reset();
 		unu = new Unu();
-		unu.linkHandler(new Doi()).linkHandler(new Patru()).linkHandler(new Trei()).linkHandler(new Patru()).linkHandler(new Cinci()).
-		linkHandler(new Trei()).linkHandler(new Sase()).linkHandler(new Sase()).linkHandler(new Sapte());
+		unu.linkInner(new Doi()).linkInner(new Patru()).linkInner(new Trei()).linkInner(new Patru()).linkInner(new Cinci()).
+		linkInner(new Trei()).linkInner(new Sase()).linkInner(new Sase()).linkInner(new Sapte());
 		unu.start();
 		System.out.println("======================================");
 		unu.packetReceived();
@@ -182,8 +182,8 @@ public class TestNumbers
 	{
 		reset();
 		sapte = new Sapte();
-		sapte.linkProvider(new Doi()).linkProvider(new Cinci()).linkProvider(new Patru()).linkProvider(new Sase()).linkProvider(new Sase()).
-		linkProvider(new Trei()).linkProvider(new Doi()).linkProvider(new Cinci()).linkProvider(new  Unu());
+		sapte.linkOuter(new Doi()).linkOuter(new Cinci()).linkOuter(new Patru()).linkOuter(new Sase()).linkOuter(new Sase()).
+		linkOuter(new Trei()).linkOuter(new Doi()).linkOuter(new Cinci()).linkOuter(new  Unu());
 		sapte.start();
 		System.out.println("======================================");
 		sapte.tick();

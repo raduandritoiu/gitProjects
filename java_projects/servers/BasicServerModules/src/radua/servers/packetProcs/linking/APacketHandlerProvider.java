@@ -1,34 +1,31 @@
 package radua.servers.packetProcs.linking;
 
-import radua.servers.packetProcs.IPacketHandler;
-import radua.servers.packetProcs.IPacketProvider;
-
-public abstract class APacketHandlerProvider extends A_Linking_Base implements ILinkHandlerProvider
+public abstract class APacketHandlerProvider extends A_Linking_Base implements ILinkInnerOuter
 {
-	public final void setProvider(IPacketProvider nProvider) { provider = nProvider; }
-	public final IPacketProvider getProvider() { return provider; }
+	public final void setProvider(IOuter nProvider) { mOuter = nProvider; }
+	public final IOuter getProvider() { return mOuter; }
 	
-	public final void setHandler(IPacketHandler nHandler) { handler = nHandler; }
-	public final IPacketHandler getHandler() { return handler; }
+	public final void setHandler(IInner nHandler) { mInner = nHandler; }
+	public final IInner getHandler() { return mInner; }
 	
-	public ILinkHandlerProvider linkProvider(IPacketProvider provider) { return super.pp_linkProvider(provider); }
-	public IPacketProvider unlinkProvider(IPacketProvider provider) { return super.pp_unlinkProvider(provider); }
-	public IPacketProvider unlinkProvider() { return super.pp_unlinkProvider(); }
+	public ILinkInnerOuter linkOuter(IOuter provider) { return super.pp_linkOuter(provider); }
+	public IOuter unlinkOuter(IOuter provider) { return super.pp_unlinkOuter(provider); }
+	public IOuter unlinkOuter() { return super.pp_unlinkOuter(); }
 
-	public ILinkHandlerProvider linkHandler(IPacketHandler handler) { return super.pp_linkHandler(handler); }
-	public IPacketHandler unlinkHandler(IPacketHandler handler) { return super.pp_unlinkHandler(handler); }
-	public IPacketHandler unlinkHandler() { return super.pp_unlinkHandler(); }
+	public ILinkInnerOuter linkInner(IInner handler) { return super.pp_linkInner(handler); }
+	public IInner unlinkInner(IInner handler) { return super.pp_unlinkInner(handler); }
+	public IInner unlinkInner() { return super.pp_unlinkInner(); }
 	
 
 	
 	
-	public ILinkHandlerProvider insertProvider(ILinkHandlerProvider provider) { return null; }
-	public ILinkHandlerProvider takeoutProvider(ILinkHandlerProvider provider) { return null; }
-	public ILinkHandlerProvider takeoutProvider() { return null; }
+	public ILinkInnerOuter insertOuter(ILinkInnerOuter provider) { return null; }
+	public ILinkInnerOuter takeoutOuter(ILinkInnerOuter provider) { return null; }
+	public ILinkInnerOuter takeoutOuter() { return null; }
 
-	public ILinkHandlerProvider insertHandler(ILinkHandlerProvider handler) { return null; }
-	public ILinkHandlerProvider takeoutHandler(ILinkHandlerProvider handler) { return null; }
-	public ILinkHandlerProvider takeoutHandler() { return null; }
+	public ILinkInnerOuter insertInner(ILinkInnerOuter handler) { return null; }
+	public ILinkInnerOuter takeoutInner(ILinkInnerOuter handler) { return null; }
+	public ILinkInnerOuter takeoutInner() { return null; }
 	
-	public ILinkHandlerProvider takeout() { return null; }
+	public ILinkInnerOuter takeout() { return null; }
 }

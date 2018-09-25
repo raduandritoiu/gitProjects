@@ -2,22 +2,15 @@ package radua.servers.packetProcs.linking;
 
 import java.util.List;
 
-import radua.servers.packetProcs.IPacketHandler;
-import radua.servers.packetProcs.IPacketHandlerMulti;
-import radua.servers.packetProcs.IPacketHandlerSingle;
-import radua.servers.packetProcs.IPacketProvider;
-import radua.servers.packetProcs.IPacketProviderMulti;
-import radua.servers.packetProcs.IPacketProviderSingle;
-
 
 /*package_p*/ abstract class A_Linking_Base 
 {
 	/*package_p*/ boolean isRunning = false;
-	/*package_p*/ IPacketProvider provider = null;
-	/*package_p*/ IPacketHandler handler = null;
+	/*package_p*/ IOuter mOuter = null;
+	/*package_p*/ IInner mInner = null;
 	
-	/*package_p*/ List<IPacketProvider> providers = null;
-	/*package_p*/ List<IPacketHandler> handlers = null;
+	/*package_p*/ List<IOuter> mOuters = null;
+	/*package_p*/ List<IInner> mInners = null;
 
 	
 //===================================================================================================
@@ -28,70 +21,70 @@ import radua.servers.packetProcs.IPacketProviderSingle;
 	
 	
 //===================================================================================================
-//== Multiple providers ==============================================================================
-	/*package_p*/ final boolean pp_hasProvider(IPacketProvider nProvider)
+//== Multiple outers ==============================================================================
+	/*package_p*/ final boolean pp_hasOuter(IOuter outer)
 	{
-		if (nProvider == null) return false;
-		if (nProvider == provider) return true;
-		if (providers == null) return false;
-		return handlers.contains(nProvider);
+		if (outer == null) return false;
+		if (outer == mOuter) return true;
+		if (mOuters == null) return false;
+		return mInners.contains(outer);
 	}
-	/*package_p*/ final IPacketProvider pp_addProvider(IPacketProvider nProvider, int pos)
+	/*package_p*/ final IOuter pp_addOuter(IOuter outer, int pos)
 	{
-		if (pos == -1) providers.add(nProvider);
-		else providers.add(pos, nProvider);
-		return nProvider;
+		if (pos == -1) mOuters.add(outer);
+		else mOuters.add(pos, outer);
+		return outer;
 	}
-	/*package_p*/ final IPacketProvider pp_removeProvider(IPacketProvider nProvider)
+	/*package_p*/ final IOuter pp_removeOuter(IOuter outer)
 	{
-		if (providers.remove(nProvider)) return nProvider;
+		if (mOuters.remove(outer)) return outer;
 		return null;
 	}
-	/*package_p*/ final IPacketProvider pp_getProvider(int pos)
+	/*package_p*/ final IOuter pp_getOuter(int pos)
 	{
-		return providers.get(pos);
+		return mOuters.get(pos);
 	}
-	/*package_p*/ final int pp_getProviderPos(IPacketProvider nProvider)
+	/*package_p*/ final int pp_getOuterPos(IOuter outer)
 	{
-		return providers.indexOf(nProvider);
+		return mOuters.indexOf(outer);
 	}
-	/*package_p*/ final int pp_getProvidersNum()
+	/*package_p*/ final int pp_getOuterNum()
 	{
-		return providers.size();
+		return mOuters.size();
 	}
 	
 	
 //===================================================================================================
-//== Multiple handlers ==============================================================================
-	/*package_p*/ final boolean pp_hasHandler(IPacketHandler nHandler)
+//== Multiple Inners ==============================================================================
+	/*package_p*/ final boolean pp_hasInner(IInner inner)
 	{
-		if (nHandler == null) return false;
-		if (nHandler == handler) return true;
-		if (handlers == null) return false;
-		return handlers.contains(nHandler);
+		if (inner == null) return false;
+		if (inner == mInner) return true;
+		if (mInners == null) return false;
+		return mInners.contains(inner);
 	}
-	/*package_p*/ final IPacketHandler pp_addHandler(IPacketHandler nHandler, int pos)
+	/*package_p*/ final IInner pp_addInner(IInner inner, int pos)
 	{
-		if (pos == -1) handlers.add(nHandler);
-		else handlers.add(pos, nHandler);
-		return nHandler;
+		if (pos == -1) mInners.add(inner);
+		else mInners.add(pos, inner);
+		return inner;
 	}
-	/*package_p*/ final IPacketHandler pp_removeHandler(IPacketHandler nHandler)
+	/*package_p*/ final IInner pp_removeInner(IInner inner)
 	{
-		if (handlers.remove(nHandler)) return nHandler;
+		if (mInners.remove(inner)) return inner;
 		return null;
 	}
-	/*package_p*/ final IPacketHandler pp_getHandler(int pos)
+	/*package_p*/ final IInner pp_getInner(int pos)
 	{
-		return handlers.get(pos);
+		return mInners.get(pos);
 	}
-	/*package_p*/ final int pp_getHandlerPos(IPacketHandler nHandler)
+	/*package_p*/ final int pp_getInnerPos(IInner inner)
 	{
-		return handlers.indexOf(nHandler);
+		return mInners.indexOf(inner);
 	}
-	/*package_p*/ final int pp_getHandlersNum()
+	/*package_p*/ final int pp_getInnersNum()
 	{
-		return handlers.size();
+		return mInners.size();
 	}
 	
 	
@@ -99,113 +92,113 @@ import radua.servers.packetProcs.IPacketProviderSingle;
 //== Running ========================================================================================
 	/*package_p*/ final boolean pp_start()
 	{
-		// bubble to handlers
-		if (handler != null && handler instanceof A_Linking_Base)
-			((A_Linking_Base) handler).pp_startHandler();
-		if (handlers != null)
-			for (IPacketHandler hdl : handlers)
+		// bubble to Inners
+		if (mInner != null && mInner instanceof A_Linking_Base)
+			((A_Linking_Base) mInner).pp_startInner();
+		if (mInners != null)
+			for (IInner hdl : mInners)
 				if (hdl != null && hdl instanceof A_Linking_Base)
-					((A_Linking_Base) hdl).pp_startHandler();
+					((A_Linking_Base) hdl).pp_startInner();
 		// do local
 		boolean ret = !isRunning;
 		if (ret) { internalStart(); }
 		isRunning = true;
-		// bubble to providers
-		if (provider != null && provider instanceof A_Linking_Base)
-			((A_Linking_Base) provider).pp_startProvider();
-		if (providers != null)
-			for (IPacketProvider prov : providers)
+		// bubble to Outers
+		if (mOuter != null && mOuter instanceof A_Linking_Base)
+			((A_Linking_Base) mOuter).pp_startOuter();
+		if (mOuters != null)
+			for (IOuter prov : mOuters)
 				if (prov != null && prov instanceof A_Linking_Base)
-					((A_Linking_Base) prov).pp_startProvider();
+					((A_Linking_Base) prov).pp_startOuter();
 		return ret;
 	}
 	/*package_p*/ final boolean pp_stop()
 	{
-		// bubble to provider
-		if (provider != null && provider instanceof A_Linking_Base)
-			((A_Linking_Base) provider).pp_stopProvider();
-		if (providers != null)
-			for (IPacketProvider prov : providers)
+		// bubble to Outers
+		if (mOuter != null && mOuter instanceof A_Linking_Base)
+			((A_Linking_Base) mOuter).pp_stopOuter();
+		if (mOuters != null)
+			for (IOuter prov : mOuters)
 				if (prov != null && prov instanceof A_Linking_Base)
-					((A_Linking_Base) prov).pp_stopProvider();
+					((A_Linking_Base) prov).pp_stopOuter();
 		// do local
 		boolean ret = isRunning;
 		isRunning = false; // reset running before stopping
 		if (ret) { internalStop(); }
-		// bubble to handlers
-		if (handler != null && handler instanceof A_Linking_Base)
-			((A_Linking_Base) handler).pp_stopHandler();
-		if (handlers != null)
-			for (IPacketHandler hdl : handlers)
+		// bubble to Inners
+		if (mInner != null && mInner instanceof A_Linking_Base)
+			((A_Linking_Base) mInner).pp_stopInner();
+		if (mInners != null)
+			for (IInner hdl : mInners)
 				if (hdl != null && hdl instanceof A_Linking_Base)
-					((A_Linking_Base) hdl).pp_stopHandler();
+					((A_Linking_Base) hdl).pp_stopInner();
 		return ret;
 	}
 	/*package_p*/ final boolean pp_stopWait()
 	{
-		// bubble to providers
-		if (provider != null && provider instanceof A_Linking_Base)
-			((A_Linking_Base) provider).pp_stopWaitProvider();
-		if (providers != null)
-			for (IPacketProvider prov : providers)
+		// bubble to Outers
+		if (mOuter != null && mOuter instanceof A_Linking_Base)
+			((A_Linking_Base) mOuter).pp_stopWaitOuter();
+		if (mOuters != null)
+			for (IOuter prov : mOuters)
 				if (prov != null && prov instanceof A_Linking_Base)
-					((A_Linking_Base) prov).pp_stopWaitProvider();
+					((A_Linking_Base) prov).pp_stopWaitOuter();
 		// do local
 		boolean ret = isRunning;
 		isRunning = false; // reset running before stopping
 		if (ret) { internalStopWait(); }
-		// bubble to handlers
-		if (handler != null && handler instanceof A_Linking_Base)
-			((A_Linking_Base) handler).pp_stopWaitHandler();
-		if (handlers != null)
-			for (IPacketHandler hdl : handlers)
+		// bubble to Inners
+		if (mInner != null && mInner instanceof A_Linking_Base)
+			((A_Linking_Base) mInner).pp_stopWaitInner();
+		if (mInners != null)
+			for (IInner hdl : mInners)
 				if (hdl != null && hdl instanceof A_Linking_Base)
-					((A_Linking_Base) hdl).pp_stopHandler();
+					((A_Linking_Base) hdl).pp_stopInner();
 		return ret;
 	}
 
 	
 //===================================================================================================
-//== Provider Running ===============================================================================
-	private final boolean pp_startProvider()
+//== Outer Running ===============================================================================
+	private final boolean pp_startOuter()
 	{
 		// do local
 		boolean ret = !isRunning;
 		if (ret) { internalStart(); }
 		isRunning = true;
-		// bubble to providers
-		if (provider != null && provider instanceof A_Linking_Base)
-			((A_Linking_Base) provider).pp_startProvider();
-		if (providers != null)
-			for (IPacketProvider prov : providers)
+		// bubble to Outers
+		if (mOuter != null && mOuter instanceof A_Linking_Base)
+			((A_Linking_Base) mOuter).pp_startOuter();
+		if (mOuters != null)
+			for (IOuter prov : mOuters)
 				if (prov != null && prov instanceof A_Linking_Base)
-					((A_Linking_Base) prov).pp_startProvider();
+					((A_Linking_Base) prov).pp_startOuter();
 		return ret;
 	}
-	private final boolean pp_stopProvider()
+	private final boolean pp_stopOuter()
 	{
-		// bubble to providers
-		if (provider != null && provider instanceof A_Linking_Base)
-			((A_Linking_Base) provider).pp_stopProvider();
-		if (providers != null)
-			for (IPacketProvider prov : providers)
+		// bubble to Outers
+		if (mOuter != null && mOuter instanceof A_Linking_Base)
+			((A_Linking_Base) mOuter).pp_stopOuter();
+		if (mOuters != null)
+			for (IOuter prov : mOuters)
 				if (prov != null && prov instanceof A_Linking_Base)
-					((A_Linking_Base) prov).pp_stopProvider();
+					((A_Linking_Base) prov).pp_stopOuter();
 		// do local
 		boolean ret = isRunning;
 		isRunning = false; // reset running before stopping
 		if (ret) { internalStop(); }
 		return ret;
 	}
-	private final boolean pp_stopWaitProvider()
+	private final boolean pp_stopWaitOuter()
 	{
-		// bubble to providers
-		if (provider != null && provider instanceof A_Linking_Base)
-			((A_Linking_Base) provider).pp_stopWaitProvider();
-		if (providers != null)
-			for (IPacketProvider prov : providers)
+		// bubble to Outers
+		if (mOuter != null && mOuter instanceof A_Linking_Base)
+			((A_Linking_Base) mOuter).pp_stopWaitOuter();
+		if (mOuters != null)
+			for (IOuter prov : mOuters)
 				if (prov != null && prov instanceof A_Linking_Base)
-					((A_Linking_Base) prov).pp_stopWaitProvider();
+					((A_Linking_Base) prov).pp_stopWaitOuter();
 		// do local
 		boolean ret = isRunning;
 		isRunning = false; // reset running before stopping
@@ -215,162 +208,162 @@ import radua.servers.packetProcs.IPacketProviderSingle;
 	
 	
 //===================================================================================================
-//== Handler Running ================================================================================
-	private final boolean pp_startHandler()
+//== Inner Running ================================================================================
+	private final boolean pp_startInner()
 	{
-		// bubble to handlers
-		if (handler != null && handler instanceof A_Linking_Base)
-			((A_Linking_Base) handler).pp_startHandler();
-		if (handlers != null)
-			for (IPacketHandler hdl : handlers)
+		// bubble to Inners
+		if (mInner != null && mInner instanceof A_Linking_Base)
+			((A_Linking_Base) mInner).pp_startInner();
+		if (mInners != null)
+			for (IInner hdl : mInners)
 				if (hdl != null && hdl instanceof A_Linking_Base)
-					((A_Linking_Base) hdl).pp_startHandler();
+					((A_Linking_Base) hdl).pp_startInner();
 		// do local
 		boolean ret = !isRunning;
 		if (ret) { internalStart(); }
 		isRunning = true;
 		return ret;
 	}
-	private final boolean pp_stopHandler()
+	private final boolean pp_stopInner()
 	{
 		// do local
 		boolean ret = isRunning;
 		isRunning = false; // reset running before stopping
 		if (ret) { internalStop(); }
-		// bubble to handlers
-		if (handler != null && handler instanceof A_Linking_Base)
-			((A_Linking_Base) handler).pp_stopHandler();
-		if (handlers != null)
-			for (IPacketHandler hdl : handlers)
+		// bubble to Inners
+		if (mInner != null && mInner instanceof A_Linking_Base)
+			((A_Linking_Base) mInner).pp_stopInner();
+		if (mInners != null)
+			for (IInner hdl : mInners)
 				if (hdl != null && hdl instanceof A_Linking_Base)
-					((A_Linking_Base) hdl).pp_stopHandler();
+					((A_Linking_Base) hdl).pp_stopInner();
 		return ret;
 	}
-	private final boolean pp_stopWaitHandler()
+	private final boolean pp_stopWaitInner()
 	{
 		// do local
 		boolean ret = isRunning;
 		isRunning = false; // reset running before stopping
 		if (ret) { internalStopWait(); }
-		// bubble to handlers
-		if (handler != null && handler instanceof A_Linking_Base)
-			((A_Linking_Base) handler).pp_stopWaitHandler();
-		if (handlers != null)
-			for (IPacketHandler hdl : handlers)
+		// bubble to Inners
+		if (mInner != null && mInner instanceof A_Linking_Base)
+			((A_Linking_Base) mInner).pp_stopWaitInner();
+		if (mInners != null)
+			for (IInner hdl : mInners)
 				if (hdl != null && hdl instanceof A_Linking_Base)
-					((A_Linking_Base) hdl).pp_stopWaitHandler();
+					((A_Linking_Base) hdl).pp_stopWaitInner();
 		return ret;
 	}
 	
 	
 //===================================================================================================
-//== I Provider Link =================================================================================
-	/*package_p*/ final ILinkHandlerProvider pp_linkProvider(IPacketProvider nProvider) // TODO ok
+//== I Outer Link =================================================================================
+	/*package_p*/ final ILinkInnerOuter pp_linkOuter(IOuter outer) // TODO ok
 	{
-		A_Linking_Base.Link(nProvider, (IPacketHandler) this, false, -1, -1);
-		if (nProvider instanceof ILinkHandlerProvider)
-			return (ILinkHandlerProvider) nProvider;
+		A_Linking_Base.Link(outer, (IInner) this, false, -1, -1);
+		if (outer instanceof ILinkInnerOuter)
+			return (ILinkInnerOuter) outer;
 		return null;
 	}
-	/*package_p*/ final IPacketProvider pp_unlinkProvider(IPacketProvider nProvider) // TODO ok
+	/*package_p*/ final IOuter pp_unlinkOuter(IOuter outer) // TODO ok
 	{
-		if (!pp_hasProvider(nProvider)) return null;
-		A_Linking_Base.Unlink(nProvider, (IPacketHandler) this);
-		return nProvider;
+		if (!pp_hasOuter(outer)) return null;
+		A_Linking_Base.Unlink(outer, (IInner) this);
+		return outer;
 	}
-	/*package_p*/ final IPacketProvider pp_unlinkProvider() // TODO ok
+	/*package_p*/ final IOuter pp_unlinkOuter() // TODO ok
 	{
-		return pp_unlinkProvider(provider);
+		return pp_unlinkOuter(mOuter);
 	}
 
 	
 //===================================================================================================
-//== I Handler Link ================================================================================
-	/*package_p*/ final ILinkHandlerProvider pp_linkHandler(IPacketHandler nHandler) // TODO ok
+//== I Inner Link ================================================================================
+	/*package_p*/ final ILinkInnerOuter pp_linkInner(IInner inner) // TODO ok
 	{
-		A_Linking_Base.Link((IPacketProvider) this, nHandler, true, -1, -1);
-		if (nHandler instanceof ILinkHandlerProvider) return
-			(ILinkHandlerProvider) nHandler; 
+		A_Linking_Base.Link((IOuter) this, inner, true, -1, -1);
+		if (inner instanceof ILinkInnerOuter) return
+			(ILinkInnerOuter) inner; 
 		return null;
 	}
-	/*package_p*/ final IPacketHandler pp_unlinkHandler(IPacketHandler nHandler) // TODO ok
+	/*package_p*/ final IInner pp_unlinkInner(IInner inner) // TODO ok
 	{
-		if (!pp_hasHandler(nHandler)) return null;
-		A_Linking_Base.Unlink((IPacketProvider) this, nHandler);
-		return nHandler;
+		if (!pp_hasInner(inner)) return null;
+		A_Linking_Base.Unlink((IOuter) this, inner);
+		return inner;
 	}
-	/*package_p*/ final IPacketHandler pp_unlinkHandler() // TODO ok
+	/*package_p*/ final IInner pp_unlinkInner() // TODO ok
 	{
-		return pp_unlinkHandler(handler);
-	}
-	
-	
-//===================================================================================================
-//== I Provider Insert ================================================================================
-	/** This is for Single Handler (NOT Multi Handler) */
-	/*package_p*/ final ILinkHandlerProvider pp_single_insertProvider(ILinkHandlerProvider nProvider) // TODO: ok
-	{
-		Insert(provider, nProvider, (I_Linking_SingleHandler) this);
-		return nProvider;
-	}
-	/** This is for Multi Handler (NOT Single Handler) */
-	/*package_p*/ final ILinkHandlerProvider pp_multi_insertProvider(I_Linking_MultiHandlerProviderNA nProvider) // TODO: ok
-	{
-		Insert_Provider(nProvider, (I_Linking_MultiHandler) this);
-		return nProvider;
+		return pp_unlinkInner(mInner);
 	}
 	
 	
 //===================================================================================================
-//== I Handler Insert ================================================================================
-	/** This is for Provider Single (NOT Provider Multi) */
-	/*package_p*/ final ILinkHandlerProvider pp_single_insertHandler(ILinkHandlerProvider nHandler) // TODO: ok
+//== I Outer Insert ================================================================================
+	/** This is for Single Inner (NOT Multi Inner) */
+	/*package_p*/ final ILinkInnerOuter pp_single_insertOuter(ILinkInnerOuter outer) // TODO: ok
 	{
-		Insert((I_Linking_ProviderSingle) this, nHandler, handler);
-		return nHandler;
+		Insert(mOuter, outer, (I_Linking_Single_Inner) this);
+		return outer;
 	}
-	/** This is for Provider Multi (NOT Provider Single) */
-	/*package_p*/ final ILinkHandlerProvider pp_multi_insertHandler(I_Linking_NAHandlerProviderMulti nHandler)  // TODO: ok
+	/** This is for Multi Inner (NOT Single Inner) */
+	/*package_p*/ final ILinkInnerOuter pp_multi_insertOuter(I_Linking_Multi_InnerOuter_NA outer) // TODO: ok
 	{
-		Insert_Handler((I_Linking_ProviderMulti) this, nHandler);
-		return nHandler;
+		Insert_Outer(outer, (I_Linking_Multi_Inner) this);
+		return outer;
 	}
 	
 	
 //===================================================================================================
-//== I Provider Takeout ================================================================================
-//		/*package_p*/ final ILinkHandlerProvider pp_takeoutProvider(ILinkHandlerProvider nProvider)
+//== I Inner Insert ================================================================================
+	/** This is for Outer Single (NOT Outer Multi) */
+	/*package_p*/ final ILinkInnerOuter pp_single_insertInner(ILinkInnerOuter inner) // TODO: ok
+	{
+		Insert((I_Linking_Outer_Single) this, inner, mInner);
+		return inner;
+	}
+	/** This is for Outer Multi (NOT Outer Single) */
+	/*package_p*/ final ILinkInnerOuter pp_multi_insertInner(I_Linking_NA_InnerOuter_Multi inner)  // TODO: ok
+	{
+		Insert_Inner((I_Linking_Outer_Multi) this, inner);
+		return inner;
+	}
+	
+	
+//===================================================================================================
+//== I Outer Takeout ================================================================================
+//		/*package_p*/ final ILinkInnerOuter pp_takeoutOuter(ILinkInnerOuter nOuter)
 //		{
-//			if (nProvider == null || nProvider != provider) return null;
-//			IPacketProvider tmp = nProvider.getProvider();
-//			Unlink(tmp, nProvider);
-//			Unlink(nProvider, (IPacketHandler) this);
-//			Link(tmp, (IPacketHandler) this, true);
-//			return nProvider;
+//			if (nOuter == null || nOuter != outer) return null;
+//			IPacketOuter tmp = nOuter.getOuter();
+//			Unlink(tmp, nOuter);
+//			Unlink(nOuter, (IPacketInner) this);
+//			Link(tmp, (IPacketInner) this, true);
+//			return nOuter;
 //		}
-//		/*package_p*/ final ILinkHandlerProvider pp_takeoutProvider()
+//		/*package_p*/ final ILinkInnerOuter pp_takeoutOuter()
 //		{
-//			if (provider != null && provider instanceof ILinkHandlerProvider)
-//				return pp_takeoutProvider((ILinkHandlerProvider) provider);
+//			if (outer != null && outer instanceof ILinkInnerOuter)
+//				return pp_takeoutOuter((ILinkInnerOuter) outer);
 //			return null;
 //		}
 
 	
 //===================================================================================================
-//== I Handler Takeout ================================================================================
-//	/*package_p*/ final ILinkHandlerProvider pp_takeoutHandler(ILinkHandlerProvider nHandler)
+//== I Inner Takeout ================================================================================
+//	/*package_p*/ final ILinkInnerOuter pp_takeoutInner(ILinkInnerOuter nInner)
 //	{
-//		if (nHandler == null || nHandler != handler) return null;
-//		IPacketHandler tmp = nHandler.getHandler();
-//		Unlink((IPacketProvider) this, nHandler);
-//		Unlink(nHandler, tmp);
-//		Link((IPacketProvider) this, tmp, true);
-//		return nHandler;
+//		if (nInner == null || nInner != inner) return null;
+//		IPacketInner tmp = nInner.getInner();
+//		Unlink((IPacketOuter) this, nInner);
+//		Unlink(nInner, tmp);
+//		Link((IPacketOuter) this, tmp, true);
+//		return nInner;
 //	}
-//	/*package_p*/ final ILinkHandlerProvider pp_takeoutHandler()
+//	/*package_p*/ final ILinkInnerOuter pp_takeoutInner()
 //	{
-//		if (handler != null && handler instanceof ILinkHandlerProvider)
-//			return pp_takeoutHandler((ILinkHandlerProvider) handler);
+//		if (inner != null && inner instanceof ILinkInnerOuter)
+//			return pp_takeoutInner((ILinkInnerOuter) inner);
 //		return null;
 //	}
 
@@ -378,119 +371,119 @@ import radua.servers.packetProcs.IPacketProviderSingle;
 	
 //===================================================================================================
 //== I Processor Link ================================================================================
-//	/*package_p*/ final ILinkHandlerProvider pp_takeout()
+//	/*package_p*/ final ILinkInnerOuter pp_takeout()
 //	{
-//		Unlink(provider, (ILinkHandlerProvider) this);
-//		Unlink((ILinkHandlerProvider) this, handler);
-//		Link(provider, handler, true);
-//		return (ILinkHandlerProvider) this;
+//		Unlink(outer, (ILinkInnerOuter) this);
+//		Unlink((ILinkInnerOuter) this, inner);
+//		Link(outer, inner, true);
+//		return (ILinkInnerOuter) this;
 //	}
 	
 	
 	
 //===================================================================================================
 //== Link Functions =================================================================================
-	private static final void Link(IPacketProvider provider, IPacketHandler handler, 
-								   boolean fromProvider, int providerPos, int handlerPos) // TODO ok
+	private static final void Link(IOuter outer, IInner inner, 
+								   boolean fromOuter, int outerPos, int innerPos) // TODO ok
 	{
 		// do not unlink anything ... maybe throw error if already linked
 		
-		// link new provider and handler
-		if (handler != null) {
-			if (handler instanceof IPacketHandlerMulti) {
-				((IPacketHandlerMulti) handler).addProvider(provider, providerPos);
-			} else if (handler instanceof IPacketHandlerSingle) {
-				((IPacketHandlerSingle) handler).setProvider(provider);
+		// link new outer and inner
+		if (inner != null) {
+			if (inner instanceof I_Multi_Inner) {
+				((I_Multi_Inner) inner).addOuter(outer, outerPos);
+			} else if (inner instanceof I_Single_Inner) {
+				((I_Single_Inner) inner).setOuter(outer);
 			}
 		}
-		if (provider != null) {
-			if (provider instanceof IPacketProviderMulti) {
-				((IPacketProviderMulti) provider).addHandler(handler, handlerPos);
-			} else if (provider instanceof IPacketProviderSingle) {
-				((IPacketProviderSingle) provider).setHandler(handler);
+		if (outer != null) {
+			if (outer instanceof I_Outer_Multi) {
+				((I_Outer_Multi) outer).addInner(inner, innerPos);
+			} else if (outer instanceof I_Outer_Single) {
+				((I_Outer_Single) outer).setInner(inner);
 			}
 		}
 		// start one based on the other
-		A_Linking_Base provider_a = (A_Linking_Base) provider;
-		A_Linking_Base handler_a = (A_Linking_Base) handler;
-		if (fromProvider) {
-			if (provider_a != null && provider_a.isRunning) {
-				handler_a.pp_startHandler();
+		A_Linking_Base outer_a = (A_Linking_Base) outer;
+		A_Linking_Base inner_a = (A_Linking_Base) inner;
+		if (fromOuter) {
+			if (outer_a != null && outer_a.isRunning) {
+				inner_a.pp_startInner();
 			}
 		} else {
-			if (handler_a != null && handler_a.isRunning) {
-				provider_a.pp_startProvider();
+			if (inner_a != null && inner_a.isRunning) {
+				outer_a.pp_startOuter();
 			}
 		}
 	}
 	
 	
-	private static final void Unlink(IPacketProvider provider, IPacketHandler handler) // TODO ok
+	private static final void Unlink(IOuter outer, IInner inner) // TODO ok
 	{
-		if (provider instanceof IPacketProviderMulti) {
-			((IPacketProviderMulti) provider).removeHandler(handler);
-		} else if (provider instanceof IPacketProviderSingle) {
-			((IPacketProviderSingle) provider).setHandler(null);
+		if (outer instanceof I_Outer_Multi) {
+			((I_Outer_Multi) outer).removeInner(inner);
+		} else if (outer instanceof I_Outer_Single) {
+			((I_Outer_Single) outer).setInner(null);
 		}
-		if (handler instanceof IPacketHandlerMulti) {
-			((IPacketHandlerMulti) handler).removeProvider(provider);
-		} else if (handler instanceof IPacketHandlerSingle) {
-			((IPacketHandlerSingle) handler).setProvider(null);
+		if (inner instanceof I_Multi_Inner) {
+			((I_Multi_Inner) inner).removeOuter(outer);
+		} else if (inner instanceof I_Single_Inner) {
+			((I_Single_Inner) inner).setOuter(null);
 		}
 	}
 
 	
-	private static final void Insert(IPacketProvider provider, ILinkHandlerProvider middle, IPacketHandler handler) // TODO: ok
+	private static final void Insert(IOuter outer, ILinkInnerOuter middle, IInner inner) // TODO: ok
 	{
 		int p_idx = -1;
 		int h_idx = -1;
-		if (provider instanceof IPacketProviderMulti) {
-			h_idx = ((IPacketProviderMulti) provider).getHandlerPos(handler);
+		if (outer instanceof I_Outer_Multi) {
+			h_idx = ((I_Outer_Multi) outer).getInnerPos(inner);
 		}
-		if (handler instanceof IPacketHandlerMulti) {
-			p_idx = ((IPacketHandlerMulti) handler).getProviderPos(provider);
+		if (inner instanceof I_Multi_Inner) {
+			p_idx = ((I_Multi_Inner) inner).getOuterPos(outer);
 		}
-		Unlink(provider, handler);
-		Link(middle, handler, false, p_idx, -1);
-		Link(provider, middle, true, -1, h_idx);
+		Unlink(outer, inner);
+		Link(middle, inner, false, p_idx, -1);
+		Link(outer, middle, true, -1, h_idx);
 	}
 	
 	
-	private static final void Insert_Handler(I_Linking_ProviderMulti provider, I_Linking_NAHandlerProviderMulti middle) // TODO: ok
+	private static final void Insert_Inner(I_Linking_Outer_Multi outer, I_Linking_NA_InnerOuter_Multi middle) // TODO: ok
 	{
-		A_Linking_Base provider_a = (A_Linking_Base) provider;
-		for (IPacketHandler handler : provider_a.handlers) {
+		A_Linking_Base outer_a = (A_Linking_Base) outer;
+		for (IInner inner : outer_a.mInners) {
 			int p_idx = -1;
-			if (handler instanceof IPacketHandlerMulti) {
-				p_idx = ((IPacketHandlerMulti) handler).getProviderPos(provider);
+			if (inner instanceof I_Multi_Inner) {
+				p_idx = ((I_Multi_Inner) inner).getOuterPos(outer);
 			}
-			Unlink(provider, handler);
-			Link(middle, handler, false, p_idx, -1);
+			Unlink(outer, inner);
+			Link(middle, inner, false, p_idx, -1);
 		}
-		Link(provider, middle, true, -1, -1);
+		Link(outer, middle, true, -1, -1);
 	}
 	
 	
-	private static final void Insert_Provider(I_Linking_MultiHandlerProviderNA middle, I_Linking_MultiHandler handler) // TODO: ok
+	private static final void Insert_Outer(I_Linking_Multi_InnerOuter_NA middle, I_Linking_Multi_Inner inner) // TODO: ok
 	{
-		A_Linking_Base handler_a = (A_Linking_Base) handler;
-		for (IPacketProvider provider : handler_a.providers) {
+		A_Linking_Base inner_a = (A_Linking_Base) inner;
+		for (IOuter outer : inner_a.mOuters) {
 			int h_idx = -1;
-			if (provider instanceof IPacketProviderMulti) {
-				h_idx = ((IPacketProviderMulti) provider).getHandlerPos(handler);
+			if (outer instanceof I_Outer_Multi) {
+				h_idx = ((I_Outer_Multi) outer).getInnerPos(inner);
 			}
-			Unlink(provider, handler);
-			Link(provider, middle, true, -1, h_idx);
+			Unlink(outer, inner);
+			Link(outer, middle, true, -1, h_idx);
 		}
-		Link(middle, handler, false, -1, -1);
+		Link(middle, inner, false, -1, -1);
 	}
 	
 	
 	
-//	private static final void Takeout(IPacketProvider provider, IProcessorLink middle, IPacketHandler handler)
+//	private static final void Takeout(IPacketOuter outer, IProcessorLink middle, IPacketInner inner)
 //	{
-//		Unlink(provider, middle);
-//		Unlink(middle, handler);
-//		Link(provider, handler, true);
+//		Unlink(outer, middle);
+//		Unlink(middle, inner);
+//		Link(outer, inner, true);
 //	}
 }
