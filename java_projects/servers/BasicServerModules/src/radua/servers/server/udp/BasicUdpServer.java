@@ -8,13 +8,13 @@ import java.net.SocketAddress;
 import radua.servers.packetProcs.Packet;
 import radua.servers.packetProcs.IPacket;
 import radua.servers.packetProcs.PacketDirection;
-import radua.servers.packetProcs.linking.ARunPacketProvider;
+import radua.servers.packetProcs.linking.ARunPacketOuter_S;
 import radua.servers.packetProcs.linking.IOuter;
 import radua.servers.server.IServer;
 import radua.utils.logs.Log;
 
 
-public class BasicUdpServer extends ARunPacketProvider implements IServer, IOuter
+public class BasicUdpServer extends ARunPacketOuter_S implements IServer
 {
 	private final DatagramSocket listenSock;
 	private final SocketAddress localAddr;
@@ -57,15 +57,16 @@ public class BasicUdpServer extends ARunPacketProvider implements IServer, IOute
 	
 	
 	/*should be protected*/
-	public final void transmitPacket(IPacket packet) throws IOException
+	public final boolean transmitPacket(IPacket packet) throws IOException
 	{
 		DatagramPacket dp = new DatagramPacket(packet.data(), packet.data().length, packet.remoteAddr());
 		listenSock.send(dp);
+		return true;
 	}
 
 	private void receivedPacket(DatagramPacket packet)
 	{
-		getHandler().handlePacket(new UdpPacket(packet));
+		getInner().handlePacket(new UdpPacket(packet));
 	}
 	
 	

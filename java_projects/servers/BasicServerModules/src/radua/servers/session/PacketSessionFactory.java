@@ -4,11 +4,11 @@ import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
 
 import radua.servers.packetProcs.IPacket;
-import radua.servers.packetProcs.linking.APacketHandlerProvider;
+import radua.servers.packetProcs.linking.APacketMiddle_SS;
 import radua.utils.errors.generic.UniqueKeyValue;
 
 
-public abstract class PacketSessionFactory extends APacketHandlerProvider implements ISessionFactory, ISessionManager
+public abstract class PacketSessionFactory extends APacketMiddle_SS implements ISessionFactory, ISessionManager
 {
 	protected final ConcurrentHashMap<ISessionKey, ISession> sendMap = new ConcurrentHashMap<>();
 
@@ -69,9 +69,10 @@ public abstract class PacketSessionFactory extends APacketHandlerProvider implem
 	
 	
 	@Override
-	public void handlePacket(IPacket packet)
+	public boolean handlePacket(IPacket packet)
 	{
 		ISession session = null;
+		boolean handled = false;
 		
 		// map not empty so search for session
 		if (!sendMap.isEmpty()) {
@@ -101,19 +102,22 @@ public abstract class PacketSessionFactory extends APacketHandlerProvider implem
 		}
 		
 		if (session != null) {
+			handled = true;
 			if (session.handlePacket(packet)) {
 				sendMap.remove(session.key());
 			}
 		}
-		else if (getHandler() != null) {
-			getHandler().handlePacket(packet);
+		else if (getInner() != null) {
+			handled = getInner().handlePacket(packet);
 		}
+		
+		return handled;
 	}
 	
 	
 	@Override
-	public void transmitPacket(IPacket packet) throws IOException
+	public boolean transmitPacket(IPacket packet) throws IOException
 	{
-		getProvider().transmitPacket(packet);
+		return getOuter().transmitPacket(packet);
 	}
 }

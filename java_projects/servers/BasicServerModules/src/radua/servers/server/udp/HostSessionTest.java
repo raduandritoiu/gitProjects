@@ -5,10 +5,10 @@ import java.net.SocketAddress;
 import java.util.concurrent.ConcurrentHashMap;
 
 import radua.servers.packetProcs.IPacket;
-import radua.servers.packetProcs.linking.APacketHandlerProvider;
+import radua.servers.packetProcs.linking.APacketMiddle_SS;
 import radua.utils.logs.Log;
 
-public class HostSessionTest extends APacketHandlerProvider
+public class HostSessionTest extends APacketMiddle_SS
 {
 	private final ConcurrentHashMap<SocketAddress, InternalHostSession> sessionsMap;
 	
@@ -19,12 +19,12 @@ public class HostSessionTest extends APacketHandlerProvider
 	}
 	
 	
-	public void transmitPacket(IPacket packet) throws IOException
+	public boolean transmitPacket(IPacket packet) throws IOException
 	{
-		getProvider().transmitPacket(packet);
+		return getOuter().transmitPacket(packet);
 	}
 
-	public void handlePacket(IPacket packet)
+	public boolean handlePacket(IPacket packet)
 	{
 		SocketAddress hostAddress = packet.remoteAddr();
 		InternalHostSession newSession = new InternalHostSession(hostAddress);
@@ -36,7 +36,7 @@ public class HostSessionTest extends APacketHandlerProvider
 		
 		session.f();
 		
-		getHandler().handlePacket(packet);
+		return getInner().handlePacket(packet);
 	}
 	
 	

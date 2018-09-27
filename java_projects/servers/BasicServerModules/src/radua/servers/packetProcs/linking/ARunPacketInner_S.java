@@ -2,7 +2,7 @@ package radua.servers.packetProcs.linking;
 
 import radua.servers.packetProcs.IRunnable;
 
-public abstract class ARunPacketHandlerProvider extends APacketHandlerProvider implements IRunnable
+public abstract class ARunPacketInner_S extends APacketInner_S implements IRunnable
 {
 	public final boolean isRunning() { return  isRunning; }
 	public final boolean start() { return super.pp_start(); }

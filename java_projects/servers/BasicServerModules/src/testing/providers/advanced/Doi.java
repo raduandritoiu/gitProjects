@@ -3,22 +3,23 @@ package testing.providers.advanced;
 import java.io.IOException;
 
 import radua.servers.packetProcs.IPacket;
-import radua.servers.packetProcs.linking.ARunPacketHandlerProvider;
+import radua.servers.packetProcs.linking.ARunPacketMiddle_SS;
 
-public class Doi extends ARunPacketHandlerProvider
+public class Doi extends ARunPacketMiddle_SS
 {
 	protected void internalStart() { System.out.println("Doi - start!"); }
 	protected void internalStop() { System.out.println("Doi - stop!"); }
 	protected void internalStopWait() { System.out.println("Doi - stop wait!"); }
 	
-	public void handlePacket(IPacket packet)
+	public boolean handlePacket(IPacket packet)
 	{
 		System.out.println("Doi - Handle Packet!");
-		getHandler().handlePacket(packet);
+		getInner().handlePacket(packet);
+		return true;
 	}
-	public void transmitPacket(IPacket packet) throws IOException
+	public boolean transmitPacket(IPacket packet) throws IOException
 	{
 		System.out.println("Doi - Send packet!");
-		getProvider().transmitPacket(packet);
+		return getOuter().transmitPacket(packet);
 	}
 }

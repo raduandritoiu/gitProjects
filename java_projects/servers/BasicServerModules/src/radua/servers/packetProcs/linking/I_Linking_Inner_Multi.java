@@ -1,8 +1,7 @@
 package radua.servers.packetProcs.linking;
 
-/*package_p*/ interface I_Multi_Inner extends IInner
+/*package_p*/ interface I_Linking_Inner_Multi extends IInner
 {
-	boolean hasOuter(IOuter outer);
 	IOuter addOuter(IOuter outer, int pos);
 	IOuter removeOuter(IOuter outer);
 	IOuter getOuter(int pos);

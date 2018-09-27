@@ -25,7 +25,7 @@ public class RequestSessionFactory extends PacketSessionFactory
 			return null;
 		}
 		RequestSession session = (RequestSession) addUniqueSession(packet);
-		getProvider().transmitPacket(packet);
+		getOuter().transmitPacket(packet);
 		return session;
 	}
 	

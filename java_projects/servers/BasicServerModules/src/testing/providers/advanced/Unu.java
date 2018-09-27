@@ -3,9 +3,9 @@ package testing.providers.advanced;
 import java.io.IOException;
 
 import radua.servers.packetProcs.IPacket;
-import radua.servers.packetProcs.linking.ARunPacketProvider;
+import radua.servers.packetProcs.linking.ARunPacketOuter_S;
 
-public class Unu extends ARunPacketProvider
+public class Unu extends ARunPacketOuter_S
 {
 	protected void internalStart() { System.out.println("Unu - start!"); }
 	protected void internalStop() { System.out.println("Unu - stop!"); }
@@ -14,11 +14,12 @@ public class Unu extends ARunPacketProvider
 	public void packetReceived()
 	{
 		System.out.println("Unu - Packet Received!");
-		getHandler().handlePacket(null);
+		getInner().handlePacket(null);
 	}
 
-	public void transmitPacket(IPacket packet) throws IOException
+	public boolean transmitPacket(IPacket packet) throws IOException
 	{
 		System.out.println("Unu - Send Packet!");
+		return true;
 	}
 }

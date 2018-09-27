@@ -258,11 +258,11 @@ import java.util.List;
 	
 //===================================================================================================
 //== I Outer Link =================================================================================
-	/*package_p*/ final ILinkInnerOuter pp_linkOuter(IOuter outer) // TODO ok
+	/*package_p*/ final IMiddle pp_linkOuter(IOuter outer) // TODO ok
 	{
 		A_Linking_Base.Link(outer, (IInner) this, false, -1, -1);
-		if (outer instanceof ILinkInnerOuter)
-			return (ILinkInnerOuter) outer;
+		if (outer instanceof IMiddle)
+			return (IMiddle) outer;
 		return null;
 	}
 	/*package_p*/ final IOuter pp_unlinkOuter(IOuter outer) // TODO ok
@@ -279,11 +279,11 @@ import java.util.List;
 	
 //===================================================================================================
 //== I Inner Link ================================================================================
-	/*package_p*/ final ILinkInnerOuter pp_linkInner(IInner inner) // TODO ok
+	/*package_p*/ final IMiddle pp_linkInner(IInner inner) // TODO ok
 	{
 		A_Linking_Base.Link((IOuter) this, inner, true, -1, -1);
-		if (inner instanceof ILinkInnerOuter) return
-			(ILinkInnerOuter) inner; 
+		if (inner instanceof IMiddle) return
+			(IMiddle) inner; 
 		return null;
 	}
 	/*package_p*/ final IInner pp_unlinkInner(IInner inner) // TODO ok
@@ -301,15 +301,15 @@ import java.util.List;
 //===================================================================================================
 //== I Outer Insert ================================================================================
 	/** This is for Single Inner (NOT Multi Inner) */
-	/*package_p*/ final ILinkInnerOuter pp_single_insertOuter(ILinkInnerOuter outer) // TODO: ok
+	/*package_p*/ final IMiddle pp_single_insertOuter(IMiddle outer) // TODO: ok
 	{
-		Insert(mOuter, outer, (I_Linking_Single_Inner) this);
+		Insert(mOuter, outer, (I_Linking_Inner_Single) this);
 		return outer;
 	}
 	/** This is for Multi Inner (NOT Single Inner) */
-	/*package_p*/ final ILinkInnerOuter pp_multi_insertOuter(I_Linking_Multi_InnerOuter_NA outer) // TODO: ok
+	/*package_p*/ final IMiddle pp_multi_insertOuter(I_Linking_Middle_Multi_NA outer) // TODO: ok
 	{
-		Insert_Outer(outer, (I_Linking_Multi_Inner) this);
+		Insert_Outer(outer, (I_Linking_Inner_Multi) this);
 		return outer;
 	}
 	
@@ -317,13 +317,13 @@ import java.util.List;
 //===================================================================================================
 //== I Inner Insert ================================================================================
 	/** This is for Outer Single (NOT Outer Multi) */
-	/*package_p*/ final ILinkInnerOuter pp_single_insertInner(ILinkInnerOuter inner) // TODO: ok
+	/*package_p*/ final IMiddle pp_single_insertInner(IMiddle inner) // TODO: ok
 	{
 		Insert((I_Linking_Outer_Single) this, inner, mInner);
 		return inner;
 	}
 	/** This is for Outer Multi (NOT Outer Single) */
-	/*package_p*/ final ILinkInnerOuter pp_multi_insertInner(I_Linking_NA_InnerOuter_Multi inner)  // TODO: ok
+	/*package_p*/ final IMiddle pp_multi_insertInner(I_Linking_Middle_NA_Multi inner)  // TODO: ok
 	{
 		Insert_Inner((I_Linking_Outer_Multi) this, inner);
 		return inner;
@@ -390,17 +390,17 @@ import java.util.List;
 		
 		// link new outer and inner
 		if (inner != null) {
-			if (inner instanceof I_Multi_Inner) {
-				((I_Multi_Inner) inner).addOuter(outer, outerPos);
-			} else if (inner instanceof I_Single_Inner) {
-				((I_Single_Inner) inner).setOuter(outer);
+			if (inner instanceof I_Linking_Inner_Multi) {
+				((I_Linking_Inner_Multi) inner).addOuter(outer, outerPos);
+			} else if (inner instanceof I_Linking_Inner_Single) {
+				((I_Linking_Inner_Single) inner).setOuter(outer);
 			}
 		}
 		if (outer != null) {
-			if (outer instanceof I_Outer_Multi) {
-				((I_Outer_Multi) outer).addInner(inner, innerPos);
-			} else if (outer instanceof I_Outer_Single) {
-				((I_Outer_Single) outer).setInner(inner);
+			if (outer instanceof I_Linking_Outer_Multi) {
+				((I_Linking_Outer_Multi) outer).addInner(inner, innerPos);
+			} else if (outer instanceof I_Linking_Outer_Single) {
+				((I_Linking_Outer_Single) outer).setInner(inner);
 			}
 		}
 		// start one based on the other
@@ -420,28 +420,28 @@ import java.util.List;
 	
 	private static final void Unlink(IOuter outer, IInner inner) // TODO ok
 	{
-		if (outer instanceof I_Outer_Multi) {
-			((I_Outer_Multi) outer).removeInner(inner);
-		} else if (outer instanceof I_Outer_Single) {
-			((I_Outer_Single) outer).setInner(null);
+		if (outer instanceof I_Linking_Outer_Multi) {
+			((I_Linking_Outer_Multi) outer).removeInner(inner);
+		} else if (outer instanceof I_Linking_Outer_Single) {
+			((I_Linking_Outer_Single) outer).setInner(null);
 		}
-		if (inner instanceof I_Multi_Inner) {
-			((I_Multi_Inner) inner).removeOuter(outer);
-		} else if (inner instanceof I_Single_Inner) {
-			((I_Single_Inner) inner).setOuter(null);
+		if (inner instanceof I_Linking_Inner_Multi) {
+			((I_Linking_Inner_Multi) inner).removeOuter(outer);
+		} else if (inner instanceof I_Linking_Inner_Single) {
+			((I_Linking_Inner_Single) inner).setOuter(null);
 		}
 	}
 
 	
-	private static final void Insert(IOuter outer, ILinkInnerOuter middle, IInner inner) // TODO: ok
+	private static final void Insert(IOuter outer, IMiddle middle, IInner inner) // TODO: ok
 	{
 		int p_idx = -1;
 		int h_idx = -1;
-		if (outer instanceof I_Outer_Multi) {
-			h_idx = ((I_Outer_Multi) outer).getInnerPos(inner);
+		if (outer instanceof I_Linking_Outer_Multi) {
+			h_idx = ((I_Linking_Outer_Multi) outer).getInnerPos(inner);
 		}
-		if (inner instanceof I_Multi_Inner) {
-			p_idx = ((I_Multi_Inner) inner).getOuterPos(outer);
+		if (inner instanceof I_Linking_Inner_Multi) {
+			p_idx = ((I_Linking_Inner_Multi) inner).getOuterPos(outer);
 		}
 		Unlink(outer, inner);
 		Link(middle, inner, false, p_idx, -1);
@@ -449,13 +449,13 @@ import java.util.List;
 	}
 	
 	
-	private static final void Insert_Inner(I_Linking_Outer_Multi outer, I_Linking_NA_InnerOuter_Multi middle) // TODO: ok
+	private static final void Insert_Inner(I_Linking_Outer_Multi outer, I_Linking_Middle_NA_Multi middle) // TODO: ok
 	{
 		A_Linking_Base outer_a = (A_Linking_Base) outer;
 		for (IInner inner : outer_a.mInners) {
 			int p_idx = -1;
-			if (inner instanceof I_Multi_Inner) {
-				p_idx = ((I_Multi_Inner) inner).getOuterPos(outer);
+			if (inner instanceof I_Linking_Inner_Multi) {
+				p_idx = ((I_Linking_Inner_Multi) inner).getOuterPos(outer);
 			}
 			Unlink(outer, inner);
 			Link(middle, inner, false, p_idx, -1);
@@ -464,13 +464,13 @@ import java.util.List;
 	}
 	
 	
-	private static final void Insert_Outer(I_Linking_Multi_InnerOuter_NA middle, I_Linking_Multi_Inner inner) // TODO: ok
+	private static final void Insert_Outer(I_Linking_Middle_Multi_NA middle, I_Linking_Inner_Multi inner) // TODO: ok
 	{
 		A_Linking_Base inner_a = (A_Linking_Base) inner;
 		for (IOuter outer : inner_a.mOuters) {
 			int h_idx = -1;
-			if (outer instanceof I_Outer_Multi) {
-				h_idx = ((I_Outer_Multi) outer).getInnerPos(inner);
+			if (outer instanceof I_Linking_Outer_Multi) {
+				h_idx = ((I_Linking_Outer_Multi) outer).getInnerPos(inner);
 			}
 			Unlink(outer, inner);
 			Link(outer, middle, true, -1, h_idx);

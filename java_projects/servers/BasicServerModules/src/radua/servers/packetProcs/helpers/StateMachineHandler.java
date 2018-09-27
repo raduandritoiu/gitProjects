@@ -5,18 +5,19 @@ import java.net.SocketAddress;
 import radua.servers.packetProcs.IPacket;
 import radua.servers.packetProcs.Packet;
 import radua.servers.packetProcs.PacketDirection;
-import radua.servers.packetProcs.linking.APacketHandler;
+import radua.servers.packetProcs.linking.APacketInner_S;
 import radua.utils.logs.Log;
 
-public class StateMachineHandler extends APacketHandler
+public class StateMachineHandler extends APacketInner_S
 {
 	private int state = 0;
 	
-	public void handlePacket(IPacket packet) 
+	public boolean handlePacket(IPacket packet) 
 	{
 		String response = getStateString();
-		try { getProvider().transmitPacket(new SMPacket(response, packet.remoteAddr())); }
+		try { getOuter().transmitPacket(new SMPacket(response, packet.remoteAddr())); }
 		catch (Exception ex) { Log._out("FUCK: " + ex); }
+		return true;
 	}
 	
 	private String getStateString()

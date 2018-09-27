@@ -3,25 +3,26 @@ package testing.providers.advanced;
 import java.io.IOException;
 
 import radua.servers.packetProcs.IPacket;
-import radua.servers.packetProcs.linking.ARunPacketHandler;
+import radua.servers.packetProcs.linking.ARunPacketInner_S;
 
-public class Cinci extends ARunPacketHandler
+public class Cinci extends ARunPacketInner_S
 {
 	protected void internalStart() { System.out.println("Cinci - start!"); }
 	protected void internalStop() { System.out.println("Cinci - stop!"); }
 	protected void internalStopWait() { System.out.println("Cinci - stop wait!"); }
 	
-	public void handlePacket(IPacket packet) 
+	public boolean handlePacket(IPacket packet) 
 	{
 		System.out.println("Cinci - Handle Packet!");
 		System.out.println("Cinci - prepare a Reply!");
-		try { getProvider().transmitPacket(null); }
+		try { getOuter().transmitPacket(null); }
 		catch (IOException ex) {}
+		return true;
 	}
 	
 	public void tick() throws IOException
 	{
 		System.out.println("Cinci - Send packet DOWN!");
-		getProvider().transmitPacket(null);
+		getOuter().transmitPacket(null);
 	}
 }

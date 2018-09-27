@@ -6,11 +6,11 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import radua.servers.packetProcs.IPacket;
-import radua.servers.packetProcs.linking.APacketHandlerProvider;
+import radua.servers.packetProcs.linking.APacketMiddle_SS;
 import radua.utils.logs.Log;
 
 
-public class ParallelPackets extends APacketHandlerProvider
+public class ParallelPackets extends APacketMiddle_SS
 {
 	private final int numThreads;
 	private ExecutorService pool;
@@ -40,13 +40,14 @@ public class ParallelPackets extends APacketHandlerProvider
 	}
 	
 	
-	public void transmitPacket(IPacket packet) throws IOException
+	public boolean transmitPacket(IPacket packet) throws IOException
 	{
-		getProvider().transmitPacket(packet);
+		return getOuter().transmitPacket(packet);
 	}
-	public void handlePacket(IPacket packet)
+	public boolean handlePacket(IPacket packet)
 	{
 		pool.execute(new ParallelPacketProcess(packet));
+		return true;
 	}
 
 
@@ -63,7 +64,7 @@ public class ParallelPackets extends APacketHandlerProvider
 		
 		public void run()
 		{
-			getHandler().handlePacket(packet);
+			getInner().handlePacket(packet);
 		}
 	}
 }
