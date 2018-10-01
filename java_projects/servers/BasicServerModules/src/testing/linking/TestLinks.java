@@ -48,7 +48,7 @@ public class TestLinks
 		Integer i2 = 5;
 		Integer a2 = 0;
 		a2 = i1;
-		i2 ++;
+		inc(i2);
 		
 		
 		
@@ -59,7 +59,12 @@ public class TestLinks
 		i.linkInner(g);
 		i.linkInner(m).linkInner(n);
 		m.linkInner(o).linkInner(p).linkInner(q);
-		GraphLinks gr = GraphLinks.CreateGraph(d);
+		GraphLinks graph = GraphLinks.CreateGraph(d);
+		graph.printGraph();
 		clear();
+	}
+	
+	public static void inc(Integer i) {
+		i++;
 	}
 }
