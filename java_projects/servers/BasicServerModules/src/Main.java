@@ -1,3 +1,4 @@
+import testing.linking.TestLinks;
 import testing.providers.advanced.TestLetters;
 import testing.providers.simple.TestNumbers;
 
@@ -10,6 +11,7 @@ public class Main
 //		TestNumbers.run();
 //		testing.providers.advanced.TestNumbers.run();
 		
-		TestLetters.run();
+//		TestLetters.run();
+		TestLinks.run();
 	}
 }
