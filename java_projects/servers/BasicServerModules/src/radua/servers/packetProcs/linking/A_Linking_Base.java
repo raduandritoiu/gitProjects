@@ -1,5 +1,6 @@
 package radua.servers.packetProcs.linking;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -22,6 +23,10 @@ import java.util.List;
 	
 //===================================================================================================
 //== Multiple outers ==============================================================================
+	/*package_p*/ final void pp_initOuters()
+	{
+		mOuters = new ArrayList<>();
+	}
 	/*package_p*/ final boolean pp_hasOuter(IOuter outer)
 	{
 		if (outer == null) return false;
@@ -56,6 +61,10 @@ import java.util.List;
 	
 //===================================================================================================
 //== Multiple Inners ==============================================================================
+	/*package_p*/ final void pp_initInners()
+	{
+		mInners = new ArrayList<>();
+	}
 	/*package_p*/ final boolean pp_hasInner(IInner inner)
 	{
 		if (inner == null) return false;

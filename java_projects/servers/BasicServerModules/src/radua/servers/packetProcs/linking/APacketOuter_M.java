@@ -2,6 +2,8 @@ package radua.servers.packetProcs.linking;
 
 public abstract class APacketOuter_M extends A_Linking_Base implements I_Linking_Outer_Multi
 {
+	public APacketOuter_M() { super.pp_initInners(); }
+
 	public IInner addInner(IInner inner, int pos) { return super.pp_addInner(inner, pos); }
 	public IInner removeInner(IInner inner) { return super.pp_removeInner(inner); }
 	public IInner getInner(int pos) { return super.pp_getInner(pos); }

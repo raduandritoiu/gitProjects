@@ -2,6 +2,9 @@ package radua.servers.packetProcs.linking;
 
 public abstract class APacketMiddle_SM extends A_Linking_Base implements I_Linking_Middle_Single_Multi
 {
+	public APacketMiddle_SM() { super.pp_initInners(); }
+	
+	
 	public final void setOuter(IOuter outer) { mOuter = outer; }
 	public final IOuter getOuter() { return mOuter; }
 	
