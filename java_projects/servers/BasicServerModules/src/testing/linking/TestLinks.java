@@ -56,9 +56,12 @@ public class TestLinks
 		
 		a.linkInner(b).linkInner(c).linkInner(d).linkInner(e);
 		c.linkInner(f).linkInner(g).linkInner(h).linkInner(q);
-		i.linkInner(g);
+		t.linkInner(l).linkInner(k).linkInner(j).linkInner(i).linkInner(g);
 		i.linkInner(m).linkInner(n);
 		m.linkInner(o).linkInner(p).linkInner(q);
+		k.linkInner(r).linkInner(i);
+		t.linkInner(v).linkInner(l);
+		u.linkInner(v);
 		GraphLinks graph = GraphLinks.CreateGraph(d);
 		graph.printGraph();
 		clear();

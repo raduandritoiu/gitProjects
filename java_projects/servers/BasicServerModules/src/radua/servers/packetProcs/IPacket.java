@@ -8,4 +8,5 @@ public interface IPacket
 	int dataLen();
 	SocketAddress remoteAddr();
 	PacketDirection direction();
+	IPacket clone();
 }

@@ -54,6 +54,7 @@ public class GraphLinks
 		
 		Node node = new Node(link);
 		visitedLinks.put(link, node);
+		nodes.add(node);
 
 		if (link.mOuter != null) {
 			Node fNode = parseLink((A_Linking_Base) link.mOuter);
@@ -80,7 +81,6 @@ public class GraphLinks
 			}
 		}		
 		
-		nodes.add(node);
 		if (node.mRews.size() == 0) {
 			firstNodes.add(node);
 		}
@@ -124,7 +124,6 @@ public class GraphLinks
 		for (Node node : firstNodes) {
 			positionNode(node, x, y);
 			x.inc();
-			y = 5;
 		}
 		visitedNodes = null;
 	}
@@ -186,7 +185,7 @@ public class GraphLinks
 			if (node.y > maxY) maxY = node.y;
 			if (node.mName.length() > maxL) maxL = node.mName.length();
 		}
-		GraphCanvas canvas = new GraphCanvas(maxX, maxY, maxL, 1, 10, 4);
+		GraphCanvas canvas = new GraphCanvas(maxX, maxY, maxL, 3, 12, 3);
 		for (Node node : nodes) {
 			for (Node fwdNode : node.mFwds) {
 				canvas.putEdgeNodes(node, fwdNode);

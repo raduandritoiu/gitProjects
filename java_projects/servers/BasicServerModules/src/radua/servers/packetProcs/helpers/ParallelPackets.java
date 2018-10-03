@@ -12,28 +12,30 @@ import radua.utils.logs.Log;
 
 public class ParallelPackets extends APacketMiddle_SS
 {
-	private final int numThreads;
-	private ExecutorService pool;
+	private final int mNumThreads;
+	private ExecutorService mPool;
 	
 	
 	public ParallelPackets(int nNumThreads)
 	{
-		numThreads = nNumThreads;
+		mNumThreads = nNumThreads;
 	}
 	
 	
 	protected void internalStart()
 	{
-		pool = Executors.newFixedThreadPool(numThreads);
+		mPool = Executors.newFixedThreadPool(mNumThreads);
 	}
 	protected void internalStop()
 	{
-	    pool.shutdown();
+	    mPool.shutdown();
 	}
 	protected void internalStopWait()
 	{
 		internalStop();
-		try { pool.awaitTermination(10, TimeUnit.SECONDS); }
+		try {
+			mPool.awaitTermination(10, TimeUnit.SECONDS);
+		}
 	    catch (Exception ex) {
 	    	Log._err("Error waiting closing POOL", ex);
 	    }
@@ -44,9 +46,10 @@ public class ParallelPackets extends APacketMiddle_SS
 	{
 		return getOuter().transmitPacket(packet);
 	}
+	
 	public boolean handlePacket(IPacket packet)
 	{
-		pool.execute(new ParallelPacketProcess(packet));
+		mPool.execute(new ParallelPacketProcess(packet));
 		return true;
 	}
 

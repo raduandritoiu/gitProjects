@@ -10,15 +10,8 @@ public class PacketLogger extends APacketMiddle_SS
 {
 	private Log log;
 	
-	public PacketLogger()
-	{
-		this(new Log());
-	}
-	
-	public PacketLogger(Log nLog)
-	{
-		log = nLog;
-	}
+	public PacketLogger() { this(new Log()); }
+	public PacketLogger(Log nLog) { log = nLog; }
 	
 	public boolean transmitPacket(IPacket packet) throws IOException 
 	{

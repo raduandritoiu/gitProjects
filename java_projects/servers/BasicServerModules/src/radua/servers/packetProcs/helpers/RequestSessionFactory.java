@@ -17,7 +17,6 @@ public class RequestSessionFactory extends PacketSessionFactory
 		Packet packet = Packet.Out(data, data.length, remoteAddr);
 		return sendRequest(packet, hasReplay);
 	}
-	
 	public RequestSession sendRequest(IPacket packet, boolean hasReplay) throws IOException, UniqueKeyValue
 	{
 		if (!hasReplay) {
