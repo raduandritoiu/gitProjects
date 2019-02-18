@@ -1,4 +1,4 @@
-package testEnum;
+package testEnumInternals;
 
 public class TestEnum
 {
