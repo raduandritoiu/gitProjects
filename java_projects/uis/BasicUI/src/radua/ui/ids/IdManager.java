@@ -2,20 +2,23 @@ package radua.ui.ids;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class IdManager {
-
-	private static final AtomicInteger cnt = new AtomicInteger(0);
+public class IdManager 
+{
+//	private static final AtomicInteger genCnt = new AtomicInteger(0);
+	private static final AtomicInteger modelCnt = new AtomicInteger(0);
+	private static final AtomicInteger viewCnt = new AtomicInteger(0);
+	private static final AtomicInteger snapCnt = new AtomicInteger(0);
 	
 	
 	public static ModelId GetModelId() {
-		return new ModelId(cnt.incrementAndGet());
+		return new ModelId(modelCnt.incrementAndGet());
 	}
 	
 	public static ViewId GetViewId() {
-		return new ViewId(cnt.incrementAndGet());
+		return new ViewId(viewCnt.incrementAndGet());
 	}
 	
 	public static SnapId GetSnapId() {
-		return new SnapId(cnt.incrementAndGet());
+		return new SnapId(snapCnt.incrementAndGet());
 	}
 }

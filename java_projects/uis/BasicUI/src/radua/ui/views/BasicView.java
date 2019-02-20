@@ -25,8 +25,8 @@ public abstract class BasicView<MDL extends IBasicModel> extends JComponent impl
 		_painters = new ArrayList<>();
 		_model = model;
 		_model.addObserver(this);
-        setLocation(_model.getPosition());
-        setSize(_model.getDimension());
+        setLocation((int) _model.x(), (int) _model.y());
+        setSize((int) _model.width(), (int) _model.height());
         setOpaque(false);
         addInitialPainters();
 	}
@@ -50,10 +50,10 @@ public abstract class BasicView<MDL extends IBasicModel> extends JComponent impl
 	public void notify(IObservable observable, ObservableEvent event, Object value) {
 		switch (event) {
 			case MOVE:
-		        setLocation(_model.getX(), _model.getY());
+		        setLocation((int) _model.x(), (int) _model.y());
 		        return;
 			case RESIZE:
-				setSize(_model.getWidth(), _model.getHeigth());
+				setSize((int) _model.width(), (int) _model.height());
 		        return;
 			case ROTATE:
 				doRotate(value);

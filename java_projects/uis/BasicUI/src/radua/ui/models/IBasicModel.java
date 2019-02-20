@@ -1,11 +1,13 @@
 package radua.ui.models;
 
 import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Point;
 
+import radua.ui.common.IReadablePoint;
+import radua.ui.common.IReadableSize;
+import radua.ui.common.IWritablePoint;
 import radua.ui.ids.ModelId;
 import radua.ui.observers.IObserver;
+import radua.ui.observers.ObservableEvent;
 
 
 public interface IBasicModel 
@@ -19,29 +21,32 @@ public interface IBasicModel
 	Color getColor();
 	void setColor(Color color);
 	boolean isSelected();
-	void setSelected(boolean selected);
+	void select(boolean selected);
 	
-	Point getPosition();
-	int getX();
-	int getY();
-	Dimension getDimension();
-	int getWidth();
-	int getHeigth();
-	double getRotation();
+	IReadablePoint position();
+	double x();
+	double y();
+	IReadableSize size();
+	double width();
+	double height();
+	double rotation();
 	
-	void move(Point point);
-	void move(int x, int y);
-	void translate(Point point);
-	void translate(int x, int y);
-	void resize(Dimension dimension);
-	void resize(int width, int height);
+	void moveTo(IReadablePoint point);
+	void moveTo(double x, double y);
+	void moveBy(IReadablePoint point);
+	void moveBy(double x, double y);
+	void resizeTo(IReadableSize size);
+	void resizeTo(double width, double height);
 	void scale(float scale);
-	void rotateDelta(double rotation);
-	void rotate(double rotation);
+	void rotateBy(double rotation);
+	void rotateTo(double rotation);
 	
-	Point relativePoint(Point point);
-	Point absolutePoint(Point point);
-	Point relativeToAbsolute(Point point);
+	void relativePoint(IReadablePoint point, IWritablePoint result);
+	void absolutePoint(IReadablePoint point, IWritablePoint result);
+	void relativeToAbsolute(IReadablePoint point, IWritablePoint result);
+	
+	void notifyObservers(ObservableEvent event, Object value);
+	
 	
 	String debugString(int tabs);
 }

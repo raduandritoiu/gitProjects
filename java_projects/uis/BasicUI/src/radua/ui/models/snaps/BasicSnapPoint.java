@@ -1,19 +1,25 @@
 package radua.ui.models.snaps;
 
-import java.awt.Dimension;
-import java.awt.Point;
-
+import radua.ui.common.IReadablePoint;
+import radua.ui.common.IReadableSize;
+import radua.ui.ids.IdManager;
+import radua.ui.ids.SnapId;
 import radua.ui.models.SnapModel;
 
 public abstract class BasicSnapPoint implements ISnapPoint
 {
+	protected final SnapId _id;
 	protected final SnapModel _parent;
 	protected ISnapPoint _neighbour;
 	
 	public BasicSnapPoint(SnapModel parent) {
+		_id = IdManager.GetSnapId();
 		_parent = parent;
 	}
-	public SnapModel getParent() {
+	public SnapId id() {
+		return _id;
+	}
+	public SnapModel parent() {
 		return _parent;
 	}
 	
@@ -27,8 +33,8 @@ public abstract class BasicSnapPoint implements ISnapPoint
 		return _neighbour != null;
 	}
 	
-	public void parentMoved(Point oldPosition) { updatePoints(); }
-	public void parentResized(Dimension oldDimension) { updatePoints(); }
+	public void parentMoved(IReadablePoint oldPosition) { updatePoints(); }
+	public void parentResized(IReadableSize oldSize) { updatePoints(); }
 	public void parentRotated(double oldRotation) { updatePoints(); }
 	abstract void updatePoints();
 	

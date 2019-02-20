@@ -1,9 +1,9 @@
 package radua.ui.models;
 
-import java.awt.Point;
+import radua.ui.common.IReadablePoint;
 
 
 public interface IPolygonModel extends IBasicModel 
 {
-	Point[] getPolygonPoints();
+	IReadablePoint[] getPolygonPoints();
 }

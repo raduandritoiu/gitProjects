@@ -1,33 +1,40 @@
 package radua.ui.models.tracks;
 
-import java.awt.Point;
+import java.awt.Color;
 
+import radua.ui.common.MPoint;
 import radua.ui.models.snaps.DirectionalSnapPoint;
-import radua.ui.utils.Rotations;
+import radua.ui.utils.Constants;
 
 
 public class ReversTrack extends TrackModel
 {
 	public ReversTrack(int x, int y) {
-		super(x, y);
+		super(new MPoint(x, y), new MPoint(50, 50).scale(SCALE_FACTOR));
+		
+		_color = Color.PINK;
 		
 		int n = 3;
-		_drawPoints = new Point[8];
-		_originalDrawPoints = new Point[8];
-		_originalDrawPoints[0] = new Point(10, 30);
-		_originalDrawPoints[1] = new Point(10, 70);
-		_originalDrawPoints[2] = new Point(10 + 8*n, 70);
+		_originalPoints = new MPoint[8];
+		_originalPoints[0] = new MPoint(10, 30).scale(SCALE_FACTOR);
+		_originalPoints[1] = new MPoint(10, 70).scale(SCALE_FACTOR);
+		_originalPoints[2] = new MPoint(10 + 8*n, 70).scale(SCALE_FACTOR);
 
-		_originalDrawPoints[3] = new Point(100 - 7*n, 47 + 4*n);
-		_originalDrawPoints[4] = new Point(100, 47);
-		_originalDrawPoints[5] = new Point(80, 13);
-		_originalDrawPoints[6] = new Point(80 - 7*n, 13 + 4*n);
+		_originalPoints[3] = new MPoint(95 - 7*n, 47 + 4*n).scale(SCALE_FACTOR);
+		_originalPoints[4] = new MPoint(95, 47).scale(SCALE_FACTOR);
+		_originalPoints[5] = new MPoint(75, 13).scale(SCALE_FACTOR);
+		_originalPoints[6] = new MPoint(75 - 7*n, 13 + 4*n).scale(SCALE_FACTOR);
 		
-		_originalDrawPoints[7] = new Point(10 + 8*n, 30);
+		_originalPoints[7] = new MPoint(10 + 8*n, 30).scale(SCALE_FACTOR);
 		
+		_drawPoints = new MPoint[8];
+		for (int i = 0; i < _originalPoints.length; i++) {
+			_drawPoints[i] = new MPoint();
+		}
+
 		updatePolygonPoints();
 		
-		_snapPoints.add(new DirectionalSnapPoint(this, 10, 50, Rotations.RAD_180));
-		_snapPoints.add(new DirectionalSnapPoint(this, 90, 30, Rotations.RAD_330));
+		_snapPoints.add(new DirectionalSnapPoint(this, new MPoint(10, 50).scale(SCALE_FACTOR), Constants.RAD_180));
+		_snapPoints.add(new DirectionalSnapPoint(this, new MPoint(85, 30).scale(SCALE_FACTOR), Constants.RAD_330));
 	}
 }

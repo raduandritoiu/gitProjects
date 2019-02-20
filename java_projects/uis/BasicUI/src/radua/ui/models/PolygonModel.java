@@ -1,29 +1,39 @@
 package radua.ui.models;
 
 import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Point;
+
+import radua.ui.common.IReadablePoint;
+import radua.ui.common.IReadableSize;
+import radua.ui.common.IWritablePoint;
 
 
 public class PolygonModel extends BasicModel implements IPolygonModel
 {
-	protected Point[] _originalDrawPoints;
-	protected Point[] _drawPoints;
+	protected IReadablePoint[] _originalPoints;
+	protected IWritablePoint[] _drawPoints;
 
-	public PolygonModel(int x, int y) {
-		super(x, y, 100, 100, Color.GREEN);
+	
+//	public PolygonModel() {
+//		super();
+//	}
+	public PolygonModel(IReadablePoint position, IReadableSize size, Color color) {
+		this(position.x(), position.y(), size.width(), size.height(), color);
+	}
+	public PolygonModel(double x, double y, double width, double height, Color color) {
+		super(x, y, width, height, color);
 	}
 	
+	
 	protected void updatePolygonPoints() {
-		for (int i = 0; i < _originalDrawPoints.length; i++) {
-			_drawPoints[i] = relativePoint(_originalDrawPoints[i]);
+		for (int i = 0; i < _originalPoints.length; i++) {
+			relativePoint(_originalPoints[i], _drawPoints[i]);
 		}
 	}
 	
 	@Override
-	protected void resizeLogic(Dimension oldDimension) {
+	protected void resizeLogic(IReadableSize oldSize) {
 		updatePolygonPoints();
-		super.resizeLogic(oldDimension);
+		super.resizeLogic(oldSize);
 	}
 	
 	@Override
@@ -32,7 +42,7 @@ public class PolygonModel extends BasicModel implements IPolygonModel
 		super.rotateLogic(oldRotation);
 	}
 	
-	public Point[] getPolygonPoints() {
+	public IReadablePoint[] getPolygonPoints() {
 		return _drawPoints;
 	}
 }

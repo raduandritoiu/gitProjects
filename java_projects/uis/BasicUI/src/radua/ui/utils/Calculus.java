@@ -1,40 +1,50 @@
 package radua.ui.utils;
 
-import java.awt.Point;
+import radua.ui.common.IReadablePoint;
+import radua.ui.common.IWritablePoint;
 
 
 public class Calculus 
 {
+	
+	
 	public static int RadToDeg(double rad) {
-//		return NormalDeg((int) Math.round(rad / Math.PI * 180));
-		return (int) Math.round(rad / Rotations.RAD_180 * 180);
+		return (int) Math.round(rad / Constants.RAD_180 * 180);
 	}
 	
 	public static double DegToRad(int deg) {
-		return NormalRad((double)deg / 180 * Rotations.RAD_180);
+		return NormalRad((double)deg / 180 * Constants.RAD_180);
 	}
 	
 	
 	public static int NormalDeg(int deg) {
-		deg %= Rotations.DEG_360;
+		deg %= Constants.DEG_360;
 		if (deg < 0) {
-			deg += Rotations.DEG_360;
+			deg += Constants.DEG_360;
 		}
 		return deg;
 	}
 	
 	public static double NormalRad(double rad) {
-		return rad - Math.floor(rad / Rotations.RAD_360) * Rotations.RAD_360;
+		double fu = rad / Constants.RAD_360;
+		fu = Math.floor(fu);
+		fu = fu * Constants.RAD_360;
+		return rad - Math.floor(rad / Constants.RAD_360) * Constants.RAD_360;
 	}
 	
 	
-	public static boolean oyParallel(Point A, Point B) {
-		return A.x == B.x;
+	public static boolean oyParallel(IReadablePoint A, IReadablePoint B) {
+		return A.x() == B.x();
 	}	
 	
 	
-	public static double computeM(Point A, Point B) {
-		double m = ((double) (B.y - A.y)) / ((double) (B.x - A.x));
+	public static double length(IReadablePoint A, IReadablePoint B) {
+		return Math.sqrt((A.x() - B.x())*(A.x() - B.x()) + (A.y() - B.y())*(A.y() - B.y()));
+	}
+	
+	
+	public static double computeM(IReadablePoint A, IReadablePoint B) {
+		double m = ((double) (B.y() - A.y())) / ((double) (B.x() - A.x()));
 		return m;
 	}
 	
@@ -44,16 +54,16 @@ public class Calculus
 	}
 	
 	
-	public static Point rotatePoint(Point point, double rotation, int centerX, int centerY) {
+	public static void rotatePoint(IReadablePoint point, double rotation, double centerX, double centerY, IWritablePoint result) {
 		double cos = Math.cos(rotation);
 		double sin = Math.sin(rotation);
-		int x = point.x - centerX;
-		int y = point.y - centerY;
-		int rx = (int) Math.round(x*cos - y*sin);
-		int ry = (int) Math.round(x*sin + y*cos);
+		double x = point.x() - centerX;
+		double y = point.y() - centerY;
+		double rx = x*cos - y*sin;
+		double ry = x*sin + y*cos;
 		rx += centerX;
 		ry += centerY;
-		return new Point(rx, ry);
+		result.moveTo(rx, ry);
 	}
 
 }

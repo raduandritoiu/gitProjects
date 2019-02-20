@@ -1,15 +1,16 @@
 package radua.ui.models;
 
 import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 
+import radua.ui.common.IReadablePoint;
+import radua.ui.common.IReadableSize;
 import radua.ui.models.snaps.DrawSnapPoint;
 import radua.ui.models.snaps.ISnapPoint;
 import radua.ui.models.snaps.SnapResult;
 import radua.ui.observers.ObservableEvent;
+import radua.ui.utils.Constants;
 
 
 public class SnapModel extends BasicModel implements ISnapModel
@@ -19,8 +20,10 @@ public class SnapModel extends BasicModel implements ISnapModel
 	protected final List<ISnapPoint> _snapPoints;
 	
 	
-	public SnapModel(int x, int y, int width, int height, Color color) { this(x, y, width, height, color, Color.BLUE, Color.RED);  }
-	public SnapModel(int x, int y, int width, int height, Color color, Color unsnapColor, Color snapColor) {
+	public SnapModel(IReadablePoint position, IReadableSize size, Color color, Color unsnapColor, Color snapColor) {
+		this(position.x(), position.y(), size.width(), size.height(), color, unsnapColor, snapColor);
+	}
+	public SnapModel(double x, double y, double width, double height, Color color, Color unsnapColor, Color snapColor) {
 		super(x, y, width, height, color);
 		_unsnappedColor = unsnapColor;
 		_snappedColor = snapColor;
@@ -42,6 +45,10 @@ public class SnapModel extends BasicModel implements ISnapModel
 		notifyObservers(ObservableEvent.SNAP_CHANGE, tmp);
 	}
 
+	public List<ISnapPoint> snapPoints() {
+		return _snapPoints;
+	}
+	
 	public ArrayList<DrawSnapPoint> getDrawSnapPoints() {
 		ArrayList<DrawSnapPoint> points = new ArrayList<>(2);
 		for (ISnapPoint snappingPoint : _snapPoints) {
@@ -52,15 +59,15 @@ public class SnapModel extends BasicModel implements ISnapModel
 	
 	
 	@Override
-	protected void moveLogic(Point oldPosition) {
+	protected void moveLogic(IReadablePoint oldPosition) {
 		for (ISnapPoint snappingPoint : _snapPoints) {
 			snappingPoint.parentMoved(oldPosition);
 		}
 	}
 	@Override
-	protected void resizeLogic(Dimension oldDimension) {
+	protected void resizeLogic(IReadableSize oldSize) {
 		for (ISnapPoint snappingPoint : _snapPoints) {
-			snappingPoint.parentResized(oldDimension);
+			snappingPoint.parentResized(oldSize);
 		}
 	}
 	@Override
@@ -70,31 +77,84 @@ public class SnapModel extends BasicModel implements ISnapModel
 		}
 	}
 	
-	
-	public SnapResult snaps(SnapModel remoteSnapModel) {
-		for (ISnapPoint localSnapPoint : _snapPoints) {
-    		for (ISnapPoint remoteSnapPoint : remoteSnapModel._snapPoints) {
-    			boolean wasSnapped = localSnapPoint.isSnapped();
-    			ISnapPoint lastRemoteSnapPoint = localSnapPoint.getSnap();
-    			if (localSnapPoint.canSnap(remoteSnapPoint)) {
-    				localSnapPoint.setSnap(remoteSnapPoint);
-    				remoteSnapPoint.setSnap(localSnapPoint);
-    				notifyObservers(ObservableEvent.SNAP_CHANGE, true);
-    				remoteSnapModel.notifyObservers(ObservableEvent.SNAP_CHANGE, true);
-    				return SnapResult.TRUE(localSnapPoint, remoteSnapPoint);
+	public SnapResult snaps(SnapModel remoteModel) {
+		SnapResult result = SnapResult.FALSE();
+		
+		for (ISnapPoint localSnap : _snapPoints) {
+			// cache info about last snap
+			ISnapPoint lastRemoteSnap = localSnap.getSnap();
+			ISnapPoint newRemoteSnap = lastRemoteSnap;
+			double newSnapStrength = Constants.MAX_INF;
+			if (lastRemoteSnap != null) {
+    			newSnapStrength = localSnap.getSnapStength(lastRemoteSnap);
+			}
+			
+			// find snap point with best strength snap
+    		for (ISnapPoint remoteSnap : remoteModel._snapPoints) {
+    			// skip last remote snap point
+    			if (remoteSnap == lastRemoteSnap)
+    				continue;
+    			if (localSnap.canSnap(remoteSnap)) {
+					double snapStrength = localSnap.getSnapStength(remoteSnap);
+    				if (snapStrength < newSnapStrength) {
+    					newSnapStrength = snapStrength;
+    					newRemoteSnap = remoteSnap;
+    				}
     			}
-    			else if (wasSnapped) {
-    				localSnapPoint.setSnap(null);
-    				lastRemoteSnapPoint.setSnap(null);
+    		}
+    		
+			// update the snap
+			if (newRemoteSnap != lastRemoteSnap) {
+				
+				String str = "============ update SNAP POINT local:"+id()+"."+localSnap.id()+
+						"  new:"+newRemoteSnap.parent().id()+"."+newRemoteSnap.id()+"  last:";
+				
+				if (lastRemoteSnap != null) {
+    				lastRemoteSnap.setSnap(null);
+    				lastRemoteSnap.parent().notifyObservers(ObservableEvent.SNAP_CHANGE, false);
+    				
+    				str += lastRemoteSnap.parent().id()+"."+lastRemoteSnap.id();
+				}
+				else {
+					str += "null";
+				}
+				System.out.println(str);
+				
+				localSnap.setSnap(newRemoteSnap);
+				newRemoteSnap.setSnap(localSnap);
+				notifyObservers(ObservableEvent.SNAP_CHANGE, true);
+				newRemoteSnap.parent().notifyObservers(ObservableEvent.SNAP_CHANGE, true);
+				result = SnapResult.TRUE(localSnap, newRemoteSnap);
+			}
+			// test if last snap still snaps
+			else if (lastRemoteSnap != null) {
+				if (localSnap.canSnap(lastRemoteSnap)) {
+					
+					System.out.println("============ keep on SNAP POINT local:"+id()+"."+localSnap.id()+
+						"  last:"+lastRemoteSnap.parent().id()+"."+lastRemoteSnap.id());
+					
+					result = SnapResult.TRUE(localSnap, lastRemoteSnap);
+    			}
+    			// remove last snap
+    			else {
+    				
+					System.out.println("============ remove SNAP POINT local:"+id()+"."+localSnap.id()+
+							"  last:"+lastRemoteSnap.parent().id()+"."+lastRemoteSnap.id());
+					
+					localSnap.setSnap(null);
+    				lastRemoteSnap.setSnap(null);
     				notifyObservers(ObservableEvent.SNAP_CHANGE, false);
-    				lastRemoteSnapPoint.getParent().notifyObservers(ObservableEvent.SNAP_CHANGE, false);
+    				lastRemoteSnap.parent().notifyObservers(ObservableEvent.SNAP_CHANGE, false);
     			}
+			}
+    		else {
+    			// nothing to do, apparently even last remote snap was null
     		}
 		}
 
-		return SnapResult.FALSE();
+		return result;
 	}
-	
+
 	
 	@Override
 	public String debugString(int tabs) {

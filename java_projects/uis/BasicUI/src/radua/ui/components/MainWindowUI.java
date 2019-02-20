@@ -45,25 +45,28 @@ public class MainWindowUI extends JFrame
         addOpsPanel(mainView);
     	
     	worldCtrl = new WorldController(mainView);
-        worldCtrl.addView(new TrackView(new StraightTrack(200, 200)));
+        worldCtrl.addView(new TrackView(new StraightTrack(100, 100)));
         worldCtrl.addView(new TrackView(new StraightTrack(300, 100)));
+        worldCtrl.addView(new TrackView(new StraightTrack(500, 100)));
+//        worldCtrl.addView(new TrackView(new StraightTrack(300, 200)));
+//        worldCtrl.addView(new TrackView(new StraightTrack(100, 400)));
         
-        worldCtrl.addView(new TrackView(new CurvedTrack(500, 100)));
-        worldCtrl.addView(new TrackView(new CurvedTrack(600, 100)));
-        worldCtrl.addView(new TrackView(new CurvedTrack(700, 100)));
-        worldCtrl.addView(new TrackView(new CurvedTrack(100, 300)));
-        worldCtrl.addView(new TrackView(new CurvedTrack(200, 300)));
-        worldCtrl.addView(new TrackView(new CurvedTrack(300, 300)));
-        worldCtrl.addView(new TrackView(new CurvedTrack(400, 300)));
-        worldCtrl.addView(new TrackView(new CurvedTrack(500, 300)));
-        worldCtrl.addView(new TrackView(new CurvedTrack(600, 300)));
-        worldCtrl.addView(new TrackView(new CurvedTrack(700, 300)));
+//        worldCtrl.addView(new TrackView(new CurvedTrack(500, 100)));
+//        worldCtrl.addView(new TrackView(new CurvedTrack(600, 100)));
+//        worldCtrl.addView(new TrackView(new CurvedTrack(700, 100)));
+//        worldCtrl.addView(new TrackView(new CurvedTrack(100, 300)));
+//        worldCtrl.addView(new TrackView(new CurvedTrack(200, 300)));
+//        worldCtrl.addView(new TrackView(new CurvedTrack(300, 300)));
+//        worldCtrl.addView(new TrackView(new CurvedTrack(400, 300)));
+//        worldCtrl.addView(new TrackView(new CurvedTrack(500, 300)));
+//        worldCtrl.addView(new TrackView(new CurvedTrack(600, 300)));
+//        worldCtrl.addView(new TrackView(new CurvedTrack(700, 300)));
+//        
+//        worldCtrl.addView(new TrackView(new CurvedTrack(100, 500)));
+//        worldCtrl.addView(new TrackView(new CurvedTrack(200, 300)));
         
-        worldCtrl.addView(new TrackView(new CurvedTrack(100, 500)));
-        worldCtrl.addView(new TrackView(new CurvedTrack(200, 500)));
-        
-        worldCtrl.addView(new TrackView(new SplitTrack(400, 500)));
-        worldCtrl.addView(new TrackView(new ReversTrack(500, 500)));
+//        worldCtrl.addView(new TrackView(new SplitTrack(400, 500)));
+//        worldCtrl.addView(new TrackView(new ReversTrack(200, 200)));
         
         
         

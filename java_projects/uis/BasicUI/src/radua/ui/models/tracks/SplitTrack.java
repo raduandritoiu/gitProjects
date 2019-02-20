@@ -1,10 +1,10 @@
 package radua.ui.models.tracks;
 
-import java.awt.Point;
-
+import radua.ui.common.IReadablePoint;
+import radua.ui.common.MPoint;
 import radua.ui.models.snaps.DirectionalSnapPoint;
 import radua.ui.observers.ObservableEvent;
-import radua.ui.utils.Rotations;
+import radua.ui.utils.Constants;
 
 
 public class SplitTrack extends TrackModel
@@ -13,37 +13,40 @@ public class SplitTrack extends TrackModel
 	
 	
 	public SplitTrack(int x, int y) {
-		super(x, y);
+		super(new MPoint(x, y), new MPoint(50, 50).scale(SCALE_FACTOR));
 		
 		_direction = Direction.LEFT;
 		
 		int n = 3;
-		_drawPoints = new Point[11];
-		_originalDrawPoints = new Point[11];
-		_originalDrawPoints[0] = new Point(10, 30);
-		_originalDrawPoints[1] = new Point(10, 70);
-		_originalDrawPoints[2] = new Point(10 + 8*n, 70);
+		_originalPoints = new MPoint[11];
+		_originalPoints[0] = new MPoint(10, 30).scale(SCALE_FACTOR);
+		_originalPoints[1] = new MPoint(10, 70).scale(SCALE_FACTOR);
+		_originalPoints[2] = new MPoint(10 + 8*n, 70).scale(SCALE_FACTOR);
 
-		_originalDrawPoints[3] = new Point(80 - 7*n, 87 - 4*n);
-		_originalDrawPoints[4] = new Point(80, 87);
-		_originalDrawPoints[5] = new Point(100, 53);
+		_originalPoints[3] = new MPoint(75 - 7*n, 87 - 4*n).scale(SCALE_FACTOR);
+		_originalPoints[4] = new MPoint(75, 87).scale(SCALE_FACTOR);
+		_originalPoints[5] = new MPoint(95, 53).scale(SCALE_FACTOR);
 
-		_originalDrawPoints[6] = new Point(90, 50);
+		_originalPoints[6] = new MPoint(90, 50).scale(SCALE_FACTOR);
 		
-		_originalDrawPoints[7] = new Point(100, 47);
-		_originalDrawPoints[8] = new Point(80, 13);
-		_originalDrawPoints[9] = new Point(80 - 7*n, 13 + 4*n);
+		_originalPoints[7] = new MPoint(95, 47).scale(SCALE_FACTOR);
+		_originalPoints[8] = new MPoint(75, 13).scale(SCALE_FACTOR);
+		_originalPoints[9] = new MPoint(75 - 7*n, 13 + 4*n).scale(SCALE_FACTOR);
 		
-		_originalDrawPoints[10] = new Point(10 + 8*n, 30);
+		_originalPoints[10] = new MPoint(10 + 8*n, 30).scale(SCALE_FACTOR);
 
+		_drawPoints = new MPoint[11];
+		for (int i = 0; i < _originalPoints.length; i++) {
+			_drawPoints[i] = new MPoint();
+		}
 		updatePolygonPoints();
 		
-		_snapPoints.add(new DirectionalSnapPoint(this, 10, 50, Rotations.RAD_180));
-		_snapPoints.add(new DirectionalSnapPoint(this, 90, 70, Rotations.RAD_30));
-		_snapPoints.add(new DirectionalSnapPoint(this, 90, 30, Rotations.RAD_330));
+		_snapPoints.add(new DirectionalSnapPoint(this, new MPoint(10, 50).scale(SCALE_FACTOR), Constants.RAD_180));
+		_snapPoints.add(new DirectionalSnapPoint(this, new MPoint(85, 70).scale(SCALE_FACTOR), Constants.RAD_30));
+		_snapPoints.add(new DirectionalSnapPoint(this, new MPoint(85, 30).scale(SCALE_FACTOR), Constants.RAD_330));
 	}
 	
-	public Point thirdPoint() {
+	public IReadablePoint thirdPoint() {
 		return ((DirectionalSnapPoint) _snapPoints.get(2)).relativeA();
 	}
 	

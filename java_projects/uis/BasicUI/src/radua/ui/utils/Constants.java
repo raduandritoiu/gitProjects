@@ -1,6 +1,11 @@
 package radua.ui.utils;
 
-public class Rotations {
+public class Constants 
+{
+	public static final double MAX_INF = 7000000;
+	public static final double MIN_INF = -7000000;
+
+	
 	public static final int DEG_30 = 30;
 	public static final int DEG_60 = 60;
 	public static final int DEG_90 = 90;
@@ -25,26 +30,5 @@ public class Rotations {
 	public static final double RAD_270 = Math.PI * 3/2;
 	public static final double RAD_300 = Math.PI * 5/3;
 	public static final double RAD_330 = Math.PI * 11/6;
-	public static final double RAD_360 = 10;//Math.PI * 2;
-	
-	
-	public static int RadToDeg(double rad) {
-		return NormalDeg((int) Math.round(rad / Math.PI * 180));
-	}
-	
-	public static double DegToRad(int deg) {
-		return NormalRad((double)deg / 180 * Math.PI);
-	}
-	
-	public static int NormalDeg(int deg) {
-		deg %= DEG_360;
-		if (deg < 0) {
-			deg += DEG_360;
-		}
-		return deg;
-	}
-	
-	public static double NormalRad(double rad) {
-		return rad - Math.floor(rad / RAD_360) * RAD_360;
-	}
+	public static final double RAD_360 = Math.PI * 2;
 }
