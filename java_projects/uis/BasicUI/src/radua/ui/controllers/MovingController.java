@@ -161,32 +161,6 @@ public class MovingController implements MouseListener, MouseMotionListener
     	initSelectionModels = null;
     }
     
-    
-//    private SnapResult handleSnapOne(IBasicModel movingSnapModel, boolean move) {
-//    	if (!(movingSnapModel instanceof SnapModel))
-//    		return SnapResult.FALSE();
-//    	
-//    	SnapResult snapResult = SnapResult.FALSE();
-//    	for (IBasicModel model : worldCtrl.getModels()) {
-//    		if (movingSnapModel == model) 
-//    			continue;
-//    		if (model.isSelected())
-//    			continue;
-//    		if (!(model instanceof SnapModel)) 
-//    			continue;
-//    		
-//    		// try to see if it snaps with model
-//    		SnapResult tmpResult = ((SnapModel) movingSnapModel).snaps((SnapModel) model);
-//    		if (tmpResult.result) {
-//    			snapResult = tmpResult;
-////    			return snapResult;
-//    		}
-//    	}
-//    	return snapResult;
-//    }
-    
-    
-    
     private SnapResult handleSnap(IBasicModel localSnapModel, ISnapPoint ignoreSnap) {
     	if (!(localSnapModel instanceof SnapModel))
     		return SnapResult.FALSE();

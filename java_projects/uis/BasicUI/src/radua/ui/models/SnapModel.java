@@ -8,9 +8,7 @@ import radua.ui.common.IReadablePoint;
 import radua.ui.common.IReadableSize;
 import radua.ui.models.snaps.DrawSnapPoint;
 import radua.ui.models.snaps.ISnapPoint;
-import radua.ui.models.snaps.SnapResult;
 import radua.ui.observers.ObservableEvent;
-import radua.ui.utils.Constants;
 
 
 public class SnapModel extends BasicModel implements ISnapModel
@@ -77,84 +75,6 @@ public class SnapModel extends BasicModel implements ISnapModel
 		}
 	}
 	
-	public SnapResult snaps(SnapModel remoteModel) {
-		SnapResult result = SnapResult.FALSE();
-		
-		for (ISnapPoint localSnap : _snapPoints) {
-			// cache info about last snap
-			ISnapPoint lastRemoteSnap = localSnap.getSnap();
-			ISnapPoint newRemoteSnap = lastRemoteSnap;
-			double newSnapStrength = Constants.MAX_INF;
-			if (lastRemoteSnap != null) {
-    			newSnapStrength = localSnap.getSnapStength(lastRemoteSnap);
-			}
-			
-			// find snap point with best strength snap
-    		for (ISnapPoint remoteSnap : remoteModel._snapPoints) {
-    			// skip last remote snap point
-    			if (remoteSnap == lastRemoteSnap)
-    				continue;
-    			if (localSnap.canSnap(remoteSnap)) {
-					double snapStrength = localSnap.getSnapStength(remoteSnap);
-    				if (snapStrength < newSnapStrength) {
-    					newSnapStrength = snapStrength;
-    					newRemoteSnap = remoteSnap;
-    				}
-    			}
-    		}
-    		
-			// update the snap
-			if (newRemoteSnap != lastRemoteSnap) {
-				
-				String str = "============ update SNAP POINT local:"+id()+"."+localSnap.id()+
-						"  new:"+newRemoteSnap.parent().id()+"."+newRemoteSnap.id()+"  last:";
-				
-				if (lastRemoteSnap != null) {
-    				lastRemoteSnap.setSnap(null);
-    				lastRemoteSnap.parent().notifyObservers(ObservableEvent.SNAP_CHANGE, false);
-    				
-    				str += lastRemoteSnap.parent().id()+"."+lastRemoteSnap.id();
-				}
-				else {
-					str += "null";
-				}
-				System.out.println(str);
-				
-				localSnap.setSnap(newRemoteSnap);
-				newRemoteSnap.setSnap(localSnap);
-				notifyObservers(ObservableEvent.SNAP_CHANGE, true);
-				newRemoteSnap.parent().notifyObservers(ObservableEvent.SNAP_CHANGE, true);
-				result = SnapResult.TRUE(localSnap, newRemoteSnap);
-			}
-			// test if last snap still snaps
-			else if (lastRemoteSnap != null) {
-				if (localSnap.canSnap(lastRemoteSnap)) {
-					
-					System.out.println("============ keep on SNAP POINT local:"+id()+"."+localSnap.id()+
-						"  last:"+lastRemoteSnap.parent().id()+"."+lastRemoteSnap.id());
-					
-					result = SnapResult.TRUE(localSnap, lastRemoteSnap);
-    			}
-    			// remove last snap
-    			else {
-    				
-					System.out.println("============ remove SNAP POINT local:"+id()+"."+localSnap.id()+
-							"  last:"+lastRemoteSnap.parent().id()+"."+lastRemoteSnap.id());
-					
-					localSnap.setSnap(null);
-    				lastRemoteSnap.setSnap(null);
-    				notifyObservers(ObservableEvent.SNAP_CHANGE, false);
-    				lastRemoteSnap.parent().notifyObservers(ObservableEvent.SNAP_CHANGE, false);
-    			}
-			}
-    		else {
-    			// nothing to do, apparently even last remote snap was null
-    		}
-		}
-
-		return result;
-	}
-
 	
 	@Override
 	public String debugString(int tabs) {
