@@ -1,10 +1,5 @@
 package radua.ui.controllers;
 
-import java.awt.Component;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
-
 import radua.ui.models.IBasicModel;
 import radua.ui.models.ISnapModel;
 import radua.ui.models.SnapModel;
@@ -13,10 +8,9 @@ import radua.ui.models.snaps.SnapResult;
 import radua.ui.models.snaps.SnapResultMove;
 import radua.ui.observers.ObservableEvent;
 import radua.ui.utils.Constants;
-import radua.ui.views.BasicView;
 
 
-public class MovingController implements MouseListener, MouseMotionListener
+public class MovementController
 {
 	private final WorldController worldCtrl;
 	
@@ -31,77 +25,12 @@ public class MovingController implements MouseListener, MouseMotionListener
     private /* volatile */ SnapResult lastSnapResult = null;
     
     
-    public MovingController(WorldController worldController) {
+    public MovementController(WorldController worldController) {
     	worldCtrl = worldController;
 	}
     
     
-    @Override
-    public void mouseEntered(MouseEvent e) {}
-    @Override
-    public void mouseExited(MouseEvent e) {}
-	@Override
-	public void mouseMoved(MouseEvent e) {}
-
-	
-	// ===================================================================
-	// ==== Mouse Listener ===============================================
-    
-    @Override
-    public void mouseClicked(MouseEvent e) {
-    	Component comp = e.getComponent();
-    	if (!(comp instanceof BasicView)) {
-    		return;
-    	}
-    	// update selection
-		updateSelection(((BasicView<?>) comp).getModel(), e.isControlDown());
-    }
-    
-    
-    @Override
-    public void mousePressed(MouseEvent e) {
-    	Component comp = e.getComponent();
-    	if (!(comp instanceof BasicView)) {
-    		return;
-    	}
-    	IBasicModel  crtModel = ((BasicView<?>) comp).getModel();
-    	// update selection
-		updateSelection(crtModel, e.isControlDown());
-		// start moving
-		startMovement(crtModel, e.getXOnScreen(), e.getYOnScreen());
-    }
-    
-    @Override
-    public void mouseDragged(MouseEvent e) {
-    	if (movingModel == null) {
-    		return;
-    	}
-    	// continue moving 
-    	updateMovement(e.getXOnScreen(), e.getYOnScreen());
-    }
- 
-    @Override
-    public void mouseReleased(MouseEvent e) {
-    	// end moving
-    	endMovement();
-    }
-	
-    
-    
-    
-	// ===================================================================
-	// ===================================================================
-    
-    private void updateSelection(IBasicModel selectedModel, boolean add) {
-		if (add) {
-			worldCtrl.addSelection(selectedModel);
-		}
-		else {
-			worldCtrl.setSelection(selectedModel);
-		}
-    }
-    
-    private void startMovement(IBasicModel newMovingModel, double x, double y) {
+    public void startMovement(IBasicModel newMovingModel, double x, double y) {
 		movingModel = newMovingModel;
 		
     	initScreenX = x;
@@ -127,7 +56,7 @@ public class MovingController implements MouseListener, MouseMotionListener
         }
     }
     
-    private void updateMovement(double x, double y) {
+    public void updateMovement(double x, double y) {
     	if (movingModel == null) {
     		return;
     	}
@@ -147,21 +76,20 @@ public class MovingController implements MouseListener, MouseMotionListener
         lastSnapResult = handleSnap(movingModel, null);
     }
     
-    private void endMovement() {
+    public void endMovement() {
     	if (lastSnapResult != null && lastSnapResult.result) {
 			SnapResultMove snapMove = lastSnapResult.getMove();
 			movingModel.moveBy(snapMove.translation);
 			movingModel.rotateBy(snapMove.rotation);
 	        handleSnap(movingModel, lastSnapResult.localSnap);
     	}
-    	
     	movingModel = null;
     	initSelectionX = null;
     	initSelectionY = null;
     	initSelectionModels = null;
     }
     
-    private SnapResult handleSnap(IBasicModel localSnapModel, ISnapPoint ignoreSnap) {
+    public SnapResult handleSnap(IBasicModel localSnapModel, ISnapPoint ignoreSnap) {
     	if (!(localSnapModel instanceof SnapModel))
     		return SnapResult.FALSE();
     	ISnapModel localModel = (ISnapModel) localSnapModel;
@@ -214,20 +142,10 @@ public class MovingController implements MouseListener, MouseMotionListener
 	    	
 			// update the snap point
 			if (newRemoteSnap != lastRemoteSnap) {
-				
-				String str = "============ update SNAP POINT local:"+localModel.id()+"."+localSnap.id()+
-						"  new:"+newRemoteSnap.parent().id()+"."+newRemoteSnap.id()+"  last:";
-				
 				if (lastRemoteSnap != null) {
     				lastRemoteSnap.setSnap(null);
     				lastRemoteSnap.parent().notifyObservers(ObservableEvent.SNAP_CHANGE, false);
-    				
-    				str += lastRemoteSnap.parent().id()+"."+lastRemoteSnap.id();
 				}
-				else {
-					str += "null";
-				}
-				System.out.println(str);
 				
 				localSnap.setSnap(newRemoteSnap);
 				newRemoteSnap.setSnap(localSnap);
@@ -243,22 +161,15 @@ public class MovingController implements MouseListener, MouseMotionListener
 			// test if last snap still snaps
 			else if (lastRemoteSnap != null) {
 				if (!localSnap.canSnap(lastRemoteSnap)) {
-    				
-					System.out.println("============ remove SNAP POINT local:"+localModel.id()+"."+localSnap.id()+
-							"  last:"+lastRemoteSnap.parent().id()+"."+lastRemoteSnap.id());
-					
 					localSnap.setSnap(null);
     				lastRemoteSnap.setSnap(null);
     				localModel.notifyObservers(ObservableEvent.SNAP_CHANGE, false);
     				lastRemoteSnap.parent().notifyObservers(ObservableEvent.SNAP_CHANGE, false);
     			}
 				else if (newSnapStrength < resultStrength) {
-					System.out.println("============ keep on SNAP POINT local:"+localModel.id()+"."+localSnap.id()+
-						"  last:"+lastRemoteSnap.parent().id()+"."+lastRemoteSnap.id());
 					snapResult = SnapResult.TRUE(localSnap, lastRemoteSnap);
 					resultStrength = newSnapStrength;
     			}
-    			// remove last snap
 			}
     		else {
     			// nothing to do, apparently even last remote snap was null
@@ -267,6 +178,4 @@ public class MovingController implements MouseListener, MouseMotionListener
 	    	
     	return snapResult;
     }
-    
-    
 }

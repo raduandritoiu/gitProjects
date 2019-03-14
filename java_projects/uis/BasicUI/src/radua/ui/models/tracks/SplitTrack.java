@@ -65,7 +65,6 @@ public class SplitTrack extends TrackModel
 	}
 	
 	
-	
 	public static enum Direction {
 		LEFT,
 		RIGHT;

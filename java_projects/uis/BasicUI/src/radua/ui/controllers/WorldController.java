@@ -16,28 +16,28 @@ public class WorldController
 	private final ArrayList<BasicView<?>> views;
 	private final ArrayList<IBasicModel> crtSelection;
 	
-	public final JComponent mainView;
-	private final MovingController movingCtrl;
-	private final KeyController keyCtrl;
-	
 	private ModelViewFactory factory;
+	private final MovementController movingCtrl;
 	
+	public final JComponent mainView;
+	private final KeyController keyCtrl;
+	private final MouseController mouseCtrl;
+
 	
 	public WorldController(JComponent view) {
 		this(view, new ModelViewFactory());
 	}
-
 	public WorldController(JComponent view, ModelViewFactory fa) {
 		this(view, new WorldModel(), fa);
 	}
-
 	public WorldController(JComponent view, WorldModel model, ModelViewFactory newFactory) {
 		world = model;
 		mainView = view;
 		factory = newFactory;
+		movingCtrl = new MovementController(this);
 		
 		keyCtrl = new KeyController(this);
-		movingCtrl = new MovingController(this);
+		mouseCtrl = new MouseController(this);
 		
 		models = new ArrayList<>();
 		views = new ArrayList<>();
@@ -60,8 +60,15 @@ public class WorldController
 		return models;
 	} 
 	
+	// ===================================================================
+	// ====== Sub components =============================================
+	
 	public void setFactory(ModelViewFactory newFactory) {
 		factory = newFactory;
+	}
+	
+	public MovementController movingController() {
+		return movingCtrl;
 	}
 	
 	// ===================================================================
@@ -82,8 +89,8 @@ public class WorldController
 		mainView.add(view);
 		
 		view.addKeyListener(keyCtrl);
-		view.addMouseListener(movingCtrl);
-        view.addMouseMotionListener(movingCtrl);
+		view.addMouseListener(mouseCtrl);
+        view.addMouseMotionListener(mouseCtrl);
 		views.add(view);
 		view.repaint();
 	}
@@ -103,8 +110,8 @@ public class WorldController
 		models.remove(model);
 		views.remove(view);
 		view.removeKeyListener(keyCtrl);
-		view.removeMouseListener(movingCtrl);
-		view.removeMouseMotionListener(movingCtrl);
+		view.removeMouseListener(mouseCtrl);
+		view.removeMouseMotionListener(mouseCtrl);
 		mainView.remove(view);
 		mainView.repaint();
 	}
@@ -191,7 +198,7 @@ public class WorldController
 	}
 	
 	// ===================================================================
-	// ==== Selection ====================================================
+	// ==== Proxy move/translation =======================================
 	
 	
 }

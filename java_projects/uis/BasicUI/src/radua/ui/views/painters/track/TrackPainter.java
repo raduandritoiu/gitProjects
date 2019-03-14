@@ -30,7 +30,7 @@ public class TrackPainter implements IPainter
         if (g instanceof Graphics2D) {
             g2d = (Graphics2D) g;
             tmp = g2d.getStroke();
-            g2d.setStroke(new BasicStroke(1));
+            g2d.setStroke(new BasicStroke(2));
         }
         
 	    g.setColor(Color.BLACK);
@@ -51,7 +51,7 @@ public class TrackPainter implements IPainter
         
         g.drawLine(model.middlePoint().intX(), model.middlePoint().intY(), black.intX(), black.intY());
         if (red != null) {
-    	    g.setColor(Color.RED);
+    	    g.setColor(Color.GRAY);
             g.drawLine(model.middlePoint().intX(), model.middlePoint().intY(), red.intX(), red.intY());
         }
         
