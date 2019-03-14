@@ -5,6 +5,7 @@ import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+import radua.ui.controllers.StageWrapper;
 import radua.ui.controllers.WorldController;
 import radua.ui.models.tracks.CurvedTrack;
 import radua.ui.models.tracks.ReversTrack;
@@ -44,7 +45,15 @@ public class MainWindowUI extends JFrame
     	add(mainView);
         addOpsPanel(mainView);
     	
-    	worldCtrl = new WorldController(mainView);
+        
+        
+    	worldCtrl = new WorldController();
+        
+        StageWrapper stageWrapper = new StageWrapper(worldCtrl, mainView);
+        worldCtrl.setStageWrapper(stageWrapper);
+        
+        
+        
         worldCtrl.addView(new TrackView(new StraightTrack(100, 100)));
         worldCtrl.addView(new TrackView(new StraightTrack(300, 100)));
         worldCtrl.addView(new TrackView(new StraightTrack(500, 100)));

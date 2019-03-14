@@ -1,18 +1,19 @@
-package radua.ui.controllers;
+package radua.ui.listeners;
 
 import java.awt.Component;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 
+import radua.ui.controllers.WorldController;
 import radua.ui.models.IBasicModel;
 import radua.ui.views.BasicView;
 
-public class MouseController implements MouseListener, MouseMotionListener
+public class MouseListenerImpl implements MouseListener, MouseMotionListener
 {
 	private final WorldController worldCtrl;
 	
-    public MouseController(WorldController worldController) {
+    public MouseListenerImpl(WorldController worldController) {
     	worldCtrl = worldController;
 	}
 
@@ -35,7 +36,7 @@ public class MouseController implements MouseListener, MouseMotionListener
     		return;
     	}
     	// update selection
-		updateSelection(((BasicView<?>) comp).getModel(), e.isControlDown());
+		updateSelection(((BasicView<?>) comp).model(), e.isControlDown());
     }
     
     
@@ -45,24 +46,24 @@ public class MouseController implements MouseListener, MouseMotionListener
     	if (!(comp instanceof BasicView)) {
     		return;
     	}
-    	IBasicModel  crtModel = ((BasicView<?>) comp).getModel();
+    	IBasicModel  crtModel = ((BasicView<?>) comp).model();
     	// update selection
 		updateSelection(crtModel, e.isControlDown());
 		
 		// start moving
-		worldCtrl.movingController().startMovement(crtModel, e.getXOnScreen(), e.getYOnScreen());
+		worldCtrl.movingHelper().startMovement(crtModel, e.getXOnScreen(), e.getYOnScreen());
     }
     
     @Override
     public void mouseDragged(MouseEvent e) {
     	// continue moving
-    	worldCtrl.movingController().updateMovement(e.getXOnScreen(), e.getYOnScreen());
+    	worldCtrl.movingHelper().updateMovement(e.getXOnScreen(), e.getYOnScreen());
     }
  
     @Override
     public void mouseReleased(MouseEvent e) {
     	// end moving
-    	worldCtrl.movingController().endMovement();
+    	worldCtrl.movingHelper().endMovement();
     }
     
     

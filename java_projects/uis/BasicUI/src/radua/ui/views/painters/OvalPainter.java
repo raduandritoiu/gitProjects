@@ -18,10 +18,10 @@ public class OvalPainter implements IPainter
 	
 	@Override
 	public void paint(BasicView<?> view, Graphics g) {
-		g.setColor(view.getModel().getColor());
+		g.setColor(view.model().getColor());
 		g.fillOval(0, 0, view.getWidth()-1, view.getHeight()-1);
 		
-		if (view.getModel().isSelected()) {
+		if (view.model().isSelected()) {
 			g.setColor(Color.RED);
 	        Graphics2D g2d = null;
 	        Stroke tmp = null;

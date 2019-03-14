@@ -1,27 +1,27 @@
-package radua.ui.controllers;
+package radua.ui.listeners;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.List;
 
+import radua.ui.controllers.KeyHelper;
+import radua.ui.controllers.WorldController;
 import radua.ui.models.IBasicModel;
 import radua.ui.models.tracks.CurvedTrack;
 import radua.ui.models.tracks.SplitTrack;
 import radua.ui.models.tracks.StraightTrack;
-import radua.ui.utils.Debug;
 import radua.ui.views.tracks.TrackView;
 
 
-public class KeyController implements KeyListener
+public class KeyListenerImpl implements KeyListener
 {
-	private static final int DELTA_MOVE = 1;
-	private static final double DELTA_ROTATION = Math.PI / 6;
-	
-	
 	private final WorldController worldCtrl;
+	private final KeyHelper keyHelper;
 	
-    public KeyController(WorldController worldController) {
+	
+    public KeyListenerImpl(WorldController worldController) {
     	worldCtrl = worldController;
+    	keyHelper = new KeyHelper();
 	}
 
 	@Override
@@ -31,6 +31,11 @@ public class KeyController implements KeyListener
 
 	@Override
 	public void keyPressed(KeyEvent e) {
+		
+		if (keyHelper.handleKeyEvent(e, worldCtrl)) {
+			return;
+		}
+		
 		List<IBasicModel> selection = worldCtrl.getSelection();
 		IBasicModel model = null;
 		if (selection.size() == 1) {
@@ -56,46 +61,6 @@ public class KeyController implements KeyListener
 			worldCtrl.removeModel(model);
 		}
 		
-		
-		// ==== rotates =============
-		// UP - 38 move model
-		else if (e.getKeyCode() == 38) {
-			if (model == null) return;
-			model.moveBy(0, -DELTA_MOVE);
-		}
-		// DOWN - 40 move model
-		else if (e.getKeyCode() == 40) {
-			if (model == null) return;
-			model.moveBy(0, DELTA_MOVE);
-		}
-		// LEFT - 37 move model
-		else if (e.getKeyCode() == 37) {
-			if (model == null) return;
-			model.moveBy(-DELTA_MOVE, 0);
-		}
-		// RIGHT - 39 move model
-		else if (e.getKeyCode() == 39) {
-			if (model == null) return;
-			model.moveBy(DELTA_MOVE, 0);
-		}
-		
-		// ==== rotates =============
-		// q - 81 for rotate LEFT
-		if (e.getKeyCode() == 81) {
-			if (model == null) return;
-			model.rotateBy(-DELTA_ROTATION);
-		}
-		// w - 87 for rotate RIGHT
-		else if (e.getKeyCode() == 87) {
-			if (model == null) return;
-			model.rotateBy(DELTA_ROTATION);
-		}
-		// r - 77 for rotate RESET
-		else if (e.getKeyCode() == 82) {
-			if (model == null) return;
-			model.rotateTo(0);
-		}
-		
 		// ==== split track =======
 		// a - 65 move switch for Split track to go RIGHT
 		else if (e.getKeyCode() == 65) {
@@ -112,11 +77,6 @@ public class KeyController implements KeyListener
 			}
 		}
 		
-		// ==== debugs =============
-		// p - 80 for debug print
-		else if (e.getKeyCode() == 80) {
-			Debug.printWorldController(worldCtrl);
-		}
 	}
 
 	@Override

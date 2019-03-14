@@ -15,7 +15,7 @@ public class SelectionPainter implements IPainter
 	
 	@Override
 	public void paint(BasicView<?> view, Graphics g) {
-		if (view.getModel().isSelected()) {
+		if (view.model().isSelected()) {
 	        g.setColor(Color.BLUE);
 	        g.drawRect(0, 0, view.getWidth()-1, view.getHeight()-1);
 		}

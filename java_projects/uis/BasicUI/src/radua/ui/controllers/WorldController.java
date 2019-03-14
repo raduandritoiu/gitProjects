@@ -3,126 +3,114 @@ package radua.ui.controllers;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.JComponent;
-
 import radua.ui.models.IBasicModel;
-import radua.ui.views.BasicView;
-import radua.ui.world.WorldModel;
+import radua.ui.models.ISnapModel;
+import radua.ui.models.snaps.ISnapPoint;
+import radua.ui.utils.Constants;
+import radua.ui.views.IBasicView;
 
 public class WorldController 
 {
-	public final WorldModel world;
-	private final ArrayList<IBasicModel> models;
-	private final ArrayList<BasicView<?>> views;
-	private final ArrayList<IBasicModel> crtSelection;
+	private final List<IBasicModel> models;
+	private final List<IBasicView<?>> views;
+	private final List<IBasicModel> crtSelection;
 	
 	private ModelViewFactory factory;
-	private final MovementController movingCtrl;
-	
-	public final JComponent mainView;
-	private final KeyController keyCtrl;
-	private final MouseController mouseCtrl;
+	private final MovementHelper movingHelper;
+	private IStageWrapper stageWrapper;
 
 	
-	public WorldController(JComponent view) {
-		this(view, new ModelViewFactory());
+	public WorldController() {
+		this(new ModelViewFactory());
 	}
-	public WorldController(JComponent view, ModelViewFactory fa) {
-		this(view, new WorldModel(), fa);
-	}
-	public WorldController(JComponent view, WorldModel model, ModelViewFactory newFactory) {
-		world = model;
-		mainView = view;
+	public WorldController(ModelViewFactory newFactory) {
 		factory = newFactory;
-		movingCtrl = new MovementController(this);
-		
-		keyCtrl = new KeyController(this);
-		mouseCtrl = new MouseController(this);
+		movingHelper = new MovementHelper(this);
 		
 		models = new ArrayList<>();
 		views = new ArrayList<>();
 		crtSelection = new ArrayList<>();
-		
-		mainView.setFocusable(true);
-		mainView.addKeyListener(keyCtrl);
 	}
 	
-	
-	public JComponent mainView() {
-		return mainView;
-	}
-	
-	public WorldModel world() {
-		return world;
-	}
-	
-	public List<IBasicModel> getModels() {
-		return models;
-	} 
 	
 	// ===================================================================
-	// ====== Sub components =============================================
+	// ====== Built-in sub components ====================================
+	
+	public void setStageWrapper(IStageWrapper newStageWrapper) {
+		stageWrapper = newStageWrapper;
+	}
 	
 	public void setFactory(ModelViewFactory newFactory) {
 		factory = newFactory;
 	}
 	
-	public MovementController movingController() {
-		return movingCtrl;
+	public ModelViewFactory getFactory() {
+		return factory;
 	}
+	
+	public MovementHelper movingHelper() {
+		return movingHelper;
+	}
+	
+	
+	// ===================================================================
+	// ====== Models and Views ===========================================
+	
+	public List<IBasicModel> getModels() {
+		return models;
+	} 
+	
+	public IBasicView<?> getView(IBasicModel model) {
+		for (IBasicView<?> view : views) {
+			if (view.model() == model)
+				return view;
+		}
+		return null;
+	}
+
 	
 	// ===================================================================
 	// ====== Add and Remove =============================================
 	
 	public final void addModel(IBasicModel model) {
-		BasicView<?> view = createView(model);
+		IBasicView<?> view = createView(model);
 		addModelView(model, view);
 	}
 	
-	public final void addView(BasicView<?> view) {
-		IBasicModel model = view.getModel();
+	public final void addView(IBasicView<?> view) {
+		IBasicModel model = view.model();
 		addModelView(model, view);
 	}
 	
-	private void addModelView(IBasicModel model, BasicView<?> view) {
+	private void addModelView(IBasicModel model, IBasicView<?> view) {
+		if (stageWrapper != null) {
+			stageWrapper.addNewView(view);
+		}
+
 		models.add(model);
-		mainView.add(view);
-		
-		view.addKeyListener(keyCtrl);
-		view.addMouseListener(mouseCtrl);
-        view.addMouseMotionListener(mouseCtrl);
-		views.add(view);
-		view.repaint();
+        views.add(view);
 	}
 	
-	protected BasicView<?> createView(IBasicModel model) {
+	protected IBasicView<?> createView(IBasicModel model) {
 		return factory.createView(model); 
 	}
 	
 	public void removeModel(IBasicModel model) {
-		BasicView<?> view = getView(model);
+		IBasicView<?> view = getView(model);
 		removeView(view);
 	}
 	
-	public void removeView(BasicView<?> view) {
-		IBasicModel model = view.getModel();
+	public void removeView(IBasicView<?> view) {
+		IBasicModel model = view.model();
 		crtSelection.remove(model);
 		models.remove(model);
 		views.remove(view);
-		view.removeKeyListener(keyCtrl);
-		view.removeMouseListener(mouseCtrl);
-		view.removeMouseMotionListener(mouseCtrl);
-		mainView.remove(view);
-		mainView.repaint();
+		
+		if (stageWrapper != null) {
+			stageWrapper.removeView(view);
+		}
 	}
 	
-	public BasicView<?> getView(IBasicModel model) {
-		for (BasicView<?> view : views) {
-			if (view.getModel() == model)
-				return view;
-		}
-		return null;
-	}
 	
 	// ===================================================================
 	// ==== Selection ====================================================
@@ -133,8 +121,6 @@ public class WorldController
 		}
 		crtSelection.add(selectedModel);
 		selectedModel.select(true);
-		BasicView<?> view = getView(selectedModel);
-		view.setFocusable(true);
 	}
 	
 	public void addSelection(List<IBasicModel> newSelection) {
@@ -144,8 +130,6 @@ public class WorldController
 			}
 			crtSelection.add(model);
 			model.select(true);
-			BasicView<?> view = getView(model);
-			view.setFocusable(true);
 		}
 	}
 	
@@ -154,8 +138,6 @@ public class WorldController
 			if (selectedModel == model) {
 				continue;
 			}
-			BasicView<?> view = getView(model);
-			view.setFocusable(false);
 			model.select(false);
 		}
 		crtSelection.clear();
@@ -164,8 +146,6 @@ public class WorldController
 		}
 		crtSelection.add(selectedModel);
 		selectedModel.select(true);
-		BasicView<?> view = getView(selectedModel);
-		view.setFocusable(true);
 	}
 	
 	public void setSelection(List<IBasicModel> newSelection) {
@@ -173,8 +153,6 @@ public class WorldController
 			if (newSelection.contains(model)) {
 				continue;
 			}
-			BasicView<?> view = getView(model);
-			view.setFocusable(false);
 			model.select(false);
 		}
 		crtSelection.clear();
@@ -184,8 +162,6 @@ public class WorldController
 			}
 			crtSelection.add(model);
 			model.select(true);
-			BasicView<?> view = getView(model);
-			view.setFocusable(true);
 		}
 	}
 	
@@ -197,8 +173,51 @@ public class WorldController
 		return crtSelection.size();
 	}
 	
+	
 	// ===================================================================
 	// ==== Proxy move/translation =======================================
 	
+	private boolean modelNotSnapped(IBasicModel model) {
+		if (model instanceof ISnapModel) {
+			ISnapModel snapModel = (ISnapModel) model;
+			for (ISnapPoint snapPoint : snapModel.snapPoints()) {
+				if (snapPoint.isSnapped()) {
+					return false;
+				}
+			}
+		}
+		return true;
+	}
 	
+	
+	public void selectionMoveBy(double x, double y) {
+		for (IBasicModel model : crtSelection) {
+			// move only unsnapped models
+			if (modelNotSnapped(model)) {
+				model.moveBy(x, y);
+			}
+		}
+	}
+	
+	public void selectionRotateBy(double rotation) {
+		for (IBasicModel model : crtSelection) {
+			// move only unsnapped models
+			if (modelNotSnapped(model)) {
+				model.rotateBy(rotation);
+			}
+		}
+	}
+	
+	public void selectionRotateTo(double rotation) {
+		for (IBasicModel model : crtSelection) {
+			// move only unsnapped models
+			if (modelNotSnapped(model)) {
+				model.rotateTo(rotation);
+			}
+		}
+	}
+	
+	public void selectionResetRotation() {
+		selectionRotateTo(Constants.DEG_0);
+	}
 }

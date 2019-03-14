@@ -17,7 +17,7 @@ public class PolygonPainter implements IPainter
 	
 	@Override
 	public void paint(BasicView<?> view, Graphics g) {
-		IReadablePoint[] points = ((IPolygonModel) view.getModel()).getPolygonPoints();
+		IReadablePoint[] points = ((IPolygonModel) view.model()).getPolygonPoints();
 		int nPoints = points.length;
 		int xPoints[] = new int[nPoints];
 		int yPoints[] = new int[nPoints];
@@ -26,7 +26,7 @@ public class PolygonPainter implements IPainter
 			yPoints[i] = points[i].intY();
 		}
 		
-		g.setColor(view.getModel().getColor());
+		g.setColor(view.model().getColor());
 		g.fillPolygon(xPoints, yPoints, nPoints);
         g.setColor(Color.BLACK);
         g.drawPolygon(xPoints, yPoints, nPoints);

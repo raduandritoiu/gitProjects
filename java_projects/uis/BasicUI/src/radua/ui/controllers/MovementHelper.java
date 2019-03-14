@@ -10,7 +10,7 @@ import radua.ui.observers.ObservableEvent;
 import radua.ui.utils.Constants;
 
 
-public class MovementController
+public class MovementHelper
 {
 	private final WorldController worldCtrl;
 	
@@ -25,7 +25,7 @@ public class MovementController
     private /* volatile */ SnapResult lastSnapResult = null;
     
     
-    public MovementController(WorldController worldController) {
+    public MovementHelper(WorldController worldController) {
     	worldCtrl = worldController;
 	}
     
@@ -89,7 +89,7 @@ public class MovementController
     	initSelectionModels = null;
     }
     
-    public SnapResult handleSnap(IBasicModel localSnapModel, ISnapPoint ignoreSnap) {
+    private SnapResult handleSnap(IBasicModel localSnapModel, ISnapPoint ignoreSnap) {
     	if (!(localSnapModel instanceof SnapModel))
     		return SnapResult.FALSE();
     	ISnapModel localModel = (ISnapModel) localSnapModel;

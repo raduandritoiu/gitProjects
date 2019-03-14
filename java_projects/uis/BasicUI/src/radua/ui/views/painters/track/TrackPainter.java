@@ -22,7 +22,7 @@ public class TrackPainter implements IPainter
 	
 	@Override
 	public void paint(BasicView<?> view, Graphics g) {
-		TrackModel model = (TrackModel) view.getModel();
+		TrackModel model = (TrackModel) view.model();
 		
 		// set stroke
         Graphics2D g2d = null;

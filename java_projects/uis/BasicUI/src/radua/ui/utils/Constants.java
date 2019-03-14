@@ -6,6 +6,7 @@ public class Constants
 	public static final double MIN_INF = -7000000;
 
 	
+	public static final int DEG_0 = 0;
 	public static final int DEG_30 = 30;
 	public static final int DEG_60 = 60;
 	public static final int DEG_90 = 90;
@@ -19,6 +20,7 @@ public class Constants
 	public static final int DEG_330 = 330;
 	public static final int DEG_360 = 360;
 
+	public static final double RAD_0 = 0;
 	public static final double RAD_30 = Math.PI / 6;
 	public static final double RAD_60 = Math.PI / 3;
 	public static final double RAD_90 = Math.PI / 2;

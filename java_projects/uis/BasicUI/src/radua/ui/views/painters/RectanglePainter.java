@@ -18,10 +18,10 @@ public class RectanglePainter implements IPainter
 	
 	@Override
 	public void paint(BasicView<?> view, Graphics g) {
-		g.setColor(view.getModel().getColor());
+		g.setColor(view.model().getColor());
 		g.fillRect(0, 0, view.getWidth(), view.getHeight());
 		
-		if (view.getModel().isSelected()) {
+		if (view.model().isSelected()) {
 			g.setColor(Color.RED);
 	        Graphics2D g2d = null;
 	        Stroke tmp = null;
