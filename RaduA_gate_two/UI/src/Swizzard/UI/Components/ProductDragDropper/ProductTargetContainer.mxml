@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx"
+		 implements="Swizzard.UI.Components.ProductDragDropper.IProductContainer" xmlns:Controls="Swizzard.UI.Controls.*">
+	
+	<fx:Script>
+		<![CDATA[
+			import com.senocular.drawing.DashedLine;
+			import com.tonp.utils.Draw;
+			
+			import spark.components.HGroup;
+			
+			import Swizzard.Data.Models.Enumeration.ProductType;
+			
+			
+			private var dl:DashedLine = new DashedLine(this, 5, 10);
+			
+			private var _currentProductType:uint = 0;
+			private var productTypeChanged:Boolean 	= false;
+			private var productNumChanged:Boolean 	= false;
+			private var productContainers:Dictionary = new Dictionary(true);
+			
+			
+			
+			public function set currentProductType(val:uint):void {
+				if (_currentProductType == val) return;
+				_currentProductType = val;
+				productTypeChanged = true;
+				productNumChanged = true;
+				invalidateProperties();
+			}
+			
+			public function get currentProductType():uint {
+				return _currentProductType;
+			}
+
+			
+			public function addProduct(product:ProductFamily):void {
+				var productContainer:HGroup;
+				if (productContainers.hasOwnProperty(product.productType)) {
+					productContainer = productContainers[product.productType];
+				}
+				else {
+					productContainer = new HGroup();
+					productContainer.left 	= 0; 
+					productContainer.right 	= 0;
+					productContainer.top 	= 0;
+					productContainer.bottom = 0;
+					productContainer.gap 	= 50;
+					// backup in case the current product was selected befre the container was created
+					productContainer.visible = (product.productType == currentProductType); 
+					productContainer.horizontalAlign = "center";
+					productContainer.verticalAlign = "middle";
+					
+					// add the container
+					addElement(productContainer);
+					productContainers[product.productType] = productContainer;
+				}
+				
+				// first find the position where to add it
+				var idx:int;
+				for (idx = 0; idx < productContainer.numElements; idx++) {
+					if ((productContainer.getElementAt(idx) as ProductFamily).pos > product.pos)
+						break;
+				}
+				productContainer.addElementAt(product, idx);
+				product.isAdded = true;
+				
+				if (product.productType == currentProductType) {
+					productNumChanged = true;
+					invalidateProperties();
+				}
+			}
+			
+			
+			public function removeProduct(product:ProductFamily):void {
+				var productContainer:HGroup = productContainers[product.productType];
+				productContainer.removeElement(product);
+				
+				if (product.productType == currentProductType) {
+					productNumChanged = true;
+					invalidateProperties();
+				}
+			}
+			
+			
+			override protected function commitProperties():void {
+				super.commitProperties();
+				
+				if (productTypeChanged) {
+					productTypeChanged = false;
+					for (var productType:* in productContainers) {
+						var productContainer:HGroup = productContainers[productType];
+						productContainer.visible = (productType == currentProductType);
+					}
+					var productStr:String = ProductType.toString(currentProductType);
+					textField.text = "Drag " + productStr + "s from the '" + productStr + " Type' list here";
+				}
+				
+				if (productNumChanged) {
+					productNumChanged = false;
+					
+					var productNum:int = 0;
+					var productContainer:HGroup = productContainers[_currentProductType];
+					if (productContainer != null) {
+						textField.visible = (productContainer.numElements == 0);
+						productNum = productContainer.numElements;
+					}					
+
+					if (productNum == 0) {
+						emptyBoxes.visible = true;
+					}
+					else {
+						emptyBoxes.visible = false;
+					}
+				}
+			}
+			
+		]]>
+	</fx:Script>
+	
+	<Controls:DaskedBoxes id="emptyBoxes" width="470" height="70" 
+						  verticalCenter="0" horizontalCenter="0"/>
+	
+	<s:Label id="textField" text="Drag Valves from the 'Valve Type' list here"
+			 verticalCenter="0" horizontalCenter="0" alpha="0.25"
+			 color="0x000000" fontSize="22" fontWeight="bold"/>
+	
+	<!-- hack to make drag-drop work on the entire surface of this object -->
+	<s:Rect left="0" right="0" top="0" bottom="0" alpha="0">
+		<s:fill> <s:SolidColor color="0x00ff00"/> </s:fill>
+	</s:Rect>
+
+	<!--Here will go the other HGroups (product containers) -->
+
+</s:Group>

@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Windows:GeneralWindow xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		  xmlns:s="library://ns.adobe.com/flex/spark" xmlns:mx="library://ns.adobe.com/flex/mx" 
+		  xmlns:Windows="Swizzard.UI.Windows.*" xmlns:Controls="Swizzard.UI.Controls.*"
+		  title="Torque Calculator" width="550" height="300">
+	
+	
+	<fx:Script>
+		<![CDATA[
+			import Swizzard.System.UI.Calculators.ITorqueResult;
+			import Swizzard.System.Utils.DamperTorqueUtil;
+			import Swizzard.UI.Components.DataGridClasses.GridColumnsUtil;
+			
+			
+			private static const autoColor:uint = 0x9d9d9d;
+			private static const manualColor:uint = 0x000000;
+			private static var instance:ElectricTorqueCalculator;
+			
+			private var torqueResult:ITorqueResult;
+			
+			
+			public static function Show(newTorqueHolder:ITorqueResult):ElectricTorqueCalculator {
+				if (instance == null) {
+					instance = new ElectricTorqueCalculator();
+					instance.open();
+					
+					// initialize the calculator
+					instance.torqueResult = newTorqueHolder;
+					instance.areaTypeSelector.dataProvider 	= DamperTorqueUtil.AreaTypes;
+					instance.fpmSelector.dataProvider 		= DamperTorqueUtil.Fpms;
+					instance.bladeTypeSelector.dataProvider = DamperTorqueUtil.BladeTypes;
+				}
+				instance.orderToFront();
+				return instance;
+			}
+			
+			
+			override public function dispose():void {
+				torqueResult = null;
+				instance = null;
+				super.dispose();
+			}
+			
+			
+			private function changehandler(evt:Event):void {
+				var area:Number;
+				var fpm:Number;
+				var cfm:Number;
+				var n:Number
+				
+				switch (evt.target) {
+					case areaInput:
+						widthInput.text 	= "";
+						heightInput.text 	= "";
+						diameterInput.text 	= "";
+						widthLabel.alpha 	= 0.4;
+						heightLabel.alpha 	= 0.4;
+						diameterLabel.alpha = 0.4;
+						areaLabel.alpha 	= 1;
+						areaInput.setStyle("color", manualColor);
+						
+						area = parseFloat(areaInput.text);
+						break;
+					
+					case widthInput:
+					case heightInput:
+						widthLabel.alpha 	= 1;
+						heightLabel.alpha 	= 1;
+						diameterLabel.alpha = 1;
+						areaLabel.alpha 	= 0.4;
+						areaInput.setStyle("color", autoColor);
+						
+						var w:Number = parseFloat(widthInput.text);
+						var h:Number = parseFloat(heightInput.text);
+						if (isNaN(w) || isNaN(h)) return;
+						
+						area = w * h / 144;
+						areaInput.text = GridColumnsUtil.numberFormatter.format(area);
+						break;
+					
+					case diameterInput:
+						widthLabel.alpha 	= 1;
+						heightLabel.alpha 	= 1;
+						diameterLabel.alpha = 1;
+						areaLabel.alpha 	= 0.4;
+						areaInput.setStyle("color", autoColor);
+
+						var d:Number = parseFloat(diameterInput.text);
+						if (isNaN(d)) return;
+						
+						area = d * d * Math.PI / 144 / 4;
+						areaInput.text = GridColumnsUtil.numberFormatter.format(area);
+						break;
+					
+					case fpmSelector:
+						fpmLabel.alpha = 1;
+						fpmSelector.setStyle("color", manualColor);
+						fpm = parseFloat(fpmSelector.selectedItem);
+						area = parseFloat(areaInput.text);
+						if (isNaN(fpm) || isNaN(area)) return;
+						
+						cfm = fpm * area;
+						cfmLabel.alpha = 0.4;
+						cfmInput.setStyle("color", autoColor);
+						cfmInput.text = GridColumnsUtil.numberFormatter.format(cfm);
+						break;
+					
+					case cfmInput:
+						cfmLabel.alpha = 1;
+						cfmInput.setStyle("color", manualColor);
+						cfm = parseFloat(cfmInput.text);
+						area = parseFloat(areaInput.text);
+						if (isNaN(cfm) || isNaN(area)) return;
+
+						fpm = cfm / area;
+						fpmLabel.alpha = 0.4;
+						fpmSelector.setStyle("color", autoColor);
+						fpmSelector.selectedItem = parseFloat(GridColumnsUtil.numberFormatter.format(fpm));
+						break;
+					
+					case bladeTypeSelector:
+						area = parseFloat(areaInput.text);
+						if (isNaN(area)) return;
+						break;
+				}
+				
+				
+				fpm = parseFloat(fpmSelector.selectedItem);
+				if (isNaN(fpm)) return;
+				
+				var blade:String = bladeTypeSelector.selectedItem;
+				n = DamperTorqueUtil.CalculateN(blade, fpm);
+				
+				var result:Number = area * n;
+				resultLabel.text = GridColumnsUtil.numberFormatter.format(result);
+				torqueResult.returnTorque(result);
+			}
+			
+			
+			private function areaTypeChanged():void {
+				squareAreaholder.visible = (areaTypeSelector.selectedItem == DamperTorqueUtil.RECTANGULAR);
+				roundAreaholder.visible = (areaTypeSelector.selectedItem == DamperTorqueUtil.ROUND);
+			}
+			
+			
+			private function closeWindow():void {
+				close();
+			}
+			
+		]]>
+	</fx:Script>
+	
+	<s:VGroup left="15" top="15" bottom="15" right="25" 
+			  gap="15" horizontalAlign="center">
+		
+		<s:HGroup width="100%" height="130" gap="2" verticalAlign="middle">
+			<s:VGroup width="200" height="100%" horizontalAlign="right">
+				<s:HGroup gap="2" verticalAlign="middle">
+					<s:RichText id="areaLabel">
+						<s:span>Area (ft</s:span>
+						<s:span baselineShift="superscript" fontSize="12">2</s:span>
+						<s:span>):</s:span>
+					</s:RichText>
+					<s:TextInput id="areaInput" width="100" restrict="0-9." 
+								 change="changehandler(event)"/>
+				</s:HGroup>
+				
+				<s:Spacer width="10" height="100%"/>
+				
+				<s:HGroup gap="2" verticalAlign="middle">
+					<s:Label text="Air Flow:"/>
+					<s:Spacer width="1" height="10"/>
+					<s:Label id="fpmLabel" text="FPM (ft/min):"/>
+					<s:ComboBox id="fpmSelector" width="100" restrict="0-9."
+								change="changehandler(event)"/>
+				</s:HGroup>
+			</s:VGroup>
+			
+			
+			<s:VGroup width="100%" height="100%" gap="10" horizontalAlign="center">
+				<s:Label text="OR" height="23" fontSize="12" fontWeight="bold" verticalAlign="middle"/>
+				<s:Spacer width="10" height="100%"/>
+				<s:Label text="AND" fontSize="12" fontWeight="bold"/>
+				<s:Label text="OR" height="23" fontSize="12" fontWeight="bold" verticalAlign="middle"/>
+			</s:VGroup>
+			
+			
+			<s:VGroup width="200" height="100%" gap="7" horizontalAlign="right">
+				<s:HGroup gap="2" verticalAlign="middle">
+					<s:Label text="Area Type:"/>
+					<Controls:CustomDropDown id="areaTypeSelector" width="100"
+											 requireSelection="true" change="areaTypeChanged()"/>
+				</s:HGroup>
+				
+				
+				<s:Group width="100%" height="50">
+					<s:VGroup id="squareAreaholder" width="100%" gap="7" horizontalAlign="right">
+						<s:HGroup gap="2" verticalAlign="middle">
+							<s:Label id="widthLabel" text="width (in):"/>
+							<s:TextInput id="widthInput" width="100" restrict="0-9."
+										 change="changehandler(event)"/>
+						</s:HGroup>
+						
+						<s:HGroup gap="2" verticalAlign="middle">
+							<s:Label id="heightLabel" text="height (in):"/>
+							<s:TextInput id="heightInput" width="100" restrict="0-9." 
+										 change="changehandler(event)"/>
+						</s:HGroup>
+					</s:VGroup>
+					
+					<s:HGroup id="roundAreaholder" width="100%" gap="2" verticalAlign="middle" horizontalAlign="right" visible="false">
+						<s:Label id="diameterLabel" text="diameter (in):"/>
+						<s:TextInput id="diameterInput" width="100" restrict="0-9." 
+									 change="changehandler(event)"/>
+					</s:HGroup>
+				</s:Group>
+				
+				<s:Spacer  width="10" height="100%"/>
+
+				<s:HGroup gap="2" verticalAlign="middle" horizontalAlign="right">
+					<s:RichText id="cfmLabel">
+						<s:span>CFM (ft </s:span>
+						<s:span baselineShift="superscript" fontSize="12">3</s:span>
+						<s:span>/min):</s:span>
+					</s:RichText>
+					<s:TextInput id="cfmInput" width="100" restrict="0-9."
+								 change="changehandler(event)"/>
+				</s:HGroup>
+			</s:VGroup>
+			
+		</s:HGroup>
+		
+		
+		<s:HGroup verticalAlign="middle">
+			<s:Label text="Blades Type"/>
+			<Controls:CustomDropDown id="bladeTypeSelector" width="155"
+									 requireSelection="true" change="changehandler(event)"/>
+		</s:HGroup>
+		
+		
+		<s:Line width="100%" xFrom="0" xTo="20">
+			<s:stroke>
+				<s:SolidColorStroke color="0x73787a" weight="2"/>
+			</s:stroke>
+		</s:Line>
+		
+		
+		<s:HGroup verticalAlign="middle" width="100%">
+			<s:Label text="Calculated torque (lb*in):" fontSize="12" fontWeight="bold"/>
+			<s:Label id="resultLabel" text="0" fontSize="14" fontWeight="bold"/>
+			<s:Spacer width="100%" height="10"/>
+			<s:Button label="close" click="closeWindow()"/>
+		</s:HGroup>
+	</s:VGroup>
+	
+</Windows:GeneralWindow>

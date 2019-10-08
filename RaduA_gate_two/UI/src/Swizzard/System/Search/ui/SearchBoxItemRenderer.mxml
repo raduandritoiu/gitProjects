@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:ItemRenderer xmlns:fx="http://ns.adobe.com/mxml/2009" 
+				xmlns:s="library://ns.adobe.com/flex/spark" 
+				xmlns:mx="library://ns.adobe.com/flex/mx" 
+				width="100%" height="22" toolTip="empty" 
+				toolTipShow="toolTipShowHandler(event)">
+	
+	<fx:Script>
+		<![CDATA[
+			import mx.core.IToolTip;
+			import mx.events.InterManagerRequest;
+			import mx.events.ToolTipEvent;
+			import mx.managers.ISystemManager;
+			
+			import Swizzard.Data.Models.AbstractSiemensProduct;
+			import Swizzard.Data.Models.SiemensActuator;
+			import Swizzard.Data.Models.SiemensAssembly;
+			import Swizzard.Data.Models.SiemensDamper;
+			import Swizzard.Data.Models.SiemensPneumatic;
+			import Swizzard.Data.Models.SiemensValve;
+			import Swizzard.Data.Models.Enumeration.ProductType;
+			import Swizzard.Data.Models.SiemensInfo.ActuatorInfo;
+			import Swizzard.Data.Models.SiemensInfo.DamperInfo;
+			import Swizzard.Data.Models.SiemensInfo.PneumaticInfo;
+			import Swizzard.Data.Models.SiemensInfo.ValveInfo;
+			import Swizzard.Images.EmbeddedImages;
+			import Swizzard.System.Search.Events.SearchBoxEvent;
+			import Swizzard.System.Search.Mediators.SearchBoxMediator;
+			
+			
+			private var product:AbstractSiemensProduct;
+			private var dataChanged:Boolean = false;
+			
+			
+			override public function set data(value:Object):void {
+				super.data = value;
+				
+				product = value as AbstractSiemensProduct;
+				dataChanged = true;
+				invalidateProperties();
+			}
+			
+			
+			override protected function commitProperties():void {
+				super.commitProperties();
+				
+				if (dataChanged) {
+					dataChanged = false;
+					if (product.productType == ProductType.VALVE && product.subProductPartNumber) {
+						itemLabel.text 	= product.partNumber + "+" + product.subProductPartNumber;
+						itemIcon.source = EmbeddedImages.valve_assembly16_img;
+					}
+					else {
+						itemLabel.text 	= product.partNumber;
+						itemIcon.source = product.icon;
+					}
+				}
+			}
+			
+			
+			private function onAddButtonClick():void {
+				owner.dispatchEvent(new SearchBoxEvent(SearchBoxEvent.ADD_BUTTON_CLICKED, product));
+			}
+			
+			
+			
+			override public function get toolTip():String {
+				var tipText:String;
+				
+				product = SearchBoxMediator.SYNC_DATA.getFullItem(product);
+				
+				switch (product.productType) {
+					case ProductType.ACTUATOR:
+					{
+						var actuatorInfo:ActuatorInfo = SiemensActuator(product).info;
+						tipText = "Type: Actuator\n";
+						tipText += "Motor Type: " + actuatorInfo.motorTypeString + "\n";
+						tipText += "Signal: " + actuatorInfo.controlSignalString + "\n";
+						break;
+					}
+						
+					case ProductType.VALVE:
+					{
+						var valveInfo:ValveInfo	= SiemensValve(product).info;
+						if (product.subProductPartNumber) {
+							tipText = "Type: Assembly\n";
+							tipText += "-- Valve: " + valveInfo.partNumber + "\n";
+							tipText += "Family: " + valveInfo.typeString  + "\n";
+							tipText += "Size: " + valveInfo.size + "\n";
+							tipText += "CV: " + valveInfo.cv + "\n";
+							tipText += "Port: " + valveInfo.portConfigurationString + "\n\n";
+							
+							var subProduct:SiemensActuator = new SiemensActuator();
+							subProduct.productType = ProductType.ACTUATOR;
+							subProduct.partNumber = product.subProductPartNumber;
+							subProduct = SearchBoxMediator.SYNC_DATA.getFullItem(subProduct, true) as SiemensActuator;
+							
+							if (subProduct) {
+								tipText += "\n";
+								tipText += "-- Actuator: " + subProduct.actualPartNumber + "\n";
+								tipText += "Motor Type: " + subProduct.info.motorTypeString + "\n";
+								tipText += "Signal: " + subProduct.info.controlSignalString + "\n";
+							}
+						}
+						else {
+							tipText = "Type: Valve - " + valveInfo.typeString + "\n";
+							tipText += "Size: " + valveInfo.size + "\n";
+							tipText += "CV: " + valveInfo.cv + "\n";
+							tipText += "Port: " + valveInfo.portConfigurationString + "\n";
+						}
+						break;
+					}
+						
+					case ProductType.ASSEMBLY:
+					{
+						var asm:SiemensAssembly	= product as SiemensAssembly;
+						tipText = "Type: Assembly\n";
+						tipText += "-- Valve: " + asm.valvePartNumber + "\n";
+						
+						if (asm.valve != null) {
+							var vInfo:ValveInfo		= asm.valve.info;
+							tipText += "Family: " + vInfo.typeString  + "\n";
+							tipText += "Size: " + vInfo.size + "\n";
+							tipText += "CV: " + vInfo.cv + "\n";
+							tipText += "Port: " + vInfo.portConfigurationString + "\n\n";
+							tipText += "-- Actuator: " + asm.actuatorPartNumber + "\n";
+						}
+						if (asm.actuator != null) {
+							var aInfo:ActuatorInfo	= asm.actuator.info;
+							tipText += "Motor Type: " + aInfo.motorTypeString + "\n";
+							tipText += "Signal: " + aInfo.controlSignalString + "\n";
+							tipText += "Close Off: " + aInfo.closeOff + "\n";
+						}
+						break;
+					}
+						
+					case ProductType.MISC:
+					{
+						tipText = "Accessory Item\n";
+						break;
+					}
+						
+					case ProductType.DAMPER:
+					{
+						var damperInfo:DamperInfo = SiemensDamper(product).info;
+						tipText = "Type: Damper\n";
+						tipText += "Damper Type: " + damperInfo.typeString + "\n";
+						tipText += "Control Signal: " + damperInfo.controlSignalString + "\n";
+						break;
+					}
+
+					case ProductType.ACCESSORY:
+					{
+						tipText = "Accessory Item\n";
+						break;
+					}
+						
+					case ProductType.PNEUMATIC:
+					{
+						var pneumaticInfo:PneumaticInfo = SiemensPneumatic(product).info;
+						tipText = "Type: Pneumatic\n";
+						tipText += "Pneumatic Type: " + pneumaticInfo.typeString + "\n";
+						tipText += "Stroke Length: " + pneumaticInfo.strokeString + "\n";
+						break;
+					}
+				}
+				
+				tipText += "Price: $" + SearchBoxMediator.NR_FORMAT.format(product.price) + "\n";
+				return tipText;
+			}
+			
+
+			protected function toolTipShowHandler(event:ToolTipEvent):void {
+				var toolTip:IToolTip = event.toolTip;
+				
+				// Calculate global position of label.
+				var pt:Point = new Point(0, 0);
+				pt = itemLabel.localToGlobal(pt);
+				
+				var sm:ISystemManager = systemManager.topLevelSystemManager;
+				var sbRoot:DisplayObject = sm.getSandboxRoot();
+				pt = sbRoot.globalToLocal(pt);
+				
+				pt.x -= (toolTip.width + 25);
+				pt.y += (height - toolTip.height) / 2;
+				pt.y = Math.max(0, pt.y); // Prevent it from going into negative coordinates
+				
+				toolTip.move(pt.x, pt.y);
+				
+				var screen:Rectangle;
+				if (sm != sbRoot) {
+					var request:InterManagerRequest = new InterManagerRequest(InterManagerRequest.SYSTEM_MANAGER_REQUEST, 
+						false, false, "getVisibleApplicationRect"); 
+					sbRoot.dispatchEvent(request);
+					screen = Rectangle(request.value);
+				}
+				else {
+					screen = sm.getVisibleApplicationRect();
+				}
+				
+				var screenRight:Number = screen.x + screen.width;
+				pt.x = toolTip.x;
+				pt.y = toolTip.y;
+				pt = sbRoot.localToGlobal(pt);
+				if (pt.x + toolTip.width > screenRight) {
+					toolTip.move(toolTip.x - (pt.x + toolTip.width - screenRight), toolTip.y);
+				}
+			}
+		]]>
+	</fx:Script>
+	
+	
+	<s:HGroup left="2" right="4" height="22" verticalAlign="middle">
+		<s:Image id="itemIcon" width="16" height="16"/>
+		
+		<s:Label id="itemLabel" width="100%" fontFamily="Arial"/>
+		
+		<s:Image id="addButton" width="16" height="16" useHandCursor="true" buttonMode="true"
+				 toolTip="add to schedule" source="{EmbeddedImages.addButton}"
+				 click="onAddButtonClick()"/>
+	</s:HGroup>
+</s:ItemRenderer>

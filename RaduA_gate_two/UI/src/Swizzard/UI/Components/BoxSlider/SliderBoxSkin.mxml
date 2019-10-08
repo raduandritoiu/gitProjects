@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+
+  Licensed to the Apache Software Foundation (ASF) under one or more
+  contributor license agreements.  See the NOTICE file distributed with
+  this work for additional information regarding copyright ownership.
+  The ASF licenses this file to You under the Apache License, Version 2.0
+  (the "License"); you may not use this file except in compliance with
+  the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+
+-->
+
+
+<!--- The default skin class for a Spark SkinnableContainer container.  
+
+     @see spark.components.SkinnableContainer
+        
+      @langversion 3.0
+      @playerversion Flash 10
+      @playerversion AIR 1.5
+      @productversion Flex 4
+-->
+<s:Skin xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:s="library://ns.adobe.com/flex/spark" 
+    xmlns:fb="http://ns.adobe.com/flashbuilder/2009" alpha.disabled="0.5" xmlns:Controls="Swizzard.UI.Controls.*">
+	<fx:Metadata>
+		[HostComponent("Swizzard.UI.Components.BoxSlider.SliderBox")]
+	</fx:Metadata>
+
+    <fx:Script fb:purpose="styling">
+        <![CDATA[         
+			
+            /**
+             *  @private
+             */
+            override protected function updateDisplayList(unscaledWidth:Number, unscaledHeight:Number) : void
+            {
+                // Push backgroundColor and backgroundAlpha directly.
+                // Handle undefined backgroundColor by hiding the background object.
+                super.updateDisplayList(unscaledWidth, unscaledHeight);
+            }
+        ]]>        
+    </fx:Script>
+    
+    <s:states>
+        <s:State name="normal" />
+        <s:State name="disabled" />
+    </s:states>
+    
+	
+    <!--  background -->
+	<s:Rect left="0" right="0" top="0" bottom="0" radiusX="5" radiusY="5">
+		<s:fill>
+			<s:SolidColor color="0xb0bac0"/>
+		</s:fill>
+	</s:Rect>
+	
+	<s:Rect left="1" right="1" top="1" bottom="1" radiusX="5" radiusY="5">
+		<s:fill>
+			<s:LinearGradient rotation="90">
+				<s:GradientEntry color="0xf2f2f2" ratio="0.392"/>
+				<s:GradientEntry color="0xeaeaea" ratio="0.593"/>
+				<s:GradientEntry color="0xe0e0e0" ratio="0.597"/>
+				<s:GradientEntry color="0xffffff" ratio="1"/>
+			</s:LinearGradient>
+		</s:fill>
+	</s:Rect>
+	
+	
+	<!-- [SkinPart(required="true")] -->
+    <s:HGroup id="contentGroup" left="0" right="0" top="0" bottom="2" minWidth="0" minHeight="0"
+			  verticalAlign="middle" gap="1000" paddingLeft="1000" paddingRight="1000"
+			  clipAndEnableScrolling="true">
+    </s:HGroup>
+	
+	
+	<!-- [SkinPart(required="true")] -->
+	<s:Image id="leftArrow" source="/assets/Arrow_Left.png"
+			 left="10" verticalCenter="0" alpha="0"
+			 useHandCursor="true" buttonMode="true"/>
+	
+	<!-- [SkinPart(required="true")] -->
+	<s:Label id="leftArrowLabel" alpha="0"
+			 width="100" height="200" left="57" verticalCenter="-2"
+			 mouseChildren="false" mouseEnabled="false"
+			 verticalAlign="middle" color="0x363636" fontSize="14" fontWeight="bold">
+		<s:filters>
+			<s:GlowFilter color="0xffffff" blurX="20" blurY="20" strength="3" quality="1"/>
+		</s:filters>
+	</s:Label>
+	
+	
+	<!-- [SkinPart(required="true")] -->
+	<s:Image id="rightArrow" source="/assets/Arrow_Right.png" 
+			 right="10" verticalCenter="0"
+			 useHandCursor="true" buttonMode="true"/>
+	
+	<!-- [SkinPart(required="true")] -->
+	<s:Label id="rightArrowLabel" alpha="0.15"
+			 width="100" height="200" right="57" verticalCenter="-4"
+			 mouseChildren="false" mouseEnabled="false" textAlign="right"
+			 verticalAlign="middle" color="0x363636" fontSize="14" fontWeight="bold">
+		<s:filters>
+			<s:GlowFilter color="0xffffff" blurX="20" blurY="20" strength="3" quality="1"/>
+		</s:filters>
+	</s:Label>
+	
+	
+	<!-- [SkinPart(required="true")] -->
+	<s:Group id="scrollTrack" height="15" bottom="4" horizontalCenter="0" width="94%" visible="false">
+		<s:filters>
+			<s:DropShadowFilter distance="2" angle="90" color="0" alpha="0.3" blurX="5" blurY="5" strength="1" quality="3" inner="true"/>
+		</s:filters>
+		<Controls:HorizontalRect width="100%" height="100%">
+			<Controls:fill>
+				<s:LinearGradient rotation="90">
+					<s:GradientEntry color="0xd7d7d7" ratio="0"/>
+					<s:GradientEntry color="0xcccccc" ratio="1"/>
+				</s:LinearGradient>
+			</Controls:fill>
+		</Controls:HorizontalRect>
+	</s:Group>
+	
+	<!-- [SkinPart(required="true")] -->
+	<s:Group id="scrollThumb" width="200" height="13" bottom="5" visible="false">
+		<Controls:HorizontalRect left="1" right="1" top="1" bottom="1" >
+			<Controls:fill>
+				<s:SolidColor color="0x83a9c1" alpha="0.6"/>
+			</Controls:fill>
+		</Controls:HorizontalRect>
+		
+		<Controls:HorizontalRect left="1" right="1" top="1" bottom="1" >
+			<Controls:fill>
+				<s:LinearGradient rotation="90">
+					<s:GradientEntry color="0xb9def5" ratio="0"/>
+					<s:GradientEntry color="0x98c4e0" ratio="0.49"/>
+					<s:GradientEntry color="0xb8daf0" ratio="1"/>
+				</s:LinearGradient>
+			</Controls:fill>
+		</Controls:HorizontalRect>
+	</s:Group>
+	
+	
+	<!-- [SkinPart(required="true")] -->
+	<s:HGroup id="labelBox" height="15" width="90%" bottom="4" horizontalCenter="0" visible="false"
+			  verticalAlign="middle"/>
+</s:Skin>

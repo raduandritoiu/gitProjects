@@ -1,0 +1,397 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx"
+		 xmlns:Controls="Swizzard.UI.Controls.*"
+		 implements="Swizzard.UI.Components.ProductDragDropper.IProductContainer"
+		 clipAndEnableScrolling="true">
+	
+	
+	<fx:Script>
+		<![CDATA[
+			import spark.effects.Animate;
+			import spark.effects.Move;
+			import spark.effects.animation.MotionPath;
+			import spark.effects.animation.SimpleMotionPath;
+			import spark.effects.easing.Bounce;
+			import spark.effects.easing.EaseInOutBase;
+			import spark.effects.easing.Power;
+			
+			import Swizzard.Data.Models.Enumeration.ProductType;
+			import Swizzard.UI.Events.ProductEvent;
+			
+			private var mainOpened:Boolean = true;
+			private var secondOpened:Boolean = true;
+			private var mainOpenDuration:Number = 1400;
+			private var mainCloseDuration:Number = 1000;
+			private var secondDuration:Number = 400;
+			private var openMainAnim:Move;
+			private var closeMainAnim:Move;
+			private var secondAnim:Move;
+			private var secondCornerAnim:Animate;
+			private var cornerMotion:SimpleMotionPath;
+			
+			private var _closeOffset:Number = 20;
+			private var _shadowOffset:Number = 15;
+			private var _innerWidth:Number = 50;
+			private var _innerHeight:Number = 100;
+			private var dimensionsChanged:Boolean = true;
+			
+			private var _currentProductType:uint = 0;
+			private var productTypeChanged:Boolean = false;
+			private var productNumChanged:Boolean = false;
+			
+			private var productContainers:Dictionary = new Dictionary(true);
+			
+			
+			public function set closeOffset(val:Number):void {
+				if (_closeOffset == val) return;
+				_closeOffset = val;
+				dimensionsChanged = true;
+				invalidateProperties();
+			}
+			
+			public function get closeOffset():Number {
+				return _closeOffset;
+			}
+			
+			
+			public function set shadowOffset(val:Number):void {
+				if (_shadowOffset == val) return;
+				_shadowOffset = val;
+				dimensionsChanged = true;
+				invalidateProperties();
+			}
+			
+			public function get shadowOffset():Number {
+				return _shadowOffset;
+			}
+			
+
+			public function set innerWidth(val:Number):void {
+				if (_innerWidth == val) return;
+				_innerWidth = val;
+				dimensionsChanged = true;
+				invalidateProperties();
+			}
+			
+			public function get innerWidth():Number {
+				return _innerWidth;
+			}
+			
+			
+			public function set innerHeight(val:Number):void {
+				if (_innerHeight == val) return;
+				_innerHeight = val;
+				dimensionsChanged = true;
+				invalidateProperties();
+			}
+			
+			public function get innerHeight():Number {
+				return _innerHeight;
+			}
+			
+			
+			public function set currentProductType(newProductType:uint):void {
+				if (_currentProductType == newProductType) return;
+				_currentProductType = newProductType;
+				productTypeChanged = true;
+				productNumChanged = true;
+				invalidateProperties();
+			}
+			
+			public function get currentProductType():uint {
+				return _currentProductType;
+			}
+			
+			
+			public function get opened():Boolean {
+				return mainOpened;
+			}
+			
+			
+			public function openAll(delay:Number = 0):void {
+				var newDelay:Number = (mainOpened ? delay : delay + mainOpenDuration);
+				openMain(delay);
+				openSecond(newDelay); // delay + mainDelay
+			}
+			
+			
+			public function closeAll(delay:Number = 0):void {
+				var newDelay:Number = (secondOpened ? delay + secondDuration : delay);
+				closeSecond(delay);
+				closeMain(newDelay);  // delay + secondDelay
+			}
+			
+			
+			public function openMain(delay:Number = 0):void {
+				if (mainOpened) return;
+				mainOpened = true;
+				
+				mainButton.arrowDirection = ProductSourceButton.UP;
+				closeMainAnim.stop();
+				openMainAnim.yTo = -1;
+				openMainAnim.startDelay = delay;
+				openMainAnim.play();
+			}
+			
+			public function closeMain(delay:Number = 0):void {
+				if (!mainOpened) return;
+				mainOpened = false;
+				
+				mainButton.arrowDirection = ProductSourceButton.DOWN;
+				openMainAnim.stop();
+				closeMainAnim.yTo = _closeOffset - _innerHeight - 1;
+				closeMainAnim.startDelay = delay;
+				closeMainAnim.play();
+			}
+			
+			
+			public function openSecond(delay:Number = 0):void {
+				if (!mainOpened) return;
+				if (secondOpened) return;
+				secondOpened = true;
+				
+				secondAnim.stop();
+				secondAnim.xTo = _innerWidth - 1; // to overlap the borders
+				secondAnim.startDelay = delay;
+				secondAnim.play();
+				
+				cornerMotion.valueFrom = true;
+				cornerMotion.valueTo = false;
+				secondCornerAnim.stop();
+				secondCornerAnim.startDelay = delay + 5;
+				secondCornerAnim.play();
+			}
+			
+			public function closeSecond(delay:Number = 0):void {
+				if (!secondOpened) return;
+				
+				secondOpened = false;
+				secondAnim.stop();
+				secondAnim.xTo = 0;
+				secondAnim.startDelay = delay;
+				secondAnim.play();
+				
+				cornerMotion.valueFrom = false;
+				cornerMotion.valueTo = true;
+				secondCornerAnim.stop();
+				secondCornerAnim.startDelay = delay + 5;
+				secondCornerAnim.play();
+			}
+			
+			
+			public function addFamily(family:Product):void {
+				// add family
+				categoriesContainer.addElement(family);
+				family.addEventListener(MouseEvent.ROLL_OVER, familyMoused, false, 0, true);
+				
+				// create new products container
+				var productContainer:VGroup = new VGroup();
+				productContainer.left 		= 0; 
+				productContainer.right 		= 0;
+				productContainer.top 		= 0;
+				productContainer.bottom 	= 0;
+				// backup in case the current product was selected befre the container was created
+				productContainer.visible = (family.productType == _currentProductType); 
+				productContainer.horizontalAlign = "center";
+				productContainer.verticalAlign = "middle";
+				
+				// add the the container
+				secondPanel.addElement(productContainer);
+				productContainers[family.productType] = productContainer;
+			}
+			
+			
+			public function addProduct(product:ProductFamily):void {
+				var productContainer:VGroup = productContainers[product.productType];
+				
+				// first find the position where to add it
+				var idx:int = 0;
+				for (idx = 0; idx < productContainer.numElements; idx++) {
+					if ((productContainer.getElementAt(idx) as ProductFamily).pos > product.pos)
+						break;
+				}
+				productContainer.addElementAt(product, idx);
+				product.isAdded = false;
+				
+				if (product.productType == _currentProductType) {
+					productNumChanged = true;
+					invalidateProperties();
+				}
+			}
+			
+			
+			public function removeProduct(product:ProductFamily):void {
+				var productContainer:VGroup = productContainers[product.productType];
+				productContainer.removeElement(product);
+				
+				if (product.productType == _currentProductType) {
+					productNumChanged = true;
+					invalidateProperties();
+				}
+			}
+			
+			
+			override protected function childrenCreated():void {
+				super.childrenCreated();
+				
+				// create animations
+				openMainAnim = new Move(mainPanel);
+				openMainAnim.duration = mainOpenDuration;
+				openMainAnim.easer = new Bounce();
+				
+				closeMainAnim = new Move(mainPanel);
+				closeMainAnim.duration = mainCloseDuration;
+				closeMainAnim.easer = new Power(0.4, 10);
+				
+				secondAnim = new Move(secondPanel);
+				secondAnim.duration = secondDuration;
+				secondAnim.easer = new EaseInOutBase();
+				
+				secondCornerAnim = new Animate(mainButton);
+				cornerMotion = new SimpleMotionPath("showCorner", true, false);
+				var v:Vector.<MotionPath> = new Vector.<MotionPath>();
+				v.push(cornerMotion);
+				secondCornerAnim.motionPaths = v;
+				secondCornerAnim.targets = [mainButton, secondButton];
+			}
+			
+			
+			override protected function commitProperties():void {
+				super.commitProperties();
+				
+				if (dimensionsChanged) {
+					dimensionsChanged = false;
+					arrangePanels();
+				}
+				
+				if (productTypeChanged) {
+					productTypeChanged = false;
+					secondButton.text = "Select " + ProductType.toString(_currentProductType) + " Types";
+					for (var productType:* in productContainers) {
+						var productContainer:VGroup = productContainers[productType];
+						productContainer.visible = (productType == _currentProductType);
+					}
+					
+					for (var i:int = 0; i < categoriesContainer.numElements; i++) {
+						var family:Product = categoriesContainer.getElementAt(i) as Product;
+						family.selected = (family.productType == _currentProductType);
+					}
+				}
+				
+				if (productNumChanged) {
+					productNumChanged = false;
+					var productContainer:VGroup = productContainers[_currentProductType];
+					if (productContainer != null) {
+						emptyBox.visible = (productContainer.numElements == 0);
+					}
+				}
+			}
+			
+			
+			private function arrangePanels():void {
+				secondPanel.width 	= _innerWidth;
+				secondPanel.height 	= _innerHeight;
+				if (secondOpened)
+					secondPanel.x = _innerWidth - 1;
+				else
+					secondPanel.x = 0;
+				
+				mainPanelContent.width 	= _innerWidth;
+				mainPanelContent.height = _innerHeight;
+				
+				mainPanel.width 	= _innerWidth;
+				mainPanel.height 	= _innerHeight;
+				mainPanel.x 		= _shadowOffset;
+				if (mainOpened)
+					mainPanel.y 	= -1; 
+				else
+					mainPanel.y 	= _closeOffset - _innerHeight - 1;
+				
+				width = (_innerWidth + _shadowOffset) * 2;
+				height = _innerHeight + _shadowOffset;
+			}
+			
+			
+			private function familyMoused(evt:MouseEvent):void {
+				var family:Product = evt.currentTarget as Product;
+				if (family == null) return;
+				
+				// must select the product family and make it visible
+				currentProductType = family.productType;
+				productNumChanged = true;
+				invalidateProperties();
+				openSecond();
+			}
+			
+			
+			private function toggleOpen():void {
+				if (mainOpened) {
+					closeAll();
+				}
+				else {
+					openAll();
+				}
+			}
+			
+			private function addAllClicked():void {
+				dispatchEvent(new ProductEvent(ProductEvent.ADD_ALL));
+			}
+			
+			private function removeAllClicked():void {
+				dispatchEvent(new ProductEvent(ProductEvent.REMOVE_ALL));
+			}
+		]]>
+	</fx:Script>
+	
+	
+	
+	<s:Group id="mainPanel">
+		
+		<s:filters>
+			<s:DropShadowFilter distance="5" angle="90" color="0x000000" alpha="0.3" blurX="8" blurY="8"/>
+		</s:filters>
+
+		<s:Group id="secondPanel">
+			<s:Rect left="0" right="0" top="0" bottom="0"
+					bottomLeftRadiusX="8" bottomLeftRadiusY="8" 
+					bottomRightRadiusX="8" bottomRightRadiusY="8">
+				<s:fill> <s:SolidColor color="0xeaeaea"/> </s:fill> 
+				<s:stroke> <s:SolidColorStroke color="0x98a2a7" alpha="0.5"/> </s:stroke>
+			</s:Rect>
+			
+			<s:Button id="removeAllButton" left="4" top="4" label="Remove all" 
+					  skinClass="Swizzard.UI.Skins.spark.LinkButtonSkin"
+					  click="removeAllClicked()"/>
+			
+			<s:Button id="addAllButton" right="5" top="4" label="Add all" 
+					  skinClass="Swizzard.UI.Skins.spark.LinkButtonSkin"
+					  click="addAllClicked()"/>
+			
+			<Controls:ProductSourceButton id="secondButton" bottom="0" left="0" right="0" height="27"
+										  changeLeftCorner="true" text="Select *** Type" click="closeSecond()"/>
+			
+			<Controls:DashedBox id="emptyBox" left="0" right="0" top="0" bottom="0"/>
+			
+			<!--Here will go the other VGroups (product containers) -->
+			
+		</s:Group>
+		
+		<s:Group id="mainPanelContent">
+			<s:Rect left="0" right="0" top="0" bottom="0"
+					bottomLeftRadiusX="8" bottomLeftRadiusY="8" 
+					bottomRightRadiusX="8" bottomRightRadiusY="8">
+				<s:fill> <s:SolidColor color="0xeaeaea"/> </s:fill> 
+				<s:stroke> <s:SolidColorStroke color="0x98a2a7" alpha="0.5"/> </s:stroke>
+			</s:Rect>
+			
+			<s:VGroup id="categoriesContainer" left="0" right="0" top="0" bottom="0" 
+					  horizontalAlign="center" verticalAlign="middle">
+			</s:VGroup>
+			<Controls:ProductSourceButton id="mainButton" bottom="0" left="0" right="0" height="27"
+										  changeRightCorner="true" text="Select Product" click="toggleOpen()"/>
+		</s:Group>
+	</s:Group> 
+	
+</s:Group>

@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 width="400" height="300">
+	
+	<fx:Script>
+		<![CDATA[
+			import mx.core.FlexGlobals;
+			import mx.graphics.SolidColor;
+			import mx.managers.PopUpManager;
+			
+			
+			private var _title:String;
+			private var titleUpdated:Boolean;
+			
+			private var _backgroundColor:uint;
+			private var backgroundChanged:Boolean;
+
+			
+			public function set title(val:String):void {
+				if (_title == val) return;
+				_title = val;
+				titleUpdated;
+				invalidateProperties();
+			}
+			
+			
+			public function set backgroundColor(value:uint):void {
+				if (_backgroundColor == value) return;
+				_backgroundColor = value;
+				backgroundChanged = true;
+				invalidateProperties();
+			}
+			
+			public function get backgroundColor():uint {
+				return _backgroundColor;
+			}
+			
+			
+			
+			override protected function commitProperties():void {
+				super.commitProperties();
+				
+				if (titleUpdated) {
+					titleUpdated = false;
+					titleLabel.text	= title;
+				}
+				
+				if (backgroundChanged) {
+					backgroundChanged = false;
+					(backgroundRect.fill as SolidColor).color = backgroundColor;
+				}
+			}
+			
+			
+			
+			public function openAlert(newAlert:GenericAlert, position:Point=null):void {
+				PopUpManager.addPopUp(newAlert, FlexGlobals.topLevelApplication as DisplayObject, true);
+				if (position == null) {
+					PopUpManager.centerPopUp(newAlert);
+				}
+				else {
+					newAlert.move(position.x, position.y);
+				}
+			}
+			
+			
+			public function close():void {
+				PopUpManager.removePopUp(this);
+			}
+
+		]]>
+	</fx:Script>
+	
+	
+	<s:filters>
+		<s:DropShadowFilter distance="1" angle="279" color="0x000000" alpha="0.3" 
+							blurX="15" blurY="15" strength="1" quality="3"/>
+		<s:DropShadowFilter distance="0" angle="90" color="0x000000" alpha="0.3" 
+							blurX="2" blurY="2" strength="1" quality="1"/>
+	</s:filters>
+	
+	
+	<!-- background fill -->
+	<s:Rect id="backgroundRect" left="15" right="15" top="15" bottom="15" >
+		<s:fill>
+			<s:SolidColor id="backgroundFill" color="0xffffff"/>
+		</s:fill>
+	</s:Rect>
+	
+	<s:VGroup left="15" right="15" top="15" bottom="15" minHeight="24" minWidth="10" gap="0">
+		
+		<!-- header -->
+		<s:Group width="100%" height="20">
+			<s:Rect id="headerBackground" left="0" right="0" top="0" bottom="0">
+				<s:fill>
+					<s:LinearGradient rotation="90">
+						<s:GradientEntry color="0x73787a" alpha="1"/>
+						<s:GradientEntry color="0x212121" alpha="1"/>
+					</s:LinearGradient>
+				</s:fill>
+			</s:Rect>
+			
+			<s:HGroup id="header" width="100%" height="20" paddingLeft="10" paddingRight="10" verticalAlign="middle">
+				<s:Label id="titleLabel" text="Title" color="0xececec" fontWeight="bold"/>
+			</s:HGroup>
+		</s:Group>
+		
+		<!-- content -->
+		<s:Group id="contentGroup" width="100%" height="100%" minHeight="0" minWidth="0"/>
+		
+	</s:VGroup>
+
+</s:Group>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<update> 
+	<!-- 
+		For Database updates increment the version number
+		under the database.version node to cause the tool to update.
+		
+		For Datasheet content update, change the dataModified value
+		to the date that the content was updated. this will invalidate 
+		any content downloaded prior to that date.
+		
+		The date must be in W3C Date Time Format described here: http://www.w3.org/TR/NOTE-datetime
+		YYYY-MM-DDThh:mm:ssTZD (eg 1997-07-16T19:20:30+01:00)
+	 -->
+	<database>
+	    <version>10</version> 
+	    <dataFileUri>https://www.swizzard.usa.siemens.com/Data2/parts.db</dataFileUri>
+	</database>
+	<content>
+		<dateModified value="2012-09-27T01:00:00-08:00" />
+	</content>
+</update>

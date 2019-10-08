@@ -1,0 +1,137 @@
+<!--
+
+  Licensed to the Apache Software Foundation (ASF) under one or more
+  contributor license agreements.  See the NOTICE file distributed with
+  this work for additional information regarding copyright ownership.
+  The ASF licenses this file to You under the Apache License, Version 2.0
+  (the "License"); you may not use this file except in compliance with
+  the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+
+-->
+<!--- A skin class for the Spark WindowedApplication and Window containers. 
+      This class defines just a border and status bar, but no gripper button, 
+      title bar, or title bar buttons.
+      
+      <p>You can either use  system chrome, the FlexChromSkin class, or 
+      the WindowedApplicationSkin class to define the appearance of 
+      the WindowedApplication and Window containers. 
+      To use the WindowedApplicationSkin class with the WindowedApplication container, 
+      set <code>systemChrome</code> to "none" 
+      in the application's .xml file, and set the <code>skinClass</code> style to
+      spark.skins.spark.WindowedApplicationSkin. 
+      To use the WindowedApplicationSkin class with the Window container, 
+      set the <code>Window.systemChrome</code> property to "none", 
+      and set the <code>skinClass</code> style to
+      spark.skins.spark.WindowedApplicationSkin.</p>
+
+      @see spark.components.WindowedApplication
+       
+      @langversion 3.0
+      @playerversion Flash 10
+      @playerversion AIR 1.5
+      @productversion Flex 4 
+      
+-->
+<s:SparkSkin xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:s="library://ns.adobe.com/flex/spark" 
+			 xmlns:fb="http://ns.adobe.com/flashbuilder/2009" xmlns:Components="Swizzard.UI.Components.*" 
+			 xmlns:UI="Swizzard.UI.*" xmlns:ui="Swizzard.System.Search.ui.*" 
+			 alpha.disabledGroup="0.5" xmlns:UI1="Swizzard.System.ContentDownload.UI.*" >
+	
+	<fx:Metadata>
+		[HostComponent("SimpleSelect")]
+	</fx:Metadata>
+	
+	<fx:Script>
+		<![CDATA[
+			import Swizzard.Images.EmbeddedImages;
+		]]>
+	</fx:Script>
+
+    
+     <s:states>
+        <s:State name="normal" />
+        <s:State name="disabled" stateGroups="disabledGroup" />
+        <s:State name="normalAndInactive" stateGroups="inactiveGroup" />
+        <s:State name="disabledAndInactive" stateGroups="disabledGroup, inactiveGroup" />
+    </s:states>
+	
+	
+    <!-- I have renamed the background fill so you cannot change it from here-->
+    <!--- Defines the default background color of the skin. -->
+    <s:Rect id="bgRect" left="0" right="0" top="0" bottom="0" visible="true">
+        <s:fill>
+            <!--- @private -->
+			<s:SolidColor id="bgFill" color="0xff00ff" alpha="0"/>
+        </s:fill>
+    </s:Rect>
+
+	
+	<!-- The entire Content -->    
+	<s:Group id="rootCanvas" left="10" right="10" top="10" bottom="10">
+		<s:filters>
+			<s:DropShadowFilter quality="3" distance="1" angle="90" blurX="4" blurY="3" color="0" alpha="0.65" alpha.inactiveGroup="0.3"/>
+		</s:filters>
+
+		<!-- The REAL/visible Background of the application -->
+		<s:Rect width="100%" height="100%" radiusX="10" radiusY="10">
+			<s:fill>
+				<s:SolidColor color="0xdbe8f0"/>
+			</s:fill>
+		</s:Rect>
+		
+		
+		<!-- The Header Background -->
+		<UI:HeaderBox id="headerBox" width="100%" height="35" doubleClickEnabled="true"/>
+		
+		
+		<!-- The Logo -->		
+		<s:Image id="logoImage" top="6" left="6" source="{EmbeddedImages.applicationLogo}" 
+				 mouseChildren="false" mouseEnabled="false"/>
+		
+		
+		<!-- The Products ButtonBar  -->
+		<s:TabBar id="productsBar" requireSelection="true" height="28" top="8" horizontalCenter="0"
+				  skinClass="Swizzard.UI.Skins.newOnes.ProductTabBarSkin"/>
+		
+		
+		
+		<!-- Put Search inside a HGroup so I can easily make it move towards the right when we rescale the stage -->
+		<s:HGroup width="25%" maxWidth="300" minWidth="230" height="20" top="8" right="55" depth="2">
+			<!-- The Search Box -->		
+			<ui:SearchBox id="searchBox" name="searchInputBox" width="230" height="21"/>
+		</s:HGroup>
+		
+		
+		<!-- The Window Controls -->
+		<Components:AppWindowControls id="windowControls" width="42" height="14" top="3" right="6"/>
+		
+		
+		<!-- The Menu Bar -->
+		<Components:AppMenuBar id="menubar" width="100%" height="22" y="35"/>
+
+		
+		<!--The Download View -->
+		<UI1:ContentDownloadView id="statusView" width="300" height="22" top="35" right="28" alpha="0" visible="false"/>
+		
+		
+		
+		<!-- The Main Content -->
+		
+		<!--- @copy spark.components.SkinnableContainer#contentGroup -->
+		<s:VGroup id="contentGroup" left="10" right="10" top="66" bottom="10" gap="8"/>
+	</s:Group>
+	
+	
+	<!-- The Resizing Thingy -->
+	<s:Image id="resizeHandle" width="14" height="14" right="12" bottom="12" source="/assets/resize-handle.png"/>
+	
+    <!-- I have removed the status bar -->
+</s:SparkSkin>

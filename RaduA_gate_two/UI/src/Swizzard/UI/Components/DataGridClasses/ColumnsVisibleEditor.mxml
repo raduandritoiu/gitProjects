@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:VGroup xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		  xmlns:s="library://ns.adobe.com/flex/spark" 
+		  xmlns:mx="library://ns.adobe.com/flex/mx"
+		  xmlns:DataGridClasses="Swizzard.UI.Components.DataGridClasses.*"
+		  paddingBottom="5" paddingLeft="5" paddingRight="5" paddingTop="5">
+	
+	<fx:Script>
+		<![CDATA[
+			import mx.collections.IList;
+			
+			private var _columns:IList;
+			private var columnsChanged:Boolean;
+			
+			
+			public function set columns(value:IList):void {
+				_columns = value;
+				columnsChanged = true;
+				invalidateProperties();
+			}
+			
+			public function get columns():IList {
+				return _columns;
+			}
+			
+			override protected function commitProperties():void {
+				super.commitProperties();
+				
+				if (columnsChanged) {
+					columnsChanged	= false;
+					columnEditor.dataProvider = columns;
+				}
+			}
+			
+			
+			protected function keyboardDownHandler(event:KeyboardEvent):void {
+				if (event.keyCode == Keyboard.SPACE) {
+					var idx:int = columnEditor.selectedIndex;
+					var renderer:ColumnVisibleRenderer = columnEditor.dataGroup.getElementAt(idx) as ColumnVisibleRenderer;
+					if (renderer != null) {
+						renderer.toggleSelectedState();
+					}
+				}
+				event.preventDefault();
+			}
+		]]>
+	</fx:Script>
+	
+	<s:Label text="Available columns:"/>
+	
+	<s:List id="columnEditor" labelField="headerText" width="150" height="100%" maxHeight="200"
+			allowMultipleSelection="true" fontSize="10" borderVisible="false"
+			itemRenderer="Swizzard.UI.Components.DataGridClasses.ColumnVisibleRenderer"
+			skinClass="Swizzard.UI.Skins.controls.TransparentList"
+			keyDown="keyboardDownHandler(event)"/>
+</s:VGroup>

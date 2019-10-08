@@ -1,0 +1,38 @@
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml"
+	width="100%" height="100%"
+	creationComplete="filters=[ activeFilter ]"
+	activate="filters=[ activeFilter ]"
+	deactivate="filters=[ inactiveFilter ]"
+	horizontalScrollPolicy="off" verticalScrollPolicy="off"
+	xmlns:flash.filters="flash.filters.*" >
+
+	
+	<mx:filters>
+		<flash.filters:DropShadowFilter id='activeFilter' quality="3" distance="1" angle="90" blurX="4" blurY="3" color="0" alpha="0.65" />
+	</mx:filters>
+	
+	<flash.filters:DropShadowFilter id='inactiveFilter'  quality="3" distance="1" angle="90" blurX="4" blurY="3" color="0" alpha="0.3" />
+		
+	<mx:Script>
+		<![CDATA[
+			
+			
+		override protected function updateDisplayList(w:Number, h:Number):void
+		{
+			super.updateDisplayList(w,h);
+			
+			graphics.clear();
+			
+			graphics.beginFill(0xdbe8f0);
+			
+			//graphics.drawRoundRect(0, 0, w, h, 10, 10);
+			
+			graphics.drawRoundRectComplex(0,0,w,h, 50, 50, 10, 10);
+			
+		}
+			
+			
+		]]>
+	</mx:Script>
+	
+</mx:Canvas>

@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:HGroup xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		  xmlns:s="library://ns.adobe.com/flex/spark" 
+		  xmlns:mx="library://ns.adobe.com/flex/mx"
+		  gap="0">
+	
+	<fx:Script>
+		<![CDATA[
+			private var _appWindow:NativeWindow;
+			
+			public function setAppWindiw(window:NativeWindow):void {
+				_appWindow = window;
+			}
+			
+			
+			// the operation is straight forward - we do not need any hook up to this action
+			public function minimizeHandler():void {
+				_appWindow.minimize();
+			}
+			
+			
+			public function toggleMaximize():void {
+				var toggMax:Boolean = (_appWindow.displayState != NativeWindowDisplayState.MAXIMIZED);
+				setMaximize(toggMax);
+			}
+			
+			
+			// the operation is straight forward - we do not need any hook up to this action
+			public function setMaximize(toMax:Boolean):void {
+				if (toMax) {
+					_appWindow.maximize();
+					maximizeButton.visible = false;
+					restoreButton.visible = true;
+				} 
+				else {
+					_appWindow.restore();
+					maximizeButton.visible = true;
+					restoreButton.visible = false;
+				}
+			}
+			
+			
+			// this operation is disabled - because the CLOSE must be routed through
+			// the app mediator to test if there is something to be saved and properly close
+			public function closeHandler():void {
+				//_appWindow.close();
+			}
+		]]>
+	</fx:Script>
+	
+	<s:Button id="minimizeButton" toolTip="Minimize" 
+			  width="14" height="14" useHandCursor="true" buttonMode="true" tabEnabled="false"
+			  click="{minimizeHandler()}"
+			  skinClass="Swizzard.UI.Skins.spark.MinimizeButtonSkin"/>
+	
+	<s:Group width="14" height="14">
+		<s:Button id="maximizeButton" toolTip="Maximize" 
+				  width="14" height="14" useHandCursor="true" buttonMode="true" tabEnabled="false"
+				  click="{setMaximize(true)}"
+				  skinClass="Swizzard.UI.Skins.spark.MaximizeButtonSkin"/>
+		
+		<s:Button id="restoreButton" toolTip="Restore" visible="false"
+				  width="14" height="14" useHandCursor="true" buttonMode="true" tabEnabled="false"
+				  click="{setMaximize(false)}"
+				  skinClass="Swizzard.UI.Skins.spark.RestoreButtonSkin"/>
+	</s:Group>
+	
+	<s:Button id="closeButton" toolTip="Close" 
+			  width="14" height="14" useHandCursor="true" buttonMode="true" tabEnabled="false"
+			  click="{closeHandler()}"
+			  skinClass="Swizzard.UI.Skins.spark.CloseButtonSkin"/>
+</s:HGroup>

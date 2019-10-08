@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:GridItemRenderer xmlns:fx="http://ns.adobe.com/mxml/2009" 
+					xmlns:s="library://ns.adobe.com/flex/spark" 
+					xmlns:mx="library://ns.adobe.com/flex/mx" 
+					width="60" height="20">
+	
+	<fx:Script>
+		<![CDATA[
+			import Swizzard.Data.Models.SiemensValve;
+			import Swizzard.Data.Models.Enumeration.Valves.ValvePattern;
+			import Swizzard.Data.Models.Enumeration.Valves.ValveType;
+			private var dataChanged:Boolean;
+			
+		
+			override public function set data(value:Object):void {
+				if (super.data == value) {
+					return;
+				}
+				super.data = value;
+				dataChanged = true;
+				invalidateProperties();
+			}
+			
+			
+			override protected function commitProperties():void {
+				super.commitProperties();
+				if (dataChanged) {
+					dataChanged = false;
+					textLabel.text = valveCvbLabel(data);
+				}
+			}
+
+			
+			private function valveCvbLabel(item:Object):String {
+				if (item == null)
+					return "";
+				var valve:SiemensValve = item as SiemensValve;
+				if (valve.info.type == ValveType.BALL && valve.info.pattern == ValvePattern.SIX_WAY) {
+					var cvb:Number = valve.info.cvb;
+					return cvb + "";
+				}
+				return "N/A";
+			}
+		]]>
+	</fx:Script>
+	
+	<s:Label id="textLabel" left="7" right="4" top="8" maxDisplayedLines="1"/>
+	
+</s:GridItemRenderer>

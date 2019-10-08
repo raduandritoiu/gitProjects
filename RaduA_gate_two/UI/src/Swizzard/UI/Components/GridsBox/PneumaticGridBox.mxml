@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:HGroup xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		  xmlns:s="library://ns.adobe.com/flex/spark" 
+		  xmlns:mx="library://ns.adobe.com/flex/mx" 
+		  xmlns:DataGridClasses="Swizzard.UI.Components.DataGridClasses.*" 
+		  xmlns:Controls="Swizzard.UI.Controls.*" xmlns:UI="Swizzard.UI.*"
+		  width="100%" height="175" minHeight="175" gap="0">
+	
+	
+	<fx:Script>
+		<![CDATA[
+			import Swizzard.Images.EmbeddedImages;
+		]]>
+	</fx:Script>
+	
+	<!-- Pneumatic Selector -->
+	<mx:HDividedBox id="hDividedBox" width="100%" height="100%" minHeight="127"
+					horizontalScrollPolicy="off" verticalScrollPolicy="off"
+					liveDragging="true" horizontalGap="4" dividerThickness="4">
+		
+		<!-- Pneumatic Grid -->
+		<DataGridClasses:ProductDataGrid id="pneumaticGrid" width="70%" height="100%" minWidth="250"
+										 selectionMode="multipleRows" horizontalScrollPolicy="auto"
+										 icon="{EmbeddedImages.pneumatic16_img}" title="Pneumatic Actuators"
+										 />
+		
+		<!-- Accessory Grid -->
+		<DataGridClasses:ProductDataGrid id="accessoryGrid" width="30%" height="100%" minWidth="250"
+										 selectionMode="multipleRows" horizontalScrollPolicy="auto"
+										 icon="{EmbeddedImages.accessory16_img}" title="Pneumatic Actuator Accessories"
+										 statusText="0 found"
+										 centerText="Please select a pneumatic."/>
+	</mx:HDividedBox>
+	
+	
+	<!-- Add Buttons -->
+	<Controls:AddButtonGroup height="100%" paddingLeft="7" paddingRight="7" verticalAlign="middle">
+		<UI:AddButton id="addPneumaticButton" width="40" enabled="false"
+					  icon="{EmbeddedImages.ADD_PNEUMATIC_BIG}"
+					  toolTip="Add selected Pneumatic Actuator to schedule"/>
+		
+		<UI:AddButton id="addAccessoryButton" width="40" enabled="false"
+					  icon="{EmbeddedImages.ADD_ACCESSORY_BIG}"
+					  toolTip="Add selected accessory kit to schedule"/>
+		
+		<UI:AddButton id="addAssemblyButton" width="40" enabled="false"
+					  visible="false" includeInLayout="false"
+					  icon="{EmbeddedImages.ADD_PNEUMATIC_ASSEMBLY_BIG}"
+					  toolTip="Add selected Damper Actuator with Accessories"/>
+		
+		<UI:AddButton id="viewFavoritesButton" width="40"
+					  icon="{EmbeddedImages.FAVORITES_BIG}"
+					  toolTip="Show favorites window"/>
+		
+	</Controls:AddButtonGroup>
+	
+</s:HGroup>

@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+				xmlns:s="library://ns.adobe.com/flex/spark" 
+				xmlns:mx="library://ns.adobe.com/flex/mx"
+				width="86" height="96" useHandCursor="true" buttonMode="true"
+				rollOut="onRollOut(event)" rollOver="onRollOver(event)">
+	
+	<fx:Script>
+		<![CDATA[
+			import Swizzard.Data.Models.Enumeration.ProductType;
+			import Swizzard.Images.EmbeddedImages;
+			
+			private var _source:String;
+			private var sourceChanged:Boolean = false;
+			
+			private var _label:String;
+			private var labelChanged:Boolean = false;
+			
+			private var _selected:Boolean;
+			private var selectedChanged:Boolean = false;
+			
+			private var _productType:uint;
+
+			
+			public function set source(value:String):void {
+				if (_source == value) return;
+				_source = value;
+				sourceChanged = true;
+				invalidateProperties();
+			}
+			
+			public function get source():String {
+				return _source;
+			}
+			
+			
+			public function set label(value:String):void {
+				if (_label == value) return;
+				_label = value;
+				labelChanged = true;
+				invalidateProperties();
+			}
+			
+			public function get label():String {
+				return _label;
+			}
+			
+			
+			public function set selected(value:Boolean):void {
+				if (_selected == value) return;
+				_selected = value;
+				selectedChanged = true;
+				invalidateProperties();
+			}
+			
+			public function get selected():Boolean {
+				return _selected;
+			}
+			
+			
+			public function set productType(value:uint):void {
+				_productType = value;
+				if (label == null) {
+					label = ProductType.toString(_productType);
+				}
+			}
+			
+			public function get productType():uint {
+				return _productType;
+			}
+			
+			
+			override protected function commitProperties():void {
+				super.commitProperties();
+				
+				if (sourceChanged) {
+					sourceChanged = false;
+					productImage.source = source;
+				}
+				
+				if (labelChanged) {
+					labelChanged = false;
+					productLabel.text = label;
+				}
+				
+				if (selectedChanged) {
+					selectedChanged = false;
+					overBg.visible = selected;
+				}
+			}
+			
+			
+			private function onRollOver(e:MouseEvent):void {
+				overBg.visible = true;
+			}
+			
+			
+			private function onRollOut(e:MouseEvent):void {
+				overBg.visible = selected;
+			}
+		]]>
+	</fx:Script>
+	
+	<s:Rect id="overBg" x="0" y="0" width="86" height="70" radiusX="6" radiusY="6" visible="false">
+		<s:fill> <s:SolidColor color="0xdbe8f0" alpha="0.8"/> </s:fill>
+	</s:Rect>
+		
+	<s:Image id="productImage" x="0" y="0" width="70" height="70" alpha="0.8"/>
+	
+	<s:Image id="productBG" x="0" y="0" width="86" height="70" 
+			 fillMode="scale" scaleMode="stretch" source="{EmbeddedImages.product_bg_img}"/>
+	
+	<s:Label id="productLabel" x="0" y="72" width="70" height="24" alpha="0.5"
+			 color="0x000000" fontWeight="normal" textAlign="center"/>
+	
+	<s:Line x="70" y="1" height="68" yFrom="0" yTo="68">
+		<s:stroke>
+			<s:LinearGradientStroke rotation="90">
+				<s:GradientEntry color="0xcfcfcf"/>
+				<s:GradientEntry color="0xd9d9d9"/>
+			</s:LinearGradientStroke>
+		</s:stroke>
+	</s:Line>
+	
+	<s:Line x="71" y="1" height="68" yFrom="0" yTo="68">
+		<s:stroke> 
+			<s:SolidColorStroke color="0xf5f5f5"/> 
+		</s:stroke>
+	</s:Line>
+	
+	<s:Path x="76" y="32" width="4" height="7" data="L 0 7 L 4 3 Z">
+		<s:fill>
+			<s:SolidColor color="0xffffff"/>
+		</s:fill>
+	</s:Path>
+	
+	<s:Path x="76" y="31" width="4" height="7" data="L 0 7 L 4 3 Z">
+		<s:fill>
+			<s:SolidColor color="0x777777"/>
+		</s:fill>
+	</s:Path>
+	
+</s:Group>

@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Windows:GeneralWindow xmlns:fx="http://ns.adobe.com/mxml/2009" 
+					   xmlns:s="library://ns.adobe.com/flex/spark" 
+					   xmlns:mx="library://ns.adobe.com/flex/mx" 
+					   xmlns:Windows="Swizzard.UI.Windows.*" 
+					   title="3-Way Butterfly Valve Configurations" 
+					   resizable="false" alwaysInFront="false" 
+					   width="860" height="220">
+	
+
+	<fx:Script>
+		<![CDATA[
+			import Swizzard.Images.EmbeddedImages;
+			
+			private static var instance:Butterfly3WayTypeSelector;
+			
+			
+			private var resultHandler:Function;
+			private var _setting:String;
+			private var settingChanged:Boolean;
+			
+			
+			public static function Show(settings:String=null, resultHandler:Function=null):Butterfly3WayTypeSelector {
+				if (instance) {
+					instance.orderToFront();
+					return instance;
+				}
+				instance = new Butterfly3WayTypeSelector;
+				instance.setting = settings;
+				instance.resultHandler = resultHandler;	
+				instance.open();
+				return instance;
+			}
+			
+
+			public function set setting(value:String):void {
+				_setting = value;
+				settingChanged = true;
+				invalidateProperties();
+			}
+			
+			public function get setting():String {
+				return _setting;
+			}
+			
+			
+			override protected function commitProperties():void {
+				super.commitProperties();
+				
+				if (settingChanged) {
+					settingChanged = false;
+					switch (setting) {
+						case "A":
+							typeSelection.selectedIndex	= 1;
+							break;
+						case "B":
+							typeSelection.selectedIndex	= 2;
+							break;
+						case "C":
+							typeSelection.selectedIndex	= 3;
+							break;
+						case "D":
+							typeSelection.selectedIndex	= 4;
+							break;
+						case "E":
+							typeSelection.selectedIndex	= 5;
+							break;
+						case "F":
+							typeSelection.selectedIndex	= 6;
+							break;
+						default:
+							typeSelection.selectedIndex	= 0;
+					}
+				}
+			}
+			
+			
+			private function selectButtonClickHandler():void {
+				var selected:String;
+				switch (typeSelection.selectedIndex) {
+					case 0:
+						selected	= null;
+						break;
+					case 1:
+						selected	= "A";
+						break;
+					case 2:
+						selected	= "B";
+						break;
+					case 3:
+						selected	= "C";
+						break;
+					case 4:
+						selected	= "D";
+						break;
+					case 5:
+						selected	= "E";
+						break;
+					case 6:
+						selected	= "F";
+						break;
+				}
+				
+				resultHandler.apply(null, [selected]);
+				
+				instance = null;
+				dispose();
+			}
+			
+			
+			private function buttonLabelFunction(item:Object):String {
+				if (item.hasOwnProperty("label")) {
+					return item.label;
+				}
+				return null;
+			}
+
+		]]>
+	</fx:Script>
+	
+	<s:VGroup width="100%" height="100%" gap="12" paddingTop="20" horizontalAlign="center">
+		<s:ButtonBar id="typeSelection" labelFunction="buttonLabelFunction" 
+					 skinClass="Swizzard.UI.Skins.spark.ButterflyButtonBarSkin">
+			<s:ArrayCollection>
+				<fx:Object label="ALL" value=""/>
+				<fx:Object icon="{EmbeddedImages.butterflyConfigA_IMG}" value="A" />
+				<fx:Object icon="{EmbeddedImages.butterflyConfigB_IMG}" value="B" />
+				<fx:Object icon="{EmbeddedImages.butterflyConfigC_IMG}" value="C" />
+				<fx:Object icon="{EmbeddedImages.butterflyConfigD_IMG}" value="D" />
+				<fx:Object icon="{EmbeddedImages.butterflyConfigE_IMG}" value="E" />
+				<fx:Object icon="{EmbeddedImages.butterflyConfigF_IMG}" value="F" />
+			</s:ArrayCollection>
+		</s:ButtonBar>
+		
+		<s:Button label="Select" click="{selectButtonClickHandler()}" width="100"/>
+	</s:VGroup>
+	
+</Windows:GeneralWindow>

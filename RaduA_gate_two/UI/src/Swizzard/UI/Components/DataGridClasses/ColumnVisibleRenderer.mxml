@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:ItemRenderer xmlns:fx="http://ns.adobe.com/mxml/2009" 
+				xmlns:s="library://ns.adobe.com/flex/spark" 
+				xmlns:mx="library://ns.adobe.com/flex/mx" 
+				xmlns:DataGridClasses="Swizzard.UI.Components.DataGridClasses.*"
+				height="24">
+	
+	<fx:Script>
+		<![CDATA[
+			import mx.controls.advancedDataGridClasses.AdvancedDataGridColumn;
+			
+			import spark.components.gridClasses.GridColumn;
+			
+			
+			
+			private var _column:GridColumn;
+			private var _mx_column:AdvancedDataGridColumn;
+			private var dataChanged:Boolean;
+			
+			
+			override public function set data(value:Object):void {
+				super.data = value;
+				_column = value as GridColumn;
+				_mx_column = value as AdvancedDataGridColumn;
+				dataChanged = true;
+				invalidateProperties();
+			}
+			
+			
+			override protected function commitProperties():void {
+				super.commitProperties();
+				
+				if (dataChanged) {
+					dataChanged	= false;
+					if (_column != null) {
+						check.label = _column.headerText;
+						check.selected	= _column.visible;
+					}
+					else if (_mx_column != null) {
+						check.label = _mx_column.headerText;
+						check.selected	= _mx_column.visible;
+					}
+				}
+			}
+			
+			public function toggleSelectedState():void {
+				check.selected = !check.selected;
+				if (_column != null) {
+					_column.visible = check.selected;
+				}
+				else if (_mx_column != null) {
+					_mx_column.visible = check.selected;
+				}
+			}
+			
+			
+			private function checkboxChangeHandler():void {
+				if (_column != null) {
+					_column.visible = check.selected;
+				}
+				else if (_mx_column != null) {
+					_mx_column.visible = check.selected;
+				}
+			}
+		]]>
+	</fx:Script>
+	
+	
+	<s:CheckBox id="check" verticalCenter="0" x="4" change="checkboxChangeHandler()"/>
+</s:ItemRenderer>

@@ -1,0 +1,1191 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:HGroup xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx"
+		 xmlns:Controls="Swizzard.UI.Controls.*"
+		 creationComplete="main()" gap="1"
+		 currentState="water" xmlns:Forms="Swizzard.UI.Forms.*">
+	
+	
+	<fx:Script>
+		<![CDATA[
+			import mx.collections.ArrayCollection;
+			import mx.collections.IViewCursor;
+			import mx.collections.Sort;
+			import mx.collections.SortField;
+			import mx.controls.Alert;
+			import mx.core.EventPriority;
+			import mx.events.PropertyChangeEvent;
+			import mx.formatters.NumberBaseRoundType;
+			import mx.formatters.NumberFormatter;
+			
+			import spark.events.IndexChangeEvent;
+			
+			import Swizzard.Data.Models.Enumeration.Valves.MixingDiverting;
+			import Swizzard.Data.Models.Enumeration.Valves.ValveConnection;
+			import Swizzard.Data.Models.Enumeration.Valves.ValveDiscType;
+			import Swizzard.Data.Models.Enumeration.Valves.ValveMedium;
+			import Swizzard.Data.Models.Enumeration.Valves.ValveNormalState;
+			import Swizzard.Data.Models.Enumeration.Valves.ValvePattern;
+			import Swizzard.Data.Models.Enumeration.Valves.ValveTrim;
+			import Swizzard.Data.Models.Enumeration.Valves.ValveType;
+			import Swizzard.Data.Models.Query.ValveQueryModel;
+			import Swizzard.Data.Utils.ValveTypeInformation;
+			import Swizzard.Images.EmbeddedImages;
+			import Swizzard.System.UI.Calculators.Enumeration.SteamCalculatorType;
+			import Swizzard.System.Utils.ValveFormUtil;
+			import Swizzard.UI.Skins.spark.ButtonFromTextSkin;
+			import Swizzard.UI.Windows.Butterfly3WayTypeSelector;
+			import Swizzard.UI.Windows.SteamCalculatorWindow;
+			
+			import utils.LogUtils;
+			
+			
+			private var _valveQueryModel:ValveQueryModel;
+			
+			private var formChanged:Boolean;
+			private var cvInputChanged:Boolean;
+			private var cvComputeChanged:Boolean;
+			private var cvInputChanged_B:Boolean;
+			private var cvComputeChanged_B:Boolean;
+			
+			private var mediumDp:ArrayCollection		= new ArrayCollection();
+			private var cvDataProvider:ArrayCollection	= new ArrayCollection();
+			private var valveSizeDp:ArrayCollection		= new ArrayCollection();
+			
+			private var portConfigDp:ArrayCollection	= new ArrayCollection();
+			private var trimDp:ArrayCollection			= new ArrayCollection();
+			private var connectionsDp:ArrayCollection	= new ArrayCollection();
+			
+			private var pressureClassDp:ArrayCollection	= new ArrayCollection();
+			private var flowDp:ArrayCollection			= new ArrayCollection();
+			private var discTypeDp:ArrayCollection		= new ArrayCollection([
+																{label: "All", value: -1},
+																{label: "Full Cut", value: ValveDiscType.FULL_CUT},
+																{label: "Under Cut", value: ValveDiscType.UNDER_CUT}
+															]);
+			private var percentGlycolDp:ArrayCollection	= new ArrayCollection([25, 30, 40, 50]);
+			
+			[Bindable]
+			private var hasButterFly:Boolean;
+			
+			private var cvNumberFormatter:NumberFormatter;
+			
+			public var lastSpecificVolume:Number	= 0;
+			public var lastSteamQuantity:Number		= 0;
+			public var lastPressureDrop:Number		= 0;
+
+			
+			private function main():void {
+				var sorter:Sort		= new Sort();
+				sorter.fields		= [new SortField("value", false, false, true)];
+				
+				mediumDp.sort		= sorter;
+				valveSizeDp.sort	= sorter;
+				
+				portConfigDp.sort	= sorter;
+				trimDp.sort			= sorter;
+				connectionsDp.sort	= sorter;
+				
+				pressureClassDp.sort = sorter;
+				flowDp.sort			= sorter;
+				
+				trimDp.filterFunction		= trimIntelligentFilter;
+				portConfigDp.filterFunction	= portConfigurationIntelligentFilter;
+				
+				cvNumberFormatter			= new NumberFormatter();
+				cvNumberFormatter.precision	= 2;
+				cvNumberFormatter.rounding	= NumberBaseRoundType.NEAREST;
+				cvNumberFormatter.useThousandsSeparator	= false;
+			}
+			
+			
+			public function set valveQueryModel(value:ValveQueryModel):void {
+				if (_valveQueryModel == value) return;
+				
+				if (_valveQueryModel) {
+					_valveQueryModel.removeEventListener(PropertyChangeEvent.PROPERTY_CHANGE, valveModelChangeHandler);
+				}
+				_valveQueryModel = value;
+				if (_valveQueryModel) {
+					_valveQueryModel.addEventListener(PropertyChangeEvent.PROPERTY_CHANGE, valveModelChangeHandler, false, EventPriority.EFFECT, true);
+				}
+			}
+			
+			public function get valveQueryModel():ValveQueryModel {
+				return _valveQueryModel;
+			}
+			
+			
+			override protected function commitProperties():void {
+				super.commitProperties();
+				
+				if (formChanged) {
+					LogUtils.UiWorkflow("*** commit properties");
+					formChanged	= false;
+					
+					// Calculate CV
+					if (cvInputChanged || cvComputeChanged) {
+						cvInputChanged = false;
+						var calculatedCV:Number	= parseFloat(cvInput.selectedItem);
+						var pressureDrop:Number	= (pressureDropInput.text) ? parseFloat(pressureDropInput.text) : parseFloat(pressureDropInput.defaultText);
+						lastPressureDrop		= pressureDrop;
+						if (cvComputeChanged) {
+							// Must compute the CV
+							cvComputeChanged = false;
+							LogUtils.UiWorkflow("*** Must compute the CV");
+							if (pressureDrop > 0) {
+								calculatedCV = computeCV(pressureDrop);
+							}
+							LogUtils.CvTesting("*** set CV");
+							if (cvInput.enabled) {
+								if (isNaN(calculatedCV)) {
+									cvInput.selectedItem = null;
+								}
+								else {
+									cvInput.selectedItem = cvNumberFormatter.format(calculatedCV);
+								}
+							}
+						}
+						if (cvInput.enabled)
+							valveQueryModel.CV = calculatedCV;
+						var percentageString:String	= cvTolerance.text.replace(new RegExp("\%", "gi"), "");
+						var percentageVal:Number 	= (parseFloat(percentageString) / 100);
+						valveQueryModel.cvTolerance	= valveQueryModel.CV * percentageVal;
+						valveQueryModel.requiredFlowTolerance = valveQueryModel.designFlow * percentageVal;
+					}
+					
+					// Calculate CV_B
+					if (cvInputChanged_B || cvComputeChanged_B) {
+						cvInputChanged_B = false;
+						calculatedCV = parseFloat(cvInput_B.selectedItem);
+						pressureDrop = (pressureDropInput_B.text) ? parseFloat(pressureDropInput_B.text) : parseFloat(pressureDropInput_B.defaultText);
+						if (cvComputeChanged_B) {
+							// Must compute the CV
+							cvComputeChanged_B = false;
+							LogUtils.UiWorkflow("*** Must compute the CV B");
+							if (pressureDrop > 0) {
+								calculatedCV = computeCV_B(pressureDrop);
+							}
+							LogUtils.CvTesting("*** set CV B");
+							if (isNaN(calculatedCV)) {
+								cvInput_B.selectedItem = null;
+							}
+							else {
+								cvInput_B.selectedItem = cvNumberFormatter.format(calculatedCV);
+							}
+						}
+						if (water_6way || glycol_6way) {
+							valveQueryModel.CVB = calculatedCV;
+							var percentageString:String	= cvTolerance.text.replace(new RegExp("\%", "gi"), "");
+							var percentageVal:Number 	= parseFloat(percentageString) / 100;
+							valveQueryModel.cvTolerance_B = valveQueryModel.CVB * percentageVal;
+						} else {
+							valveQueryModel.CVB = 0;
+							valveQueryModel.cvTolerance_B = 0;
+						}
+					}
+				}
+			}
+			
+			
+			private function reconstructDataProviders():void {
+				LogUtils.UiWorkflow("*** reconstruct data providers");
+				// the CV data provider is not reconstructed here - but in the change handler for the valveModel
+				
+				// remember current values for dropdowns
+				var lastMediumIndex:int	= mediumSelector.selectedIndex;
+				if (lastMediumIndex < 0)
+					lastMediumIndex = 0;
+				
+				// small hack - made default "none" not null, because null is the value for All options; and default value must be a value that is never used
+				
+				var valveSizeValue:Object 	= (valveSizeSelector.selectedItem != null) 		? valveSizeSelector.selectedItem.value 		: "none";
+				var portConfigValue:Object 	= (portConfigSelector.selectedItem != null) 	? portConfigSelector.selectedItem.value 	: "none";
+				var trimValue:Object 		= (trimSelector.selectedItem != null) 			? trimSelector.selectedItem.value 			: "none";
+				var connectionValue:Object 	= (connectionSelector.selectedItem != null) 	? connectionSelector.selectedItem.value 	: "none";
+				var presureValue:Object 	= (pressureClassSelector.selectedItem != null) 	? pressureClassSelector.selectedItem.value 	: "none";
+				var flowValue:Object 		= (flowSelector.selectedItem != null) 			? flowSelector.selectedItem.value 			: "none";
+				
+				// remove all items from data providers
+				mediumDp.removeAll();
+				valveSizeDp.removeAll();
+				portConfigDp.removeAll();
+				portConfigDp.source = []
+				trimDp.removeAll();
+				trimDp.source = [];
+				connectionsDp.removeAll();
+				pressureClassDp.removeAll();
+				flowDp.removeAll();
+				
+				// add items to data providers
+				var mediumCursor:IViewCursor		= mediumDp.createCursor();
+				var valveSizeCursor:IViewCursor		= valveSizeDp.createCursor();
+				var portConfigCursor:IViewCursor	= portConfigDp.createCursor();
+				var trimCursor:IViewCursor			= trimDp.createCursor();
+				var connectionsCursor:IViewCursor	= connectionsDp.createCursor();
+				var pressureClassCursor:IViewCursor	= pressureClassDp.createCursor();
+				var flowCursor:IViewCursor			= flowDp.createCursor();
+				
+				hasButterFly = false;
+				var cvEnabled:Boolean = false;
+				
+				for each (var type:uint in valveQueryModel.valveTypes) {
+					var typeInfo:ValveTypeInformation = ValveFormUtil.getValveEnumInfo(type);
+					
+					cvEnabled = (cvEnabled || !typeInfo.disableCVForm);
+					
+					if (typeInfo.valveType == ValveType.BUTTERFLY)
+						hasButterFly = true;			
+					
+					// Medium
+					for each (var mediumItem:Object in typeInfo.selectableMedium) {
+						if (!mediumCursor.findAny({value: mediumItem.value}))
+							mediumDp.addItem(mediumItem);
+					}
+					// Valve Size
+					for each (var size:Object in typeInfo.selectableSizes) {
+						if (!valveSizeCursor.findAny({value: size.value}))
+							valveSizeDp.addItem(size);
+					}
+					// Port Config
+					for each (var portConf:Object in typeInfo.selectablePortConfig) {
+						if (!portConfigCursor.findAny({value: portConf.value}))
+							portConfigDp.addItem(portConf);
+					}
+					// Trim
+					for each (var trim:Object in typeInfo.selectableTrim) {
+						if (!trimCursor.findAny({value: trim.value}))
+							trimDp.addItem(trim);
+					}
+					// Connections
+					for each (var conn:Object in typeInfo.selectableConnections) {
+						if (!connectionsCursor.findAny({value: conn.value}))
+							connectionsDp.addItem(conn);
+					}
+					// Pressure Class
+					for each (var pc:Object in typeInfo.selectablePressureClass) {
+						if (!pressureClassCursor.findAny({value: pc.value}))
+							pressureClassDp.addItem(pc);
+					}
+					// Flow
+					for each (var flow:Object in typeInfo.selectableFlowChar) {
+						if (!flowCursor.findAny({value: flow.value}))
+							flowDp.addItem(flow);
+					}
+				}
+				
+				discTypeSelector.enabled	= hasButterFly;
+				cvInput.enabled				= cvEnabled;
+				pressureDropInput.enabled	= cvEnabled;
+				
+				if (!cvEnabled)
+					cvInput.selectedItem = null;
+				
+				mediumDp.refresh();
+				valveSizeDp.refresh();
+				portConfigDp.refresh();
+				trimDp.refresh();
+				connectionsDp.refresh();
+				pressureClassDp.refresh();
+				flowDp.refresh();
+				
+				
+				// reselect the values that were before 
+				// (removing all from dp, adding stuff and refreshing resets the selection)
+				for each (var item:Object in valveSizeDp) {
+					if (item.value == valveSizeValue)
+						valveSizeSelector.selectedItem = item;
+				}
+				for each (var item:Object in portConfigDp) {
+					if (item.value == portConfigValue)
+						portConfigSelector.selectedItem = item;
+				}
+				for each (var item:Object in trimDp) {
+					if (item.value == trimValue)
+						trimSelector.selectedItem = item;
+				}
+				for each (var item:Object in connectionsDp) {
+					if (item.value == connectionValue)
+						connectionSelector.selectedItem = item;
+				}
+				for each (var item:Object in pressureClassDp) {
+					if (item.value == presureValue)
+						pressureClassSelector.selectedItem = item;
+				}
+				for each (var item:Object in flowDp) {
+					if (item.value == flowValue)
+						flowSelector.selectedItem = item;
+				}
+				// re-set selected values
+				if (mediumDp.length > 0) {
+					mediumSelector.selectedIndex = lastMediumIndex;
+				}
+				
+				// why do you validate it now and not wait???
+				this.validateNow();
+				
+				if (hasButterFly) {
+					if (valveQueryModel.medium != ValveMedium.STEAM)
+						butterflyConfigButton.visible = true;
+						
+					if (valveQueryModel.pattern == 3) {
+						if (valveQueryModel.butterflyConfig)
+							portConfigSelector.text	= "3 Way | Type " + valveQueryModel.butterflyConfig;
+						else
+							portConfigSelector.text	= "3 Way";
+					}
+					else {
+						portConfigSelector.invalidateDisplayList();
+					}
+				}
+				else {
+					butterflyConfigButton.visible	= false;
+					discTypeSelector.selectedIndex	= -1;
+				}
+				
+				if (valveQueryModel.valveTypes.length < 1) {
+					valveQueryModel.reset(false);
+				}
+				else {
+					syncForm();
+				}
+			}
+			
+			
+			// Synchronize Query Model 
+			private function syncForm():void {
+				LogUtils.UiWorkflow("*** sync forms");
+				valveQueryModel.suppressEvents	= true;
+				valveQueryModel.medium			= mediumSelector.selectedItem.value;
+				computeVisibleItems();
+				LogUtils.UiWorkflow("======== set STATE - from syncForm()");
+				switch (valveQueryModel.medium)
+				{
+					case ValveMedium.WATER:
+						currentState	= "water";
+						break;
+					case ValveMedium.STEAM:
+						currentState	= "steam";
+						break;
+					case ValveMedium.GLYCOL:
+						currentState	= "glycol";
+						break;
+				}
+				
+				// WARNING: this is a bit wierd in 2 ways. One it is setting nulls to numbers and I have to change that and two 
+				// when changing the data provider it assumes nothing is selected so that it will use a "default" value of null.
+				// the default value (of null) set here (after the "?" in the if clauses) is not the same as the All value for
+				// flowCharacteristic: here is null and PICV has 1
+				// and CV (a little to investigate because that one is editable)
+				valveQueryModel.lineSize			= (valveSizeSelector.enabled 	&& valveSizeSelector.selectedItem) 		? valveSizeSelector.selectedItem.value 		: null;
+				valveQueryModel.trim				= (trimSelector.enabled 		&& trimSelector.selectedItem) 			? trimSelector.selectedItem.value 			: null;
+				valveQueryModel.connection			= (connectionSelector.enabled 	&& connectionSelector.selectedItem) 	? connectionSelector.selectedItem.value 	: null;
+				valveQueryModel.flowCharacteristic	= (flowSelector.enabled 		&& flowSelector.selectedItem) 			? flowSelector.selectedItem.value 			: null;
+				valveQueryModel.discType			= (discTypeSelector.enabled 	&& discTypeSelector.selectedItem) 		? discTypeSelector.selectedItem.value 		: -1;
+				valveQueryModel.pressureClass		= (pressureClassSelector.enabled && pressureClassSelector.selectedItem) ? pressureClassSelector.selectedItem.value 	: null;
+				valveQueryModel.CV					= (!isNaN(parseFloat(cvInput.selectedItem))) 							? parseFloat(cvInput.selectedItem) 			: null;
+				valveQueryModel.CVB					= (!isNaN(parseFloat(cvInput_B.selectedItem))) 							? parseFloat(cvInput_B.selectedItem) 		: null;
+				
+				configurePort((portConfigSelector.selectedItem) ? portConfigSelector.selectedItem.value : 0);
+				
+				valveQueryModel.suppressEvents		= false;
+			}
+			
+			
+			private function valveModelChangeHandler(event:PropertyChangeEvent):void  {
+				LogUtils.UiWorkflow("*** valve model changed <" + event.property + "> - <" + event.newValue + ">");
+				if (event.property) {
+					switch (event.property) 
+					{
+						case "medium":
+							if (event.newValue) {
+								for each (var item:Object in mediumDp) {
+									if (event.newValue == item.value) {
+										mediumSelector.selectedItem	= item;
+										break;
+									}
+								}
+								// set current state
+								LogUtils.UiWorkflow("========= set STATE - from valveModelChangeHandler()");
+								computeVisibleItems();
+								switch (event.newValue) {
+									case ValveMedium.WATER:
+										currentState = "water";
+										break;
+									case ValveMedium.STEAM:
+										currentState = "steam";
+										break;
+									case ValveMedium.GLYCOL:
+										currentState = "glycol";
+										break;
+								}
+							}
+							else {
+								mediumSelector.selectedIndex	= 0;
+								computeVisibleItems();
+								currentState					= "water";
+							}
+							
+							refreshIntelligentFilters();
+							break;
+							
+						case "valveTypes":
+							var previousCVValue:Number	= parseFloat(cvInput.selectedItem);
+							var previousCVValue_B:Number = parseFloat(cvInput_B.selectedItem);
+							cvDataProvider.removeAll();
+							
+							for each (var valveType:uint in event.newValue) {
+								var info:ValveTypeInformation = ValveFormUtil.getValveEnumInfo(valveType);
+								for each (var cv:Number in info.selectableCV) {
+									if (cvDataProvider.getItemIndex(cv) < 0)
+										cvDataProvider.addItem(cv);
+								}
+							}
+							cvDataProvider.refresh();
+							
+							/* According to Byran, do not change CV When valve types change */
+							if (isNaN(previousCVValue)) {
+								cvInput.selectedItem = null;
+							}
+							else {
+								cvInput.selectedItem = previousCVValue;	
+							}
+							if (isNaN(previousCVValue_B)) {
+								cvInput_B.selectedItem = null;
+							}
+							else {
+								cvInput_B.selectedItem = previousCVValue_B;	
+							}
+							
+							formChanged			= true;
+							cvInputChanged 		= true;
+							cvInputChanged_B 	= true;
+							
+							computeVisibleItems();
+							reconstructDataProviders();
+							invalidateProperties();
+							break;
+						
+						case "CV":
+							if (event.newValue) {
+								if (isNaN(event.newValue as Number)) {
+									cvInput.selectedItem = null;
+								}
+								else {
+									cvInput.selectedItem = cvNumberFormatter.format(event.newValue);
+								}
+							}
+							break;
+						
+						case "CVB":
+							if (event.newValue) {
+								if (isNaN(event.newValue as Number)) {
+									cvInput_B.selectedItem = null;
+								}
+								else {
+									cvInput_B.selectedItem = cvNumberFormatter.format(event.newValue);
+								}
+							}
+							break;
+					}
+				}
+				
+				// the property is null - this is on RESET query model
+				// I must add the effect of valveTypes changed (because of the previous architecture)
+				else {
+					// Reset All
+					LogUtils.UiWorkflow("*** reset all");
+					mediumDp.removeAll();
+					valveSizeDp.removeAll();
+					
+					portConfigDp.removeAll();
+					portConfigDp.source = [];
+					trimDp.removeAll();
+					trimDp.source = [];
+					connectionsDp.removeAll();
+					
+					pressureClassDp.removeAll();
+					flowDp.removeAll();
+					
+					// because valveTypes changed is not called I have to do this manually
+					hasButterFly 				= false;
+					cvInput.enabled				= false;
+					pressureDropInput.enabled	= false;
+					discTypeSelector.enabled 	= false;
+					butterflyConfigButton.visible = false;
+					mediumSelector.selectedIndex = 0;
+					LogUtils.UiWorkflow(" === reset all ===");
+					computeVisibleItems();
+					currentState				= "water";
+					
+					cvDataProvider.removeAll();
+					cvInput.selectedItem = null;
+					cvInput.textInput.text = "";
+					cvInput_B.selectedItem = null;
+					
+					if (pressureDropInput)
+						pressureDropInput.text	= null;
+					if (pressureDropInput_B)
+						pressureDropInput_B.text	= null;
+					
+					if (requiredFlowInput)
+						requiredFlowInput.text	= null;
+					if (requiredFlowInput_B)
+						requiredFlowInput_B.text	= null;
+					
+					if (steamQuantityInput)
+						steamQuantityInput.text	= null;
+					
+					if (steamSupplyPressInput)
+						steamSupplyPressInput.text = null;
+					
+					if (percentGlycolSelector)
+						percentGlycolSelector.selectedIndex= 3; //allways keep 50% as default selection
+					if (percentGlycolSelector_B)
+						percentGlycolSelector_B.selectedIndex= 3; //allways keep 50% as default selection
+				}
+			}
+			
+			
+			private function configurePort(flag:uint):void {
+				if (!portConfigSelector.enabled)
+					flag	= 0;
+				
+				switch (flag) {
+					case 0:
+						valveQueryModel.pattern		= null;
+						valveQueryModel.normalState	= null;
+						valveQueryModel.application	= null;
+						valveQueryModel.butterflyConfig	= null;
+						break;
+					
+					/* ------------- TOO WAY ------------ */
+					case 1:
+						valveQueryModel.pattern		= ValvePattern.TWO_WAY;
+						valveQueryModel.normalState	= null;
+						valveQueryModel.application	= null;
+						valveQueryModel.butterflyConfig	= null;
+						break;
+					
+					case 2:
+						valveQueryModel.pattern		= ValvePattern.TWO_WAY;
+						valveQueryModel.normalState	= ValveNormalState.NORMALLY_OPEN;
+						valveQueryModel.application	= null;
+						valveQueryModel.butterflyConfig	= null;
+						break;
+					
+					case 3:
+						valveQueryModel.pattern		= ValvePattern.TWO_WAY;
+						valveQueryModel.normalState	= ValveNormalState.NORMALLY_CLOSED;
+						valveQueryModel.application	= null;
+						valveQueryModel.butterflyConfig	= null;
+						break;
+					
+					/* ------------- THREE WAY ------------ */
+					case 4:
+						valveQueryModel.pattern		= ValvePattern.THREE_WAY;
+						valveQueryModel.normalState	= null;
+						valveQueryModel.application	= null;
+						if (hasButterFly) {
+							if (!valveQueryModel.butterflyConfig)
+								Butterfly3WayTypeSelector.Show(valveQueryModel.butterflyConfig, butterflyConfigSelectedHandler);
+						}
+						else {
+							valveQueryModel.butterflyConfig	= null;
+						}
+						break;
+					
+					case 5:
+						valveQueryModel.pattern		= ValvePattern.THREE_WAY;
+						valveQueryModel.normalState	= null;
+						valveQueryModel.application	= MixingDiverting.MIXING;
+						valveQueryModel.butterflyConfig	= null;
+						break;
+					
+					case 6:
+						valveQueryModel.pattern		= ValvePattern.THREE_WAY;
+						valveQueryModel.normalState	= null;
+						valveQueryModel.application	= MixingDiverting.DIVERTING;
+						valveQueryModel.butterflyConfig	= null;
+						break;
+					
+					// BOTH 2-Way and 3-Way
+					case 7:
+						valveQueryModel.pattern		= ValvePattern.BOTH;
+						valveQueryModel.normalState	= null;
+						valveQueryModel.application	= null;
+						valveQueryModel.butterflyConfig	= null;
+						break;
+					
+					// 6-Way
+					case 8:
+						valveQueryModel.pattern		= ValvePattern.SIX_WAY;
+						valveQueryModel.normalState	= null;
+						valveQueryModel.application	= null;
+						valveQueryModel.butterflyConfig	= null;
+						break;
+				}
+			}
+			
+			
+			private function changeHandler(event:Event):void {
+				if (valveQueryModel == null)
+					return;
+				
+				LogUtils.UiWorkflow("*** change handler from " + event.target);
+				switch (event.target) 
+				{
+					case mediumSelector:
+						valveQueryModel.medium	= mediumSelector.selectedItem.value;
+						computeVisibleItems();
+						LogUtils.UiWorkflow("======== set STATE - from changeHandler()");
+						switch (valveQueryModel.medium) 
+						{
+							case ValveMedium.WATER:
+								currentState = "water";
+								break;
+							
+							case ValveMedium.STEAM:
+								// Show Steam Calculator
+								pressureDropCalculatorClickHandler();
+								currentState = "steam";
+								
+								if (portConfigSelector.selectedItem && portConfigSelector.selectedItem.value > 3)
+									portConfigSelector.selectedIndex = 0;
+									
+								syncForm();
+								break;
+							
+							case ValveMedium.GLYCOL:
+								currentState = "glycol";
+								break;
+						}
+						
+						cvComputeChanged = true;
+						cvComputeChanged_B = true;
+						break;
+					
+					case cvTolerance:
+						var percentageString:String	= cvTolerance.text.replace(new RegExp("\%", "gi"), "");
+						cvTolerance.text			= percentageString + "%";
+						var percentageVal:Number 	= parseFloat(percentageString) / 100;
+						
+						valveQueryModel.cvTolerance	= valveQueryModel.CV * percentageVal;
+						valveQueryModel.cvTolerance_B = valveQueryModel.CVB * percentageVal;
+						valveQueryModel.requiredFlowTolerance = valveQueryModel.designFlow * percentageVal;
+						break;
+						
+					case cvInput:
+						cvInputChanged = true;
+						break;
+					
+					case valveSizeSelector:
+						valveQueryModel.lineSize = valveSizeSelector.selectedItem.value;
+						break;
+						
+					case pressureDropInput:
+						var psi2:Number	= parseFloat(pressureDropInput.text);
+						if (!isNaN(psi2) && (psi2 < .1))
+							pressureDropInput.text = "1";
+						cvComputeChanged = true;
+						break;
+
+					case requiredFlowInput:
+						valveQueryModel.designFlow = parseFloat(requiredFlowInput.text);
+						cvComputeChanged = true;
+						break;
+					
+					case percentGlycolSelector:
+						cvComputeChanged = true;
+						break;
+					
+					case cvInput_B:
+						cvInputChanged_B = true;
+						break;
+					
+					case pressureDropInput_B:
+						var psi2:Number	= parseFloat(pressureDropInput_B.text);
+						if (!isNaN(psi2) && (psi2 < .1))
+							pressureDropInput_B.text = "1";
+						cvComputeChanged_B = true;
+						break;
+					
+					case requiredFlowInput_B:
+						cvComputeChanged_B = true;
+						break;
+					
+					case percentGlycolSelector_B:
+						cvComputeChanged_B = true;
+						break;
+					
+					case steamSupplyPressInput:
+						valveQueryModel.minSteamSupplyPressure = parseFloat(steamSupplyPressInput.text);
+						break;
+
+					case portConfigSelector:
+						configurePort(portConfigSelector.selectedItem.value);
+						computeVisibleItems();
+						cvComputeChanged = true;
+						cvComputeChanged_B = true;
+						break;
+					
+					case trimSelector:
+						valveQueryModel.trim = trimSelector.selectedItem.value;
+						break;
+					
+					case connectionSelector:
+						if (connectionSelector.selectedItem.value == ValveConnection.WAFER) {
+							Alert.show("For WAFER Connection, Please contact inside sales");
+							connectionSelector.selectedIndex = 0;
+							valveQueryModel.connection = 0;
+						}
+						else {
+							valveQueryModel.connection = connectionSelector.selectedItem.value;
+						}
+						break;
+					
+					case pressureClassSelector:
+						valveQueryModel.pressureClass = pressureClassSelector.selectedItem.value;
+						break;
+					
+					case flowSelector:
+						valveQueryModel.flowCharacteristic	= flowSelector.selectedItem.value;
+						break;
+					
+					case discTypeSelector:
+						valveQueryModel.discType = discTypeSelector.selectedItem.value;
+						break;				
+				}
+				
+				formChanged	= true;
+				invalidateProperties();
+			}
+			
+			
+			private function computeCV(pressureDrop:Number):Number {
+				var calculatedCV:Number = 0;
+				var specificGravity:Number	= 1.0;
+				switch (currentState) 
+				{
+					case "glycol":
+						var percentGlycol:int = percentGlycolSelector.selectedItem as int;
+						switch (percentGlycol) 
+						{
+							case 25:
+								specificGravity	= 1.048;
+								break;
+							case 30:
+								specificGravity	= 1.057;
+								break;
+							case 40:
+								specificGravity	= 1.07;
+								break;
+							case 50:
+								specificGravity	= 1.088;
+								break;
+							case 60:
+								specificGravity	= 1.1;
+								break;
+							case 65:
+								specificGravity	= 1.11;
+								break;
+							case 100:
+								specificGravity	= 1.145;
+								break;
+						}
+						// no break here, uses the same formula as WATER
+						
+					case "water":
+						var reqFlow:Number = parseFloat(requiredFlowInput.text);
+						if (isNaN(reqFlow))
+							break;
+						calculatedCV = reqFlow * Math.sqrt(specificGravity / pressureDrop);
+						break;
+					
+					case "steam":
+						var quantity:Number		= parseFloat(steamQuantityInput.text);
+						var supplyPress:Number	= parseFloat(steamSupplyPressInput.text);
+						lastSpecificVolume		= 339.041093198727 * Math.pow(supplyPress + 14.7, -0.942604480454646);
+						calculatedCV	= (quantity * Math.sqrt(lastSpecificVolume)) / (63.5 * Math.sqrt(pressureDrop));
+						break;
+				}
+				return calculatedCV;
+			}
+			
+			
+			private function computeCV_B(pressureDrop:Number):Number {
+				var calculatedCV:Number = 0;
+				var specificGravity:Number	= 1.0;
+				switch (currentState) 
+				{
+					case "glycol":
+						var percentGlycol:int = percentGlycolSelector_B.selectedItem as int;
+						switch (percentGlycol) 
+						{
+							case 25:
+								specificGravity	= 1.048;
+								break;
+							case 30:
+								specificGravity	= 1.057;
+								break;
+							case 40:
+								specificGravity	= 1.07;
+								break;
+							case 50:
+								specificGravity	= 1.088;
+								break;
+							case 60:
+								specificGravity	= 1.1;
+								break;
+							case 65:
+								specificGravity	= 1.11;
+								break;
+							case 100:
+								specificGravity	= 1.145;
+								break;
+						}
+						// no break here, uses the same formula as WATER
+						
+					case "water":
+						var reqFlow:Number = parseFloat(requiredFlowInput_B.text);
+						if (isNaN(reqFlow))
+							break;
+						calculatedCV = reqFlow * Math.sqrt(specificGravity / pressureDrop);
+						break;
+					
+					case "steam":
+						calculatedCV = NaN;
+						break;
+				}
+				return calculatedCV;
+			}
+			
+			
+			// ------ Intelligent Filters -------
+			private function refreshIntelligentFilters():void {
+				var portValue:Object = (portConfigSelector.selectedItem != null) ? portConfigSelector.selectedItem.value : "none";
+				var trimValue:Object = (trimSelector.selectedItem != null) ? trimSelector.selectedItem.value : "none";
+				
+				portConfigDp.refresh();
+				trimDp.refresh();
+				
+				for each (var item:Object in portConfigDp) {
+					if (item.value == portValue)
+						portConfigSelector.selectedItem = item;
+				}
+				for each (var item:Object in trimDp) {
+					if (item.value == trimValue)
+						trimSelector.selectedItem = item;
+				}
+			}
+			
+			
+			// Steam & Brass/Bronze are incompatible
+			private function trimIntelligentFilter(trimObj:Object):Boolean {
+				if (valveQueryModel.medium  == ValveMedium.STEAM) {
+					if ((trimObj.value == ValveTrim.BRASS__BRONZE) ||
+						(trimObj.value == ValveTrim.BRASS) ||
+						(trimObj.value == ValveTrim.BRONZE))
+					{
+						return false;
+					}
+				}
+				return true;
+			}
+			
+			
+			// Steam should not contain 3-way valves
+			private function portConfigurationIntelligentFilter(portItem:Object):Boolean {
+				if (valveQueryModel.medium == ValveMedium.STEAM) {
+					return (portItem.value < 4); //|| (portItem.value == 7));	
+				}
+				return true;
+			}
+			
+			
+			private function butterflyConfigButtonClickHandler():void {
+				if (hasButterFly)
+					Butterfly3WayTypeSelector.Show(valveQueryModel.butterflyConfig, butterflyConfigSelectedHandler);
+			}
+			
+			
+			private function butterflyConfigSelectedHandler(config:String):void {
+				valveQueryModel.butterflyConfig	= config;
+				valveQueryModel.pattern			= ValvePattern.THREE_WAY;
+				if (valveQueryModel.butterflyConfig) {
+					portConfigSelector.text	= "3 Way | Type " + valveQueryModel.butterflyConfig;
+				}
+				else {
+					portConfigSelector.text	= "3 Way";
+				}
+			}
+			
+
+			private function pressureDropCalculatorClickHandler():void {
+				var supplyPressure:Number = (steamSupplyPressInput) ? parseFloat(steamSupplyPressInput.text) : 0;
+				SteamCalculatorWindow.Show(calculatorResultHandler, supplyPressure, SteamCalculatorType.PRESSURE_DROP);
+			}
+			
+			
+			private function steamQuantityCalculatorClickHandler():void {
+				var supplyPressure:Number = (steamSupplyPressInput) ? parseFloat(steamSupplyPressInput.text) : 0;
+				SteamCalculatorWindow.Show(calculatorResultHandler, supplyPressure, SteamCalculatorType.STEAM_QUANTITY);
+			}
+			
+			
+			// Calculator
+			private function calculatorResultHandler(type:String, value:Number, supplyPressure:Number):void {
+				if (isNaN(value))
+					return;
+				
+				switch (type) {
+					case SteamCalculatorType.PRESSURE_DROP:
+						pressureDropInput.text = cvNumberFormatter.format(value);
+						break;
+						
+					case SteamCalculatorType.STEAM_QUANTITY:
+						steamQuantityInput.text	= cvNumberFormatter.format(value);
+						break;
+				}
+				
+				if (steamSupplyPressInput)
+					steamSupplyPressInput.text = cvNumberFormatter.format(supplyPressure);
+				
+				valveQueryModel.minSteamSupplyPressure = supplyPressure;
+				
+				formChanged	= true;
+				invalidateProperties();
+			}
+			
+			
+			private function pressureDropFocusOut():void {
+				if (pressureDropInput.text == '0') {
+					pressureDropInput.text = pressureDropInput.defaultText
+				}
+			}
+			
+			
+			public var water_6way:Boolean = false;
+			public var glycol_6way:Boolean = false;
+			private function computeVisibleItems():void {
+				var hasBall:Boolean = false;
+				for (var i:int = 0; i < valveQueryModel.valveTypes.length; i++) {
+					if (valveQueryModel.valveTypes[i] == ValveType.BALL) {
+						hasBall = true;
+						break;
+					}
+				}
+				water_6way = hasBall && (valveQueryModel.medium == ValveMedium.WATER) && (valveQueryModel.pattern == ValvePattern.SIX_WAY);
+				glycol_6way = hasBall && (valveQueryModel.medium == ValveMedium.GLYCOL) && (valveQueryModel.pattern == ValvePattern.SIX_WAY);
+				
+				
+				var crtSt:String = currentState;
+				var crtMed:String = ValveMedium.flagToString(valveQueryModel.medium);
+				LogUtils.UiWorkflow(" - state:" + crtSt + " - medium:" + valveQueryModel.medium + " - " + crtMed + " : " + 
+					water_6way + " / " + glycol_6way);
+				
+				
+				cvFormItem_B.visible 			= cvFormItem_B.includeInLayout 				= (water_6way || glycol_6way);
+				pressureDropFormItem_B.visible 	= pressureDropFormItem_B.includeInLayout 	= (water_6way || glycol_6way);
+				requiredFlowFormItem_B.visible 	= requiredFlowFormItem_B.includeInLayout 	= (water_6way || glycol_6way);
+				percentGlycolFormItem_B.visible = percentGlycolFormItem_B.includeInLayout 	= glycol_6way;
+				form_B.visible 					= form_B.includeInLayout 					= (water_6way || glycol_6way);
+				
+				if (water_6way || glycol_6way) {
+					cvFormItem.label = "CvA:";
+					pressureDropFormItem.label = "Pressure Drop A:";
+					requiredFlowFormItem.label = "Required Flow A:";
+					percentGlycolFormItem.label = "Percent Glycol A:";
+				}
+				else {
+					cvFormItem.label = "Cv:";
+					pressureDropFormItem.label = "Pressure Drop:";
+					requiredFlowFormItem.label = "Required Flow:";
+					percentGlycolFormItem.label = "Percent Glycol:";
+				}
+			}
+		]]>
+	</fx:Script>
+	
+	<s:states>
+		<s:State name="water"/>
+		<s:State name="glycol"/>
+		<s:State name="steam"/>
+	</s:states>
+	
+	
+	
+	<s:transitions>
+		<s:Transition fromState="*" toState="water">
+			<s:Parallel>
+				<s:SetAction target="{butterflyConfigButton}" property="visible" value="{hasButterFly}" />
+			</s:Parallel>
+		</s:Transition>
+		
+		<s:Transition fromState="*" toState="glycol">
+			<s:Parallel>
+				<s:SetAction target="{butterflyConfigButton}" property="visible" value="{hasButterFly}" />
+			</s:Parallel>
+		</s:Transition>
+		
+		<s:Transition fromState="*" toState="steam">
+			<s:Parallel>
+				<s:SetAction target="{butterflyConfigButton}" property="visible" value="{false}" />
+			</s:Parallel>
+		</s:Transition>
+	</s:transitions>
+	
+	
+	<s:Form id="mainForm" >
+		<Controls:CustomFormItem label="Medium:" id="mediumFormItem">
+			<s:DropDownList id="mediumSelector" width="75" 
+									 enabled="{mediumDp.length > 0}"
+									 dataProvider="{mediumDp}" change="changeHandler(event)" />
+		</Controls:CustomFormItem>
+		
+		<Controls:CustomFormItem id="cvFormItem" label="Cv:">
+			<Controls:CustomComboBox id="cvInput" width="75"
+									 selectedIndex="-1" restrict="0-9." 
+									 dataProvider="{cvDataProvider}" change="changeHandler(event)" />
+			<s:Label text="±"/>
+			<s:TextInput id="cvTolerance"  width="50" 
+						 restrict="0-9.%" maxChars="4" text="50%" 
+						 change="changeHandler(event)"/>
+		</Controls:CustomFormItem>
+		
+		<Controls:CustomFormItem id="cvFormItem_B" label="CvB:"
+								 visible="false" includeInLayout="false">
+			<Controls:CustomComboBox id="cvInput_B" width="75"
+									 selectedIndex="-1" restrict="0-9." 
+									 dataProvider="{cvDataProvider}" change="changeHandler(event)" />
+		</Controls:CustomFormItem>
+		
+		<Controls:CustomFormItem label="Valve Size:">
+			<s:DropDownList id="valveSizeSelector" width="75" 
+									 prompt="All" enabled="{valveSizeDp.length > 0}" 
+									 dataProvider="{valveSizeDp}" change="changeHandler(event)"/>
+		</Controls:CustomFormItem>
+	</s:Form>
+	
+	<s:Form id="subForm">
+		<Controls:CustomFormItem id="pressureDropFormItem" label="Pressure Drop:" contentGap="-1">
+			<Forms:TextInputWithDefault id="pressureDropInput" width="34"
+										enabled="false" restrict="0-9." maxChars="6"
+										defaultText="5" defaultText.steam=""
+										focusOut="{pressureDropFocusOut()}"
+										change="changeHandler(event)"/>
+			<s:Button id="pressureDropBtn" width="16" icon="{EmbeddedImages.calculatorIcon_img}"
+					  click="pressureDropCalculatorClickHandler()" height="22" 
+					  visible="false" includeInLayout="false"
+					  visible.steam="true" includeInLayout.steam="true"
+					  skinClass="Swizzard.UI.Skins.spark.ButtonFromTextSkin"/>
+			<s:Group width="7" height="10"/>
+			<s:Label text="psi" fontStyle="italic"/>
+		</Controls:CustomFormItem>
+		
+		<Controls:CustomFormItem label="Required Flow:" id="requiredFlowFormItem"
+								 visible="true" includeInLayout="true"
+								 visible.steam="false" includeInLayout.steam="false">
+			<s:TextInput id="requiredFlowInput" width="34" restrict="0-9." maxChars="4" change="changeHandler(event)"/>
+			<s:Label text="gpm" fontStyle="italic"/>
+		</Controls:CustomFormItem>
+		
+		<Controls:CustomFormItem label="Quantity Of Steam:"
+								 visible="false" includeInLayout="false"
+								 visible.steam="true" includeInLayout.steam="true">
+			<Controls:TextInputWithButton id="steamQuantityInput" showButton="true"
+										  icon="{EmbeddedImages.calculatorIcon_img}" width="49" restrict="0-9." maxChars="6" 
+										  buttonClick="steamQuantityCalculatorClickHandler()" change="changeHandler(event);"/>
+			<s:Label text="lbs/hr" fontStyle="italic"/>
+		</Controls:CustomFormItem>
+		
+		<Controls:CustomFormItem label="Steam Supply Press:"
+								 visible="false" includeInLayout="false"
+								 visible.steam="true" includeInLayout.steam="true">
+			<s:TextInput id="steamSupplyPressInput" width="49" 
+						 restrict="0-9." maxChars="6" 
+						 change="changeHandler(event)"/>
+			<s:Label text="psig" fontStyle="italic"/>
+		</Controls:CustomFormItem>
+		
+		<Controls:CustomFormItem label="Percent Glycol:" id="percentGlycolFormItem"
+								 visible="false" includeInLayout="false"
+								 visible.glycol="true" includeInLayout.glycol="true">
+			<s:DropDownList id="percentGlycolSelector" width="52"
+							selectedIndex="3" dataProvider="{percentGlycolDp}" 
+							change="changeHandler(event)"/>
+			<s:Label text="%" fontStyle="italic"/>
+		</Controls:CustomFormItem>
+	</s:Form>
+	
+	<s:Form id="form_B"
+			visible="false" includeInLayout="false">
+		<Controls:CustomFormItem id="pressureDropFormItem_B" label="Pressure Drop B:" contentGap="-1"
+								 visible="false" includeInLayout="false">
+			<Forms:TextInputWithDefault id="pressureDropInput_B" width="34"
+										restrict="0-9." maxChars="6"
+										defaultText="5" defaultText.steam=""
+										focusOut="{pressureDropFocusOut()}"
+										change="changeHandler(event)"/>
+			<s:Group width="7" height="10"/>
+			<s:Label text="psi" fontStyle="italic"/>
+		</Controls:CustomFormItem>
+		
+		<Controls:CustomFormItem label="Required Flow B:" id="requiredFlowFormItem_B"
+								 visible="false" includeInLayout="false">
+			<s:TextInput id="requiredFlowInput_B" width="34" restrict="0-9." maxChars="4" change="changeHandler(event)"/>
+			<s:Label text="gpm" fontStyle="italic"/>
+		</Controls:CustomFormItem>
+		
+		<Controls:CustomFormItem label="Percent Glycol B:" id="percentGlycolFormItem_B"
+								 visible="false" includeInLayout="false">
+			<s:DropDownList id="percentGlycolSelector_B" width="52"
+							selectedIndex="3" dataProvider="{percentGlycolDp}" 
+							change="changeHandler(event)"/>
+			<s:Label text="%" fontStyle="italic"/>
+		</Controls:CustomFormItem>
+	</s:Form>
+	
+	<s:Form>
+		<Controls:CustomFormItem label="Port Config:" contentGap="2">
+			<Controls:CustomDropDown id="portConfigSelector" width="125"
+									 prompt="All" enabled="{portConfigDp.length > 0}" 
+									 dataProvider="{portConfigDp}" change="changeHandler(event)"/>
+			<s:Button id="butterflyConfigButton" width="16" height="22"
+					  visible="false" skinClass="Swizzard.UI.Skins.spark.PlusButtonSkin"
+					  click="butterflyConfigButtonClickHandler()"/> 
+		</Controls:CustomFormItem>
+		
+		<Controls:CustomFormItem label="Trim :">
+			<s:DropDownList id="trimSelector" width="115" prompt="All"  
+							enabled="{trimDp.length > 0}"
+							dataProvider="{trimDp}" change="changeHandler(event)"/>
+		</Controls:CustomFormItem>
+		
+		<Controls:CustomFormItem id="connectionSelectorForm" label="Connections:">
+			<s:DropDownList id="connectionSelector" width="100"
+							prompt="All" enabled="{connectionsDp.length > 0}" 
+							dataProvider="{connectionsDp}" change="changeHandler(event)"/>
+		</Controls:CustomFormItem>
+	</s:Form>
+	
+	<s:Form>
+		<Controls:CustomFormItem label="Pressure Class:">
+			<s:DropDownList id="pressureClassSelector" width="100" 
+							prompt="All" enabled="{pressureClassDp.length > 0}" 
+							dataProvider="{pressureClassDp}" change="changeHandler(event)"/>
+		</Controls:CustomFormItem>
+		
+		<Controls:CustomFormItem label="Flow Characteristic:">
+			<s:DropDownList id="flowSelector" width="100"
+							enabled="{flowDp.length > 0}" prompt="All" 
+							dataProvider="{flowDp}" change="changeHandler(event)"/>
+		</Controls:CustomFormItem>
+		
+		<Controls:CustomFormItem label="Disc Type:">
+			<s:DropDownList id="discTypeSelector" width="100" prompt="All" 
+							dataProvider="{discTypeDp}" change="changeHandler(event)"/>
+		</Controls:CustomFormItem>
+	</s:Form>
+</s:HGroup>

@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:HGroup xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		  xmlns:s="library://ns.adobe.com/flex/spark" 
+		  xmlns:mx="library://ns.adobe.com/flex/mx"
+		  verticalAlign="middle">
+	
+	<fx:Script>
+		<![CDATA[
+			import mx.collections.XMLListCollection;
+			
+			override protected function updateDisplayList(w:Number, h:Number):void
+			{
+				super.updateDisplayList(w, h);
+				
+				graphics.clear();
+				
+				graphics.beginGradientFill("linear", [0xefefef, 0xeaeaea], [1, 1], [0, 255], verticalGradientMatrix(0, 0, w, h));
+				graphics.drawRect(0, 1, w, h);
+				graphics.endFill();
+				
+				graphics.beginFill(0x9ea7ac);
+				graphics.drawRect(0, h, w, 1);
+				graphics.endFill();
+			}
+			
+			
+			public function disable(actionName:String):void
+			{
+				var mi:XMLList	= (mainMenuBar.dataProvider as XMLListCollection).source;
+				switch (actionName)
+				{
+					case "file.save":
+						var m:Object	= mi[0].menuitem[3];
+						m.@enabled		= "false";
+						break;
+				}
+			}
+			
+			
+			public function enable(actionName:String):void
+			{
+				var mi:XMLList	= (mainMenuBar.dataProvider as XMLListCollection).source;
+				switch (actionName)
+				{
+					case "file.save":
+						var m:Object	= mi[0].menuitem[3];
+						m.@enabled		= "true";
+						break;
+				}
+			}
+
+		]]>
+	</fx:Script>
+	
+	<s:Group width="160" height="10"/>
+	
+	<mx:MenuBar id="mainMenuBar" labelField="@label">
+		<mx:dataProvider>
+			<fx:XMLList xmlns="">
+				<menuitem label="File">
+					<menuitem label="New" 			action="file.new"  enabled="true"/>
+					<menuitem label="Open..." 		action="file.open" enabled="true"/>
+					<menuitem type="separator" />
+					<menuitem label="Save" 			action="file.save" enabled="false"/>
+					<menuitem label="Save As..."	action="file.saveAs" enabled="true"/>
+					<menuitem type="separator" />
+					<menuitem label="Exit" 			action="file.exit"/>
+				</menuitem>
+				
+				<menuitem label="Edit">
+					<menuitem label="My Info" action="edit.myInfo"/>
+					<menuitem label="My Favorites" action="edit.favorites"/>
+					<menuitem type="separator" />
+					<menuitem label="Reset Columns" action="edit.resetColumns" />    
+				</menuitem>
+				
+				<menuitem label="Downloads">
+					<menuitem label="Download Data For Offline Usage" action="options.downloadContent" />
+					<menuitem label="Download Adobe Acrobat Reader" action="options.downloadAcrobat" />
+				</menuitem>
+				
+				<menuitem label="Help">
+					<menuitem label="Show User Guide" action="help.showUserGuide"/>
+					<menuitem label="Show EULA" action="help.showEula"/>
+					<menuitem label="Show Help" action="help.showHelp"/>
+					<menuitem type="separator" /> 
+					<menuitem label="Contact Us" action="help.contactUs" />
+					<menuitem type="separator" /> 
+					<menuitem label="About" action="help.about"/>
+				</menuitem>
+			</fx:XMLList>
+		</mx:dataProvider>
+	</mx:MenuBar>
+	
+</s:HGroup>

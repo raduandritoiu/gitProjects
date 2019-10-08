@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+
+  Licensed to the Apache Software Foundation (ASF) under one or more
+  contributor license agreements.  See the NOTICE file distributed with
+  this work for additional information regarding copyright ownership.
+  The ASF licenses this file to You under the Apache License, Version 2.0
+  (the "License"); you may not use this file except in compliance with
+  the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+
+-->
+
+
+<!--- The default skin class for the Spark VScrollBar component. The thumb and track skins are defined by the
+VScrollBarThumbSkin and VScrollBarTrackSkin classes, respectively.  
+
+       @see spark.components.VScrollBar
+       @see spark.skins.spark.VScrollBarThumbSkin
+       @see spark.skins.spark.VScrollBarTrackSkin
+        
+      @langversion 3.0
+      @playerversion Flash 10
+      @playerversion AIR 1.5
+      @productversion Flex 4
+-->
+<s:SparkSkin xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:s="library://ns.adobe.com/flex/spark"
+    xmlns:fb="http://ns.adobe.com/flashbuilder/2009" width="10">
+
+    <fx:Metadata>
+		<![CDATA[ 
+		    /** 
+		     * @copy spark.skins.spark.ApplicationSkin#hostComponent
+		     */
+		    [HostComponent("spark.components.VScrollBar")]
+			
+			/* Has a default WIDTH set to 10 */
+		]]>
+    </fx:Metadata> 
+	
+	
+    <s:states>
+        <s:State name="normal" />
+        <s:State name="disabled" />
+        <s:State name="inactive" />
+    </s:states>
+	
+	
+	<s:Rect top="0" bottom="0" left="0" right="0">
+		<s:fill>
+			<s:LinearGradient>
+				<s:GradientEntry alpha="0.1" ratio="0" color="0xb1b1b1"/>				
+				<s:GradientEntry alpha="0.6" ratio="0.1" color="0xffffff"/>
+				<s:GradientEntry alpha="1" ratio="1" color="0xffffff"/>
+			</s:LinearGradient>
+		</s:fill>
+	</s:Rect>
+	
+	<s:Line top="0" left="0" bottom="0">
+		<s:stroke>
+			<s:SolidColorStroke color="0xb1b1b1" weight="1" activate="0.8"/>
+		</s:stroke>
+	</s:Line>
+	
+	<s:Line bottom="0" top="0" right="0">
+		<s:stroke>
+			<s:SolidColorStroke color="0xb1b1b1" weight="1" activate="0.8"/>
+		</s:stroke>
+	</s:Line>
+    
+	<!---  The default skin class is VScrollBarTrackSkin.  
+            @copy spark.components.supportClasses.TrackBase#track 
+            @see spark.skins.spark.VScrollBarTrackSkin -->
+    <s:Button id="track" top="10" bottom="10" width="10"
+              focusEnabled="false" tabEnabled="false"
+              skinClass="Swizzard.UI.Skins.scroller.VScrollBarTrackSkin" />
+    
+    <!--- The default skin class is VScrollBarThumbSkin.
+            @copy spark.components.supportClasses.TrackBase#thumb 
+            @see spark.skins.spark.VScrollBarThumbSkin -->
+    <s:Button id="thumb" width="10" minHeight="10"
+              focusEnabled="false" visible.inactive="false" tabEnabled="false"
+              skinClass="Swizzard.UI.Skins.scroller.VScrollBarThumbSkin" />
+    
+    <!--- The default skin class is ScrollBarUpButtonSkin. 
+            @copy spark.components.supportClasses.ScrollBarBase#decrementButton 
+            @see spark.skins.spark.ScrollBarUpButtonSkin -->
+    <s:Button id="decrementButton" top="0" width="10" height="10"
+			  enabled.inactive="false" focusEnabled="false" tabEnabled="false"
+              skinClass="Swizzard.UI.Skins.scroller.ScrollBarUpButtonSkin" />
+    
+    <!---  The default skin class is ScrollBarDownButtonSkin. 
+            @copy spark.components.supportClasses.ScrollBarBase#incrementButton
+            @see spark.skins.spark.ScrollBarDownButtonSkin -->
+    <s:Button id="incrementButton" bottom="0" width="10" height="10"
+			  enabled.inactive="false" focusEnabled="false" tabEnabled="false"
+              skinClass="Swizzard.UI.Skins.scroller.ScrollBarDownButtonSkin" />
+
+</s:SparkSkin>

@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:ItemRenderer xmlns:fx="http://ns.adobe.com/mxml/2009" 
+				xmlns:s="library://ns.adobe.com/flex/spark" 
+				xmlns:mx="library://ns.adobe.com/flex/mx"
+				width="100%" minHeight="24">
+	
+	
+	<fx:Script>
+		<![CDATA[
+			import Swizzard.Data.Models.CrossReferenceProduct;
+			import Swizzard.Images.EmbeddedImages;
+			
+			
+			private var product:CrossReferenceProduct;
+			private var dataChanged:Boolean;
+			private var isOpenChanged:Boolean;
+			
+			
+			override public function set data(value:Object):void {
+				super.data = value;
+				if (product == value) return;
+				product = value as CrossReferenceProduct;
+				dataChanged	= true;
+				isOpenChanged = true;
+				invalidateProperties();
+			}
+			
+			
+			public function set isOpen(value:Boolean):void {
+				if (product == null) return;
+				product.isOpen = value;
+				isOpenChanged	= true;
+				invalidateProperties();
+			}
+			
+			
+			public function get isOpen():Boolean {
+				if (product != null) {
+					return product.isOpen;
+				}
+				return false;
+			}
+			
+			
+			override protected function commitProperties():void {
+				super.commitProperties();
+				
+				if (dataChanged) {
+					dataChanged	= false;
+					if (product) {
+						textDisplay.text = product.competitorPartNumber;
+						icon.source	= product.icon;
+					}
+					else {
+						textDisplay.text = null;
+						icon.source	= null;
+					}
+				}
+				
+				if (isOpenChanged) {
+					isOpenChanged	= false;
+					var cacheOpen:Boolean 		= isOpen;
+					openArrow.visible 			= cacheOpen;
+					openArrow.includeInLayout 	= cacheOpen;
+					closeArrow.visible 			= !cacheOpen;
+					closeArrow.includeInLayout 	= !cacheOpen;
+					openedBg.visible 			= cacheOpen;
+					if (itemList != null) {
+						itemList.dataProvider	= (cacheOpen) ? product.siemensParts : null;
+					}
+					itemList.visible			= cacheOpen;
+					itemList.includeInLayout	= cacheOpen;				
+				}
+			}
+			
+			
+			private function rendererClickHandler(event:MouseEvent):void {
+				isOpen = !isOpen;
+			}
+		]]>
+	</fx:Script>
+	
+	
+	
+	<s:VGroup width="100%" gap="2">
+		<s:Group width="100%" click="rendererClickHandler(event)">
+			<s:Rect id="openedBg" width="100%" height="100%" >
+				<s:fill> <s:SolidColor color="0x7FCEFF"/> </s:fill>
+			</s:Rect>
+			
+			<s:HGroup width="100%" minHeight="24" gap="2" verticalAlign="middle">
+				<s:Image id="icon" width="16" height="16" useHandCursor="false" mouseEnabled="false" focusEnabled="false" smooth="true"/>
+				
+				<s:Label id="textDisplay" mouseEnabled="false" mouseChildren="false" focusEnabled="false"/>
+				
+				<s:Spacer width="100%"/>
+				
+				<s:Group width="16" height="16">
+					<s:Image id="openArrow" width="16" height="16" source="{EmbeddedImages.ITEM_OPEN_ARROW}"
+							 focusEnabled="false" useHandCursor="true" buttonMode="true"/>
+					<s:Image id="closeArrow" width="16" height="16" source="{EmbeddedImages.ITEM_CLOSED_ARROW}"
+							 focusEnabled="false" useHandCursor="true" buttonMode="true" visible="false"/>
+				</s:Group>
+			</s:HGroup>
+		</s:Group>
+		
+		<s:List id="itemList" width="100%" minHeight="10" visible="false" includeInLayout="false"
+				dragEnabled="true" focusEnabled="false" tabEnabled="false"
+				skinClass="Swizzard.System.Search.ui.skins.CrossReferenceListSkin"
+				itemRenderer="Swizzard.System.Search.ui.SearchBoxItemRenderer">
+<!--
+			<s:layout>
+				<s:VerticalLayout useVirtualLayout="false" requestedMinRowCount="1"/>
+			</s:layout>
+-->		
+		</s:List>
+	</s:VGroup>
+			  
+</s:ItemRenderer>

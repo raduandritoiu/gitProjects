@@ -1,0 +1,70 @@
+Release 2009/10/13
+
+	1. Method reIndex2 removed for all indexing classes.
+	  
+	2. added new test class testMDXBy2ndParty
+	
+	3. removed old debugging code from some classes.
+	
+	4. Fixed null pointer exception which happened when calling close() without any NDX files open.
+	
+	5. abstracted the getType method in abstract Field class.
+	
+	5.a  getType no longer throws xBaseJException.
+	
+	6. cleaned up put(double) method in FloatField.
+	
+	7. key size was wrong for date and numeric changed from 16 to 8
+	
+	8. reIndex() was using read() and should have been using gotoRecord()
+	
+	9. Made a patch to make date index work. The way things are, 
+	Date and Numeric will only work if they are keys by themselves.
+	If you need dates or numbers to be part of a segmented key you 
+	need to declare them as Character  columns.
+	
+	10. added testType method to Junit TestField class.
+	
+	11. Updated RMI Field class getType in base package no longer
+	throws xBaseJException.
+	
+	12. DBF renameTo() only works when the rename  
+	isn't occurring across partitions or physical devices.
+	
+	 
+Release 2009/09/22 
+
+	1. Replaced the Log4J usage in the Util class with Apache
+	  Commons Logging.  You can still use Log4J, Commons Logging will
+	  use that library if it finds it in the classpath.
+	  
+	2. Updated documentation and added examples to source tree.
+
+Release 2009/09/16 
+
+	1. When storing the decimal seperator use the '.' character.  When
+	  getting from the db restore with the locale defined character.
+	  
+	2. When writing String data with DBT_FPT use encoding logic.
+
+Release 2.2.3
+
+  1. Decimal separator made to use locale defined character.
+
+Release 2.2.2 
+
+  1.  [ 1985813 ] Bug in DBT_fpt.java
+     add file.skipBytes(4) to bypass memo field type in FPT files.
+     
+   2.  added missing subdirectory name in test scripts.
+   
+Release 2.2.1
+
+  1 Changed license from GENERAL PUBLIC LICENSE (GPL) to LESSER GENERAL PUBLIC LICENSE (LGPL).
+    
+Release 2.2.0
+
+  1. Initial Open Source Release
+  
+
+  

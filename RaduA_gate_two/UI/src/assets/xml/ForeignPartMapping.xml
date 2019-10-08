@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PartMap xmlns="http://www.siemens.com/ForeignPartMap" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.siemens.com/ForeignPartMap ForeignPartMapping.xsd ">
+  <ForeignPart isObsolete="true" manufacturer="siemens" partNumber="xyz">
+    <Replacement partNumber="abc"/>
+  </ForeignPart>
+  <ForeignPart manufacturer="honeywell" partNumber="789">
+    <Replacement partNumber="123"/>
+    <Replacement partNumber="456"/>
+    <Replacement partNumber="987"/>
+  </ForeignPart>
+  <ForeignPart manufacturer="honeywell" partNumber="212">
+    <Replacement partNumber="312"/>
+    <Replacement partNumber="412"/>
+    <Replacement partNumber="512"/>
+  </ForeignPart>
+  <ForeignPart manufacturer="belimo" partNumber="912">
+    <Replacement partNumber="913"/>
+    <Replacement partNumber="914"/>
+    <Replacement partNumber="915"/>
+  </ForeignPart>
+</PartMap>

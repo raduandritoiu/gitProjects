@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 xmlns:Controls="Swizzard.UI.Controls.*"
+		 mouseChildren="false" mouseEnabled="false">
+	
+	
+	<fx:Script>
+		<![CDATA[
+			import Swizzard.Data.Models.AbstractSiemensProduct;
+			import Swizzard.Data.Models.SiemensAccessory;
+			import Swizzard.Data.Models.SiemensActuator;
+			import Swizzard.Data.Models.SiemensDamper;
+			import Swizzard.Data.Models.SiemensDocument;
+			import Swizzard.Data.Models.SiemensPneumatic;
+			import Swizzard.Data.Models.SiemensValve;
+			import Swizzard.Data.Models.Enumeration.SiemensDocumentType;
+			import Swizzard.Data.Utils.SynchronousDataUtility;
+			import Swizzard.System.Utils.ContentUtility;
+			
+			
+			private var LAST_SOURCE:String = "";
+			
+			private var target:DisplayObject;
+			private var targetChanged:Boolean = false;
+			private var product:AbstractSiemensProduct;	
+			private var productChanged:Boolean = false;
+			
+			
+			public function setTarget(value:DisplayObject):void {
+				if (target == value) return;
+				target = value; 
+				targetChanged = true;
+				invalidateProperties();
+			}
+			
+			
+			public function setProduct(value:AbstractSiemensProduct):void {
+				if (product == value) return;
+				product = value;
+				productChanged = true;
+				invalidateProperties();
+			}
+			
+			
+			override protected function commitProperties():void {
+				super.commitProperties()
+					
+				if (productChanged) {
+					productChanged = false;
+					resetChildren();
+				}
+				
+				if (targetChanged) {
+					targetChanged = false;
+					position();
+				}
+			}
+
+			
+			protected function resetChildren():void {
+				// ydrate the documents only if they are none
+				if (product.documents == null || product.documents.length == 0) {
+					var util:SynchronousDataUtility = new SynchronousDataUtility();
+					util.hydrateProductDocuments(product);
+					util.dispose();
+				}
+				
+				// set image and part number
+				var imgSource:String = "/assets/images/siemens_logo_60.gif";
+				for each(var doc:SiemensDocument in product.documents)  {
+					if (doc.documentType == SiemensDocumentType.THUMBNAIL)  {
+						imgSource = ContentUtility.getContent(doc.location);
+						break;
+					}
+				}
+				if (LAST_SOURCE != imgSource) {
+					LAST_SOURCE = imgSource;
+					thumbnail.source = imgSource;
+				}
+				
+				partNumber.text = "Part Number: " + product.partNumber;
+				
+				// set speciffic product stuff
+				if (product is SiemensValve)  {
+					var valve:SiemensValve = product as SiemensValve;
+					productType.text = "Valve Type: " + valve.info.typeString;
+					medium.text = "Medium:" + valve.info.mediumString;
+					Cv.text = "Cv: " + valve.info.cvu;
+					showLabels(21);
+				}
+				else if (product is SiemensActuator) {
+					showLabels(0);
+				}
+				else if (product is SiemensDamper) {
+					var damper:SiemensDamper = product as SiemensDamper;
+					productType.text = "Damper Type: " + damper.info.typeString;
+					showLabels(11);
+				}
+				else if (product is SiemensPneumatic) {
+					var pneumatic:SiemensPneumatic = product as SiemensPneumatic;
+					productType.text = "Pneumatic Type: " + pneumatic.info.typeString;
+					showLabels(11);
+				}
+				else if (product is SiemensAccessory) {
+					showLabels(0);
+				}
+			}
+			
+			
+			private function showLabels(val:uint):void {
+				productType.visible 		= (val > 0);
+				productType.includeInLayout = (val > 0);
+				medium.visible 				= (val > 20);
+				medium.includeInLayout 		= (val > 20);
+				Cv.visible 					= (val > 20);
+				Cv.includeInLayout 			= (val > 20);
+			}
+			
+			
+			override protected function measure():void {
+				super.measure();
+				position();
+			}
+			
+			
+			private function position():void {
+				if (target == null) return;
+				if (stage == null) return;
+				
+				// move the component
+				var b:Rectangle;
+				b = target.getBounds(stage);
+				var tp:Point = new Point(b.x - 15, b.y + 20);
+				move(tp.x, tp.y);
+			}
+		]]>
+	</fx:Script>
+	<Controls:J2FlyoutPanel id="bg" left="0" right="0" top="0" bottom="0"/>
+	
+	<s:HGroup gap="10" verticalAlign="middle"
+			  paddingLeft="10" paddingRight="15" paddingTop="25" paddingBottom="5">
+		<s:Image id="thumbnail" smooth="true" cacheAsBitmap="true">
+			<s:filters>
+				<s:DropShadowFilter distance="0" angle="90" color="0x000000" alpha="0.5" 
+									blurX="10" blurY="10" strength="1" quality="3"/>
+			</s:filters>
+		</s:Image>
+		
+		<s:VGroup gap="6">
+			<s:Label id="partNumber" color="0xeaeaea" text="Part Number: blank"/>
+			<s:Label id="productType" color="0xeaeaea" text="Valve Type: blank"
+					 visible="false" includeInLayout="false"/>
+			<s:Label id="medium" color="0xeaeaea" text="Medium: blank"
+					 visible="false" includeInLayout="false"/>
+			<s:Label id="Cv" color="0xeaeaea" text="Cv: blank"
+					 visible="false" includeInLayout="false"/>
+		</s:VGroup>
+	</s:HGroup>
+</s:Group>

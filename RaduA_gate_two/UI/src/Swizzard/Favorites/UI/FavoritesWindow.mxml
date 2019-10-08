@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Windows:GeneralWindow xmlns:fx="http://ns.adobe.com/mxml/2009" 
+					   xmlns:s="library://ns.adobe.com/flex/spark" 
+					   xmlns:mx="library://ns.adobe.com/flex/mx" 
+					   xmlns:Windows="Swizzard.UI.Windows.*" 
+					   implements="Swizzard.Favorites.Interfaces.IFavoritesWindow"
+					   title="Favorite Dampers" alwaysInFront="true" resizable="true" 
+					   width="680" height="480">
+	<fx:Script>
+		<![CDATA[
+			import Swizzard.Favorites.Interfaces.IFavoritesWindow;
+			import Swizzard.Favorites.Mediators.FavoritesMediator;
+			import Swizzard.System.ApplicationFacade;
+			
+			
+			private static var instance:FavoritesWindow;
+			
+			
+			public static function Show():FavoritesWindow {
+				if (instance) {
+					instance.orderToFront();
+					return instance;
+				}
+				instance = new FavoritesWindow();
+				instance.open();
+				var mediator:FavoritesMediator = ApplicationFacade.getInstance().retrieveMediator(FavoritesMediator.NAME) as FavoritesMediator;
+				mediator.setWindowView(instance);
+				return instance;
+			}
+			
+			
+			protected function closeHandler():void {
+				instance = null;
+				var mediator:FavoritesMediator = ApplicationFacade.getInstance().retrieveMediator(FavoritesMediator.NAME) as FavoritesMediator;
+				mediator.setWindowView(null);
+				dispose();
+			}
+			
+			
+			public function get list():DataGrid {
+				return innerList;
+			}
+			
+			
+			public function get removeButton():Button {
+				return innerRemoveButton;
+			}
+			
+			
+			public function set infoText(str:String):void {
+				infoTextLbl.text = str;
+			}
+		]]>
+	</fx:Script>
+	
+	
+	<s:VGroup width="100%" height="100%" gap="6"
+			  paddingBottom="15" paddingLeft="15" paddingRight="15" paddingTop="18">
+		<s:Label id="infoTextLbl" height="15" 
+				 text="Drag any damper or accessory kit from the application into the grid below. They will be saved for quick access and future use."/>
+		
+		<mx:DataGrid id="innerList" name="favoritesList"
+					 width="100%" height="100%"
+					 paddingTop="2" paddingBottom="2"
+					 allowMultipleSelection="true"
+					 horizontalScrollPolicy="on"
+					 dragEnabled="true"
+					 headerStyleName="scheduleHeaderStyle">
+		</mx:DataGrid>
+		
+		<s:HGroup width="100%">
+			<s:Button label="Remove Selected" id="innerRemoveButton" enabled="{innerList.selectedItem}" />
+			<s:Spacer width="100%"/>
+			<s:Button label="Close" click="closeHandler()"/>
+		</s:HGroup>
+	</s:VGroup>
+</Windows:GeneralWindow>

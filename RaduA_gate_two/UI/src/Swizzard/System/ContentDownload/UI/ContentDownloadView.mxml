@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:HGroup xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		  xmlns:s="library://ns.adobe.com/flex/spark" 
+		  xmlns:mx="library://ns.adobe.com/flex/mx"
+		  verticalAlign="middle" width="300" height="22">
+	
+	<s:Label height="18" text="Downloading Content:" verticalAlign="middle"/>
+	
+	<mx:ProgressBar id="progressBar" height="18" width="120" barSkin="Swizzard.UI.Skins.spark.CustomProgressBarSkin"
+					indeterminate="true" labelPlacement="center" mode="manual"/>
+
+	<s:Button id="cancelButton" width="16" height="16"
+			  skinClass="Swizzard.UI.Skins.spark.CancelButtonSkin"
+			  buttonMode="true" useHandCursor="true"/>
+</s:HGroup>

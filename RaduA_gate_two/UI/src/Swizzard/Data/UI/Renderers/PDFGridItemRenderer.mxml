@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:GridItemRenderer xmlns:fx="http://ns.adobe.com/mxml/2009" 
+					xmlns:s="library://ns.adobe.com/flex/spark" 
+					xmlns:mx="library://ns.adobe.com/flex/mx"
+					width="100%">
+	
+	<fx:Script>
+		<![CDATA[
+			import flash.net.navigateToURL;
+			
+			import mx.collections.ArrayCollection;
+			import mx.controls.Alert;
+			import mx.controls.Menu;
+			import mx.events.MenuEvent;
+			
+			import Swizzard.Data.Models.AbstractSiemensProduct;
+			import Swizzard.Data.Models.SiemensActuator;
+			import Swizzard.Data.Models.SiemensAssembly;
+			import Swizzard.Data.Models.SiemensDocument;
+			import Swizzard.Data.Models.SiemensValve;
+			import Swizzard.Data.Models.Enumeration.ProductType;
+			import Swizzard.Data.Models.Enumeration.SiemensDocumentType;
+			import Swizzard.Data.Utils.SynchronousDataUtility;
+			import Swizzard.Images.EmbeddedImages;
+			import Swizzard.System.Models.Interfaces.IScheduleItem;
+			import Swizzard.System.Utils.ContentUtility;
+			import Swizzard.System.Utils.MenuItem;
+			import Swizzard.System.Utils.MenuItemDataDescriptor;
+			
+			
+			private var menu:Menu;
+			private var menuData:ArrayCollection;
+			private var submittalSheets:MenuItem;
+			private var technicalInstructions:MenuItem;
+			private var installationInstructions:MenuItem;
+			
+			private var product:AbstractSiemensProduct;
+			private var dataChanged:Boolean;
+			
+			
+			override public function set data(value:Object):void {
+				super.data = value;
+				
+				if (value != null && value is IScheduleItem) {
+					if (value.product != product) {
+						product = value.product as AbstractSiemensProduct;
+						dataChanged	= true;
+						invalidateProperties();
+					}
+				}
+				else if (value != product) {
+					product = value as AbstractSiemensProduct;
+					dataChanged	= true;
+					invalidateProperties();
+				}
+			}
+			
+			
+			override protected function commitProperties():void {
+				super.commitProperties();
+				
+				if (dataChanged) {
+					dataChanged	= false;
+					// test enabled only if it is used in schedule grid for the vlave and actuator columns
+					if (product != null) {
+						if (data is IScheduleItem) {
+							// If this renderer is used for a schedule
+							if (product is SiemensValve) {
+								if (column.dataField != "valve:dataSheetLink") {
+									enabled	= false;
+								}
+								else {
+									enabled	= true;
+								}
+							}
+							else if (product  is SiemensActuator) {
+								if (column.dataField != "actuator:dataSheetLink") {
+									enabled	= false;
+								}
+								else {
+									enabled	= true;
+								}
+							}
+							else {
+								enabled	= true;
+							}
+						}
+					}
+				}
+			}
+			
+
+			override protected function createChildren():void {
+				super.createChildren();
+				
+				if (menu == null) {
+					menu = new Menu();
+					menu.labelField	= "name";
+					menu.addEventListener(MenuEvent.ITEM_CLICK, itemClickHandler, false, 0, true);
+					menu.dataDescriptor	= new MenuItemDataDescriptor();
+					
+					// create menu data 
+					submittalSheets				= new MenuItem();
+					submittalSheets.name		= "Submittal Sheets";
+					
+					technicalInstructions		= new MenuItem();
+					technicalInstructions.name	= "Technical Instructions";
+					
+					installationInstructions		= new MenuItem();
+					installationInstructions.name	= "Installation Instructions";
+					
+					menuData	= new ArrayCollection(	[
+						submittalSheets,
+						technicalInstructions,
+						installationInstructions
+					]);
+					Menu.popUpMenu(menu, this, menuData);
+				}
+			}
+			
+			
+			private function clickHandler(event:MouseEvent):void {
+				event.stopPropagation();
+				event.stopImmediatePropagation();
+				
+				if (product != null) {
+					var tmpProduct:AbstractSiemensProduct = product;
+					// get the actual product for which to present data sheets 
+					if (tmpProduct.productType == ProductType.ASSEMBLY) {
+						switch (column.dataField) {
+							case "valve:dataSheetLink":
+								if (SiemensAssembly(tmpProduct).valve) {
+									tmpProduct	= SiemensAssembly(tmpProduct).valve;
+								}
+								break;
+							
+							case "actuator:dataSheetLink":
+								if (SiemensAssembly(tmpProduct).actuator) {
+									tmpProduct = SiemensAssembly(tmpProduct).actuator;
+								}
+								break;
+						}
+					}
+					
+					if (!tmpProduct.documents) {
+						var util:SynchronousDataUtility	= new SynchronousDataUtility();
+						util.hydrateProductDocuments(tmpProduct);
+						util.dispose();
+					}
+					
+					var docs:Array;
+					if (tmpProduct.productType == ProductType.ACCESSORY) {
+						docs = tmpProduct.documents.filter(instalationDocumentFilter);
+					}
+					else {
+						docs = tmpProduct.documents.filter(nonImageDocumentFilter);
+					}
+					
+					submittalSheets.children.removeAll();
+					installationInstructions.children.removeAll();
+					technicalInstructions.children.removeAll();
+					
+					for each (var doc:SiemensDocument in docs) {
+						switch (doc.documentType) {
+							case SiemensDocumentType.SUBMITTAL_SHEET:
+								submittalSheets.children.addItem(doc);
+								break;
+							
+							case SiemensDocumentType.TECHNICAL_BULLETIN:
+								technicalInstructions.children.addItem(doc);
+								break;
+							
+							case SiemensDocumentType.INSTALLATION_INSTRUCTIONS:
+								installationInstructions.children.addItem(doc);
+								break;
+						}
+					}
+					
+					menuData.refresh();
+					
+					var globalMouse:Point = new Point(event.stageX, event.stageY);
+					if (stage) {
+						// If its going off the right side of the screen, move it to the other side.
+						if ((globalMouse.x + 150) > stage.nativeWindow.width) {
+							globalMouse.x -= 160;
+						}
+					}
+					
+					menu.show(globalMouse.x, globalMouse.y);
+				}
+			}
+			
+			
+			private function nonImageDocumentFilter(item:SiemensDocument, index:int, arr:Array):Boolean {
+				return !item.isImage;
+			}
+			private function instalationDocumentFilter(item:SiemensDocument, index:int, arr:Array):Boolean {
+				return (!item.isImage) && (item.name.indexOf("129") == 0);
+			}
+			
+			
+			private function itemClickHandler(event:MenuEvent):void {
+				var document:SiemensDocument;
+				
+				if (event.item is MenuItem) {
+					document = MenuItem(event.item).children.getItemAt(0) as SiemensDocument;
+				}
+				else if (event.item is SiemensDocument) {
+					document = event.item as SiemensDocument;
+				}
+				
+				if (document) {
+					downloadFile(document.location);	
+				}
+			}
+			
+			
+			private function downloadFile(url:String):void {
+				var fileUrl:String	= ContentUtility.getContent(url);
+				
+				if (fileUrl.substr(0, 4) != "http") {
+					navigateToURL(new URLRequest(fileUrl));
+				} 
+				else {
+					try {
+						navigateToURL(new URLRequest(url));
+					}
+					catch (err:Error) {
+						Alert.show("Content has not been downloaded");
+					}	
+				}
+			}
+		]]>
+	</fx:Script>
+	
+	<s:Image id="pdfImg" source="{EmbeddedImages.acrobat16_img}"
+			 click="clickHandler(event)"
+			 buttonMode="true" useHandCursor="true"
+			 verticalCenter="0" horizontalCenter="0"/>
+</s:GridItemRenderer>

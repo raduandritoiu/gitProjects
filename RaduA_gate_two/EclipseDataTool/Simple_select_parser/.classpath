@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
+	<classpathentry kind="lib" path="C:/radua/home_proj/de_la_mine/svn_repositories/RaduA/EclipseDataTool/Simple_select_parser/libs/antlr-runtime-3.1.3.jar"/>
+	<classpathentry kind="lib" path="C:/radua/home_proj/de_la_mine/svn_repositories/RaduA/EclipseDataTool/Simple_select_parser/libs/OpenXLS-6.0.7.jar"/>
+	<classpathentry kind="lib" path="C:/radua/home_proj/de_la_mine/svn_repositories/RaduA/EclipseDataTool/Simple_select_parser/libs/sqljet-1.0.7.jar"/>
+	<classpathentry kind="lib" path="C:/radua/home_proj/de_la_mine/svn_repositories/RaduA/EclipseDataTool/Simple_select_parser/libs/xBase/xBase/lib/commons-logging-1.1.1.jar"/>
+	<classpathentry kind="lib" path="C:/radua/home_proj/de_la_mine/svn_repositories/RaduA/EclipseDataTool/Simple_select_parser/libs/xBase/xBase/lib/xBaseJ.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

@@ -1,0 +1,350 @@
+/* CSS file */
+
+@namespace Controls "Swizzard.UI.Controls.*";
+@namespace ui "Swizzard.System.Search.ui.*";
+@namespace mx "library://ns.adobe.com/flex/mx";
+@namespace BoxSlider "Swizzard.UI.Components.BoxSlider.*";
+@namespace s "library://ns.adobe.com/flex/spark";
+@namespace spark "Swizzard.UI.Skins.spark.*";
+@namespace DataGridClasses "Swizzard.UI.Components.DataGridClasses.*";
+@namespace Windows "Swizzard.UI.Windows.*";
+@namespace Forms "Swizzard.UI.Forms.*";
+
+/*
+@font-face
+{
+	src: 		url("fonts/ARIAL.TTF");
+	fontFamily:	Arial;
+	fontWeight:	normal;
+	fontStyle:	normal;
+	embedAsCFF: false;
+	unicodeRange: U+0020-U+007F;
+	advancedAntiAliasing: true;
+}
+
+@font-face
+{
+	src: 		url("fonts/ARIALBD.TTF");
+	fontFamily:	Arial;
+	fontWeight:	bold;
+	fontStyle:	normal;
+	embedAsCFF: false;
+	unicodeRange: U+0020-U+007F;
+	advancedAntiAliasing: true;
+}
+
+@font-face
+{
+	src: 		url("fonts/ARIALBI.TTF");
+	fontFamily:	Arial;
+	fontWeight:	bold;
+	fontStyle:	italic;
+	embedAsCFF: false;
+	unicodeRange: U+0020-U+007F;
+	advancedAntiAliasing: true;
+}
+
+@font-face
+{
+	src: 		url("fonts/ARIALI.TTF");
+	fontFamily:	Arial;
+	fontWeight:	normal;
+	fontStyle:	italic;
+	embedAsCFF: false;
+	unicodeRange: U+0020-U+007F;
+	advancedAntiAliasing: true;
+}
+*/
+
+global 
+{
+	embedFonts: true;
+	fontFamily: Arial;
+	fontSize: 10;
+	color: #212121;
+}
+
+.alignCenter 
+{
+	text-align:center;
+}
+
+/* unused */
+.BoxSliderScrollBar 
+{
+	up-arrow-skin: ClassReference("undefined");
+	down-arrow-skin: ClassReference("undefined");
+	thumb-skin:  Embed(source="/assets/HScrollBar_thumbUpSkin.png", scaleGridLeft="1", scaleGridTop="19", scaleGridRight="2", scaleGridBottom="32");  
+	track-skin: Embed(source="/assets/HScrollBar_trackSkin.png", scaleGridLeft="1", scaleGridTop="10", scaleGridRight="2", scaleGridBottom="118");
+}
+
+/* used in Windows Util*/
+.headerStyle
+{
+	border-skin: ClassReference("Swizzard.UI.Skins.HeaderSkin");
+	padding-left: 10;
+	padding-right: 10;
+	vertical-align: middle;
+	color: #ececec;
+}
+
+/* unused */
+.sliderPanelTitle 
+{
+	color: #676767;
+	letterSpacing: 3;
+	textAlign: center;
+	fontFamily: Arial;
+}
+
+/* unused */
+.sliderPanel
+{
+	borderStyle: none;
+	borderAlpha: 0;
+	borderThickness: 0;
+	cornerRadius: 0;
+	headerHeight: 10;
+	backgroundColor: #ffffff;
+	dropShadowEnabled: false;
+	titleStyleName: "sliderPanelTitle";
+	vertical-align:bottom;
+}
+
+
+/* unused */
+.ValveSchedulePanel 
+{
+	borderThicknessLeft:0;
+	borderThicknessBottom: 0;
+	borderThicknessRight: 0;
+}
+
+/* -------------------------------- */
+
+mx|AdvancedDataGrid
+{
+	verticalLockedSeparatorSkin: ClassReference("Swizzard.UI.Skins.VerticalLockedSeparatorSkin");
+	headerSortSeparatorSkin: ClassReference("mx.skins.ProgrammaticSkin");
+	headerSeparatorSkin: ClassReference("Swizzard.UI.Skins.HeaderSeparatorSkin");
+	horizontalSeparatorSkin: ClassReference("Swizzard.UI.Skins.HeaderHorizontalSeparatorSkin");
+}
+
+
+.scheduleHeaderStyle
+{
+	fontFamily:		"Arial";
+	fontWeight:		"bold";
+	color:			#212121;
+	verticalAlign:	"middle";
+	paddingTop:		0;
+	paddingBottom:	0;
+	paddingLeft:	0;
+	paddingRight:	0;
+}
+
+mx|Button
+{
+	skin: ClassReference('Swizzard.UI.Skins.SiemensButtonSkin');	
+}
+
+ComboBox
+{	
+	skin: ClassReference('Swizzard.UI.Skins.SiemensComboBoxSkin');	
+}
+
+HDividedBox, VDividedBox 
+{
+	dividerAlpha: 0.75;
+	dividerColor: #b0bac0;
+	dividerThickness: 2;
+}
+
+Form 
+{
+	padding-top:0px;
+	padding-bottom:0px;
+	padding-left:0px;
+	padding-right:0px;
+}
+
+mx|MenuBar 
+{
+	backgroundSkin: ClassReference("Swizzard.UI.Skins.VSSTMenubarSkin");
+	cornerRadius: 0;
+	rollOverColor: #dbe8f0;
+	selectionColor: #dbdbdb;
+	themeColor: #dbe8f0;
+	borderColor: #9ea7ac;
+	fontSize: 12;
+	menuStyleName: "customMenuStyle";
+}
+
+/* used in menus */
+.customMenuStyle 
+{
+	dropShadowEnabled: false;
+	borderStyle: solid;
+	backgroundColor: #ececec;
+	cornerRadius: 2;
+	separatorSkin: ClassReference("Swizzard.UI.Skins.JSeperatorSkin");
+	fontSize: 12;
+	color: #4d4d4d;
+	rollOverColor: #dbe8f0;
+}
+
+
+/* transformed into s|Panel - but still used for Alert*/
+.myPanelTitle 
+{
+	font-weight: bold;
+	color: #212121; /* this is for Alert title color */
+}
+
+/* transformed into s|Panel - but still used for Alert*/
+mx|Panel
+{
+	borderColor: #b0bac0;
+	borderAlpha: 1;
+	cornerRadius: 0;
+	headerHeight: 15;
+	titleStyleName: "myPanelTitle";
+	padding-top:10px;
+	padding-bottom:10px;
+	padding-left:15px;
+	padding-right:15px;
+}
+
+mx|ScrollBar
+{
+	trackSkin: ClassReference("Swizzard.UI.Skins.ScrollTrackSkin");
+	thumbSkin: ClassReference("Swizzard.UI.Skins.ScrollThumbSkin");
+	upArrowSkin: ClassReference("Swizzard.UI.Skins.ScrollArrowSkin");
+	downArrowSkin: ClassReference("Swizzard.UI.Skins.ScrollArrowSkin");
+}
+
+
+mx|ToolTip
+{
+	backgroundColor: #FFFFCC;
+	backgroundAlpha: 0.95;
+	borderColor: #919999;
+	borderSkin: ClassReference("mx.skins.halo.ToolTipBorder");
+	borderStyle: "toolTip";
+	cornerRadius: 2;
+	letter-spacing: 1px;
+	fontSize: 12;
+	paddingBottom: 2;
+	paddingLeft: 4;
+	paddingRight: 4;
+	paddingTop: 2;
+	shadowColor: #000000;
+}
+
+/* unused */
+VSSTPopupWindow 
+{
+	corner-radius: 0;
+	padding-bottom:10;
+	padding-left:10;
+	padding-right:10;
+	padding-top:10;
+	background-color: #ffffff;
+	show-flex-chrome: true;
+}
+
+
+/* ------- My Added CSS ----------- */
+s|VScrollBar
+{
+	skinClass:ClassReference("Swizzard.UI.Skins.scroller.SwizzardVScrollBarSkin");	
+}
+
+s|HScrollBar
+{
+	skinClass:ClassReference("Swizzard.UI.Skins.scroller.SwizzardHScrollBarSkin");
+}
+
+s|Button
+{
+	skinClass:ClassReference("Swizzard.UI.Skins.controls.SiemensButtonSkin");
+}
+
+Forms|TextInputWithDefault
+{
+	skinClass: ClassReference("Swizzard.UI.Skins.spark.TextWithDefaultSkin");
+}
+
+Controls|TextInputWithButton
+{
+	skinClass: ClassReference("Swizzard.UI.Skins.spark.TextWithButtonSkin");
+}
+
+ui|SearchBox
+{
+	skinClass: ClassReference("Swizzard.System.Search.ui.skins.SearchBoxSkin");
+}
+
+ui|ArrowToggleButton
+{
+	skinClass: ClassReference("Swizzard.System.Search.ui.skins.ArrowButtonSkin");
+}
+
+BoxSlider|SliderBox
+{
+	skinClass: ClassReference("Swizzard.UI.Components.BoxSlider.SliderBoxSkin");
+}
+
+s|Panel
+{
+	skinClass: ClassReference("Swizzard.UI.Skins.spark.PanelSkin");
+	dropShadowVisible: false;
+	borderAlpha: 1;
+	cornerRadius: 0;	
+}
+
+s|Form
+{
+	skinClass: ClassReference("Swizzard.UI.Skins.spark.CustomFormSkin");
+}
+
+Controls|CustomFormItem
+{
+	skinClass: ClassReference("Swizzard.UI.Skins.spark.CustomFormItemSkin");
+}
+
+DataGridClasses|ProductDataGrid
+{
+	skinClass: ClassReference("Swizzard.UI.Skins.spark.ProductGridSkin");
+}
+
+Controls|SlidingPopUpButton
+{
+	skinClass: ClassReference("Swizzard.UI.Skins.spark.SlidingPopUpButtonSkin");
+}
+
+s|List
+{
+	rollOverColor:#B2E1FF;
+	selectionColor:#7FCEFF;
+}
+
+s|DropDownList 
+{
+	skinClass: ClassReference("Swizzard.UI.Skins.controls.SwizzardDropDownSkin");
+}
+
+Controls|CustomDropDown
+{
+	skinClass: ClassReference("Swizzard.UI.Skins.controls.SwizzardDropDownSkin");
+}
+
+Controls|CustomComboBox
+{
+	skinClass: ClassReference("Swizzard.UI.Skins.controls.SwizzardComboBoxSkin");
+}
+
+Windows|GeneralWindow
+{
+	skinClass: ClassReference("Swizzard.UI.Skins.spark.GeneralWindowSkin");
+}

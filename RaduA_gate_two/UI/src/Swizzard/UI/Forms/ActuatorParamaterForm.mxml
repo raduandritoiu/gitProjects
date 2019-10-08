@@ -1,0 +1,489 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:HGroup xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		  xmlns:s="library://ns.adobe.com/flex/spark" 
+		  xmlns:mx="library://ns.adobe.com/flex/mx"
+		  xmlns:Controls="Swizzard.UI.Controls.*"
+		  creationComplete="main()" gap="0"
+		  width="100%" height="100%">
+	
+	
+	<fx:Script>
+		<![CDATA[
+			import mx.collections.ArrayCollection;
+			import mx.collections.IViewCursor;
+			import mx.collections.Sort;
+			import mx.collections.SortField;
+			import mx.core.UIComponent;
+			import mx.events.PropertyChangeEvent;
+			
+			import Swizzard.Data.Models.Enumeration.Actuator.ActuatorMotorType;
+			import Swizzard.Data.Models.Enumeration.Actuator.ActuatorSafetyFunction;
+			import Swizzard.Data.Models.Enumeration.Valves.ValveType;
+			import Swizzard.Data.Utils.ValveTypeInformation;
+			import Swizzard.Data.Models.Query.ActuatorQueryModel;
+			import Swizzard.Data.Models.Query.ValveQueryModel;
+			import Swizzard.System.Utils.ValveFormUtil;
+			
+			
+			private const actuatorTypes:ArrayCollection		= new ArrayCollection();
+			private const controlSignals:ArrayCollection	= new ArrayCollection();
+			private const failureModeDp:ArrayCollection		= new ArrayCollection(ActuatorSafetyFunction.DATA_PROVIDER);
+			
+			private const supplyVoltageDp:ArrayCollection	= new ArrayCollection();
+			private const springRanges:ArrayCollection		= new ArrayCollection();
+			private const positionerDp:ArrayCollection		= new ArrayCollection();
+			
+			private const endSwitchDp:ArrayCollection		= new ArrayCollection();
+			private const hasHeaterDp:ArrayCollection		= new ArrayCollection([
+																{label: "All", value: -1},
+																{label: "No", value: 0},
+																{label: "Yes", value: 1}	
+															]);
+			
+			private var _actuatorQueryModel:ActuatorQueryModel;
+			private var _valveQueryModel:ValveQueryModel;
+			private var queryModelChanged:Boolean;
+			
+			
+			private function main():void
+			{
+				var sorter:Sort	= new Sort();
+				sorter.fields	= [new SortField("value", false, false, true), new SortField("label")];
+				
+				actuatorTypes.sort		= sorter;
+				controlSignals.sort		= sorter;
+				supplyVoltageDp.sort	= sorter;
+				springRanges.sort		= sorter;
+				positionerDp.sort		= sorter;
+				endSwitchDp.sort		= sorter;
+				
+				failureModeDp.filterFunction	= failureModeIntelligentFilter;
+			}						
+			
+			
+			public function set valveQueryModel(value:ValveQueryModel):void {
+				if (_valveQueryModel == value) ReturnKeyLabel;
+				if (_valveQueryModel) {
+					_valveQueryModel.removeEventListener(PropertyChangeEvent.PROPERTY_CHANGE, queryFormChangeHandler);
+				}
+				_valveQueryModel = value;
+				if (_valveQueryModel) {
+					_valveQueryModel.addEventListener(PropertyChangeEvent.PROPERTY_CHANGE, queryFormChangeHandler, false, 0, true);
+				}				
+				queryModelChanged = true;
+				invalidateProperties();
+			}
+			
+			public function get valveQueryModel():ValveQueryModel {
+				return _valveQueryModel;
+			}
+			
+			
+			public function set actuatorQueryModel(value:ActuatorQueryModel):void {
+				_actuatorQueryModel = value;
+			}
+			
+			public function get actuatorQueryModel():ActuatorQueryModel {
+				return _actuatorQueryModel;
+			}
+			
+			
+			override protected function commitProperties():void {
+				super.commitProperties();
+				
+				if (queryModelChanged) {
+					queryModelChanged = false;
+					reconstructDataProviders();	
+				}
+			}
+			
+			
+			private function queryFormChangeHandler(event:PropertyChangeEvent):void {
+				if (event.property) {
+					switch (event.property) {
+						case "valveTypes": 
+							reconstructDataProviders();					
+							break;
+					}
+				}
+				// this is called at RESET 
+				// I must recreate the effect of valveTypes changed (because of the previous architecture)
+				else {
+					reconstructDataProviders();					
+				}
+			}
+			
+			
+			private function reconstructDataProviders(reconstructType:Boolean = true):void
+			{
+				// remember current values for dropdowns
+				// small hack - made default "none" not null, because null is sometimes the value for All option; and the default must be a value that is never used
+				
+				var actuatorValue:Object;
+				if (reconstructType) {
+					actuatorValue 	= (actuatorTypeSelector.selectedItem != null) 	? actuatorTypeSelector.selectedItem.value 	: "none";
+				}				
+				var controlValue:Object 	= (controlSignalSelector.selectedItem != null) 	? controlSignalSelector.selectedItem.value 	: "none";
+				var failureValue:Object 	= (failureModeSelector.selectedItem != null) 	? failureModeSelector.selectedItem.value 	: "none";
+				var supplyValue:Object 		= (supplyVoltageSelector.selectedItem != null) 	? supplyVoltageSelector.selectedItem.value 	: "none";
+				var springValue:Object 		= (springRangeSelector.selectedItem != null) 	? springRangeSelector.selectedItem.value 	: "none";
+				var positionerValue:Object 	= (positionerSelector.selectedItem != null) 	? positionerSelector.selectedItem.value 	: "none";
+				var endSwitchValue:Object 	= (endSwitchesSelector.selectedItem != null) 	? endSwitchesSelector.selectedItem.value 	: "none";
+				
+				// reset the items in the drop downs
+				if (reconstructType) {
+					actuatorTypes.removeAll();
+				}
+				controlSignals.removeAll();
+				supplyVoltageDp.removeAll();
+				springRanges.removeAll();
+				positionerDp.removeAll();
+				endSwitchDp.removeAll();
+				
+				// add the new items in the drop downs
+				var actuatorsCursor:IViewCursor;
+				if (reconstructType) {
+					actuatorsCursor = actuatorTypes.createCursor();
+				}				
+				var controlCursor:IViewCursor	= controlSignals.createCursor();
+				var supplyCursor:IViewCursor	= supplyVoltageDp.createCursor();
+				var springCursor:IViewCursor	= springRanges.createCursor();
+				var positionerCursor:IViewCursor = positionerDp.createCursor();
+				var endSwitchCursor:IViewCursor	= endSwitchDp.createCursor();
+				
+				
+				var hasButterFly:Boolean 		= false;
+				var endSwitchEnabled:Boolean	= false;
+				var positionerEnabled:Boolean	= false;
+				
+				
+				for each (var type:uint in valveQueryModel.valveTypes) {
+					var typeInfo:ValveTypeInformation = ValveFormUtil.getValveEnumInfo(type);
+										
+					positionerEnabled = (positionerEnabled || !typeInfo.disablePositioner);
+					
+					switch (typeInfo.valveType)
+					{
+						case ValveType.BUTTERFLY:
+							hasButterFly		= true;
+							endSwitchEnabled	= true;
+							break;
+							
+						case ValveType.BALL:
+							endSwitchEnabled	= true;
+							break;
+					}				
+									
+					// add Actuator Types
+					if (reconstructType) {
+						for each (var actType:Object in typeInfo.actuatorTypes) {
+							if (!actuatorsCursor.findAny(actType))
+								actuatorTypes.addItem(actType);
+						}
+					}
+					
+					// if actuator type Pnuematic is selected
+					if (!actuatorTypeSelector.selectedItem || (actuatorTypeSelector.selectedItem.value == ActuatorMotorType.PNEUMATIC) ||
+						(actuatorTypeSelector.selectedItem.value == -1))
+					{
+						// add Spring Range
+						for each (var signalp:Object in typeInfo.pneumaticControlSignal) {
+							if (!springCursor.findAny({value: signalp.value}))
+								springRanges.addItem(signalp);
+						}
+						springRangeSelector.enabled	= true;
+						controlSignalSelector.selectedIndex	= -1;
+					}
+					else {
+						springRangeSelector.enabled	= false;	
+						positionerEnabled = false;
+						positionerSelector.selectedIndex = -1;
+					}
+					
+					// if actuator type Electric is selected
+					if (!actuatorTypeSelector.selectedItem || (actuatorTypeSelector.selectedItem.value == ActuatorMotorType.ELECTRIC) ||
+						(actuatorTypeSelector.selectedItem.value == -1))
+					{
+						// add Control Signals
+						for each (var signal:Object in typeInfo.electricControlSignal) {
+							if (!controlCursor.findAny({value: signal.value}))
+								controlSignals.addItem(signal);
+						}
+						
+						// add Supply Voltage
+						for each (var supplyItem:Object	in typeInfo.supplyVoltage) {
+							if (!supplyCursor.findAny({value: supplyItem.value}))
+									supplyVoltageDp.addItem(supplyItem);
+						}
+						
+						controlSignalSelector.enabled	= true;
+						failureModeSelector.enabled		= true;
+						springRangeSelector.selectedIndex = -1;
+					}
+					else {
+						controlSignalSelector.enabled	= false;
+						failureModeSelector.enabled		= false;
+					}
+					
+					// add Positioner
+					if (typeInfo.selectablePositioner) {
+						for each (var selectablePositioner:Object in typeInfo.selectablePositioner) {
+							if (!positionerCursor.findAny({value: selectablePositioner.value}))
+								positionerDp.addItem(selectablePositioner);
+						}
+					}
+					
+					// add End Switch
+					if (endSwitchEnabled) {
+						if (typeInfo.endSwitchSelection) {
+							for each (var endSwitch:Object in typeInfo.endSwitchSelection) {
+								if (!endSwitchCursor.findAny({value: endSwitch.value}))
+									endSwitchDp.addItem(endSwitch);
+							}
+						}
+					}
+				}
+				
+				
+				heaterSelector.enabled 		= hasButterFly;
+				endSwitchesSelector.enabled	= endSwitchEnabled;
+				positionerSelector.enabled 	= (positionerDp.length > 0) && positionerEnabled;
+				
+				
+				// Butterfly Mixture
+				if ((valveQueryModel.valveTypes.length > 1) && hasButterFly) {
+					pneumaticSignalForm.label	= "Air Supply/Spring Range:";
+				}
+				
+				if (!hasButterFly) {
+					// No Butterfly at all
+					pneumaticSignalForm.label = "Spring Range:";
+					heaterSelector.selectedIndex = -1;
+					// WEIRD_TODO: I really do not understand why reset this if no butterfly; what about ball?
+					endSwitchesSelector.selectedIndex = -1;
+				}
+				else if (valveQueryModel.valveTypes.length == 1) {
+					// Butterfly Only
+					pneumaticSignalForm.label	= "Air Supply Range:";
+				}
+				
+				if (reconstructType) {
+					actuatorTypes.refresh();
+				}
+				controlSignals.refresh();
+				failureModeDp.refresh(); 
+				supplyVoltageDp.refresh();
+				springRanges.refresh();
+				positionerDp.refresh();
+				endSwitchDp.refresh();
+				
+				
+				// re-set the values for the dropdowns
+				if (reconstructType) {
+					for each (var item:Object in actuatorTypes) {
+						if (item.value == actuatorValue)
+							actuatorTypeSelector.selectedItem = item;
+					}
+				}
+				
+				for each (var item:Object in controlSignals) {
+					if (item.value == controlValue)
+						controlSignalSelector.selectedItem = item;
+				}
+				
+				for each (var item:Object in failureModeDp) {
+					if (item.value == failureValue)
+						failureModeSelector.selectedItem = item;
+				}
+				
+				for each (var item:Object in supplyVoltageDp) {
+					if (item.value == supplyValue)
+						supplyVoltageSelector.selectedItem = item;
+				}
+				
+				for each (var item:Object in springRanges) {
+					if (item.value == springValue)
+						springRangeSelector.selectedItem = item;
+				}
+				
+				for each (var item:Object in positionerDp) {
+					if (item.value == positionerValue)
+						positionerSelector.selectedItem = item;
+				}
+				
+				for each (var item:Object in endSwitchDp) {
+					if (item.value == endSwitchValue)
+						endSwitchesSelector.selectedItem = item;
+				}
+				
+
+				this.validateNow();
+				
+				
+				if (valveQueryModel.valveTypes.length < 1) {
+					failureModeSelector.selectedIndex = -1;
+					actuatorQueryModel.reset(false);
+				}
+				else {
+					syncActuatorModel();
+				}
+			}
+			
+			
+			private function syncActuatorModel():void {
+				// Synchronize Query Model 
+				actuatorQueryModel.suppressEvents	= true;
+				
+				// WARNING: again with the default values that do not match
+				// motor - the PICV valve has as default value ActuatorMotorType.ELECTRIC -> (1) 
+				// supply voltage - again for the PICV the default is 1 and for all the default is -1, not 0 (as set here)
+				
+				actuatorQueryModel.motor			= (actuatorTypeSelector.enabled && actuatorTypeSelector.selectedItem) 	? actuatorTypeSelector.selectedItem.value 	: -1;
+				actuatorQueryModel.signal			= (controlSignalSelector.enabled && controlSignalSelector.selectedItem) ? controlSignalSelector.selectedItem.value 	: -1;
+				actuatorQueryModel.safetyFunction	= (failureModeSelector.enabled 	&& failureModeSelector.selectedItem) 	? failureModeSelector.selectedItem.value 	: -1;
+				actuatorQueryModel.supplyVoltage	= (supplyVoltageSelector.enabled && supplyVoltageSelector.selectedItem) ? supplyVoltageSelector.selectedItem.value 	: 0;
+				actuatorQueryModel.positioner		= (positionerSelector.enabled 	&& positionerSelector.selectedItem) 	? positionerSelector.selectedItem.value 	: -1;
+				actuatorQueryModel.endSwitch		= (endSwitchesSelector.enabled 	&& endSwitchesSelector.selectedItem) 	? endSwitchesSelector.selectedItem.value 	: -1;
+				actuatorQueryModel.hasHeater		= (heaterSelector.enabled 		&& heaterSelector.selectedItem) 		? heaterSelector.selectedItem.value 		: -1;
+				
+				actuatorQueryModel.suppressEvents	= false;
+			}
+			
+			
+			private function changeHandler(event:Event):void {
+				var component:UIComponent = event.target as UIComponent;
+				switch (component)
+				{
+					case actuatorTypeSelector:
+//						reconstructDataProviders(false);
+						
+						if (actuatorTypeSelector.selectedItem.value == null) {
+							actuatorQueryModel.motor = -1;
+						}
+						else {
+							actuatorQueryModel.motor = actuatorTypeSelector.selectedItem.value;
+						}
+						
+						positionerSelector.enabled = (actuatorQueryModel.motor != ActuatorMotorType.ELECTRIC);
+						if (!positionerSelector.enabled) {
+							positionerSelector.selectedIndex = -1;
+						}
+						// Do not break determine positioner.
+					
+					case positionerSelector:
+						if (!positionerSelector.enabled) {
+							actuatorQueryModel.positioner = -1;
+						}
+						else if (positionerSelector.selectedItem == null) {
+							actuatorQueryModel.positioner = -1;
+						}
+						else {
+							actuatorQueryModel.positioner = positionerSelector.selectedItem.value;
+						}
+						break;
+						
+					case controlSignalSelector:
+					case springRangeSelector:
+						var selector:DropDownList = component as DropDownList;
+						if (selector.selectedItem.value == null) {
+							actuatorQueryModel.signal = -1;
+						}
+						else {
+							actuatorQueryModel.signal = selector.selectedItem.value;
+						}
+						if (component == controlSignalSelector) {
+							springRangeSelector.selectedIndex	= 0;
+						}
+						else {
+							controlSignalSelector.selectedIndex = 0;	
+						}
+						break;
+					
+					case failureModeSelector:
+						if (failureModeSelector.selectedItem == null || failureModeSelector.selectedItem.value == null) {
+							actuatorQueryModel.safetyFunction = -1;
+						}
+						else {
+							actuatorQueryModel.safetyFunction = failureModeSelector.selectedItem.value;
+						}
+						break;
+					
+					case supplyVoltageSelector:
+						actuatorQueryModel.supplyVoltage	= supplyVoltageSelector.selectedItem.value;
+						break;
+					
+					case endSwitchesSelector:
+						actuatorQueryModel.endSwitch	= endSwitchesSelector.selectedItem.value;
+						break;
+					
+					case heaterSelector:
+						actuatorQueryModel.hasHeater	= heaterSelector.selectedItem.value;
+						break;
+				}
+			}
+			
+			
+			// ----------- Intelligent Filters -----------
+			
+			private function failureModeIntelligentFilter(item:Object):Boolean {
+				if (valveQueryModel.valveTypes.length < 1)
+					return false;
+				
+				if ((valveQueryModel.valveTypes.length == 1) && ( (valveQueryModel.valveTypes[0] == ValveType.MAGNETIC))) {
+					if (item.value == ActuatorSafetyFunction.NON_SPRING_RETURN)
+						return false;
+				}
+				
+				return true;
+			}
+		]]>
+	</fx:Script>
+	
+	
+	<s:Form width="100%" height="100%">
+		<Controls:CustomFormItem label="Actuator Type:">
+			<s:DropDownList id="actuatorTypeSelector" width="160" prompt="All" enabled="{(actuatorTypes.length > 0)}"
+							dataProvider="{actuatorTypes}" change="changeHandler(event)"/>
+		</Controls:CustomFormItem>
+		
+		<Controls:CustomFormItem label="Control Signal:">
+			<s:DropDownList id="controlSignalSelector" width="160" prompt="All" enabled="{controlSignals.length > 0}" 
+							dataProvider="{controlSignals}" change="changeHandler(event)"/>
+		</Controls:CustomFormItem>
+		
+		<Controls:CustomFormItem label="Failure Mode:">
+			<s:DropDownList id="failureModeSelector" width="160" prompt="All" enabled="{failureModeDp.length > 0}"
+							dataProvider="{failureModeDp}" change="changeHandler(event)"/>
+		</Controls:CustomFormItem>
+	</s:Form>
+	
+	<s:Form width="100%" height="100%">
+		<Controls:CustomFormItem label="Supply Voltage:">
+			<s:DropDownList id="supplyVoltageSelector" width="160" prompt="All" enabled="{supplyVoltageDp.length > 0}" 
+							dataProvider="{supplyVoltageDp}" change="changeHandler(event)"/>
+		</Controls:CustomFormItem>
+		
+		<Controls:CustomFormItem id="pneumaticSignalForm" label="Spring Range:">
+			<s:DropDownList id="springRangeSelector" width="160" prompt="All" enabled="{springRanges.length > 0}" 
+							dataProvider="{springRanges}" change="changeHandler(event)"/>
+		</Controls:CustomFormItem>		
+				
+		<Controls:CustomFormItem label="Positioner:">
+			<s:DropDownList id="positionerSelector" width="125" prompt="All" 
+							dataProvider="{positionerDp}" change="changeHandler(event)"/>
+		</Controls:CustomFormItem>
+				
+	</s:Form>
+	
+	<s:Form width="100%" height="100%">		
+		<Controls:CustomFormItem label="End Switches:">
+			<s:DropDownList id="endSwitchesSelector" width="160" prompt="All" 
+							dataProvider="{endSwitchDp}" change="changeHandler(event)"/>
+		</Controls:CustomFormItem>
+		
+		<Controls:CustomFormItem label="Heater:">
+			<s:DropDownList id="heaterSelector" width="62" prompt="All" 
+							dataProvider="{hasHeaterDp}" change="changeHandler(event)"/>
+		</Controls:CustomFormItem>
+	</s:Form>
+</s:HGroup>

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Windows:GeneralWindow xmlns:fx="http://ns.adobe.com/mxml/2009" 
+					   xmlns:s="library://ns.adobe.com/flex/spark" 
+					   xmlns:mx="library://ns.adobe.com/flex/mx" 
+					   xmlns:Windows="Swizzard.UI.Windows.*" 
+					   width="330" height="230"
+					   title="Update Available">
+	
+	<fx:Script>
+		<![CDATA[
+			import Swizzard.UI.Skins.spark.CustomProgressBarSkin;
+			public static function Show():UpdaterWindow {
+				var instance:UpdaterWindow = new UpdaterWindow();
+				instance.open();
+				return instance;
+			}
+			
+			
+			private var _viewIndex:int = 0;
+			public function set viewIndex(val:int):void {
+				_viewIndex 		= val;
+				view_0.visible 	= (val == 0);
+				view_1.visible 	= (val == 1);
+				view_2.visible 	= (val == 2);
+			}
+			
+			public function get viewIndex():int {
+				return _viewIndex;
+			}
+		]]>
+	</fx:Script>
+	
+	
+	<s:VGroup id="view_0" width="100%" height="100%" verticalAlign="middle" horizontalAlign="center" visible="true">
+		<s:Label text="Update pending." id="updatePendingLabel" fontSize="12"/>
+		<s:HGroup>
+			<s:Button id="yesButton" label="Yes" width="60"/>
+			<s:Button id="noButton" label="No" width="60"/>
+		</s:HGroup>
+	</s:VGroup>
+	
+	<s:VGroup id="view_1" width="100%" height="100%" verticalAlign="middle" horizontalAlign="center" visible="false">
+		<s:Label text="Downloading Update." id="updatingLabel"/>
+		<mx:ProgressBar id="progressBar" width="100%" height="16" barSkin="Swizzard.UI.Skins.spark.CustomProgressBarSkin"
+						paddingLeft="10" paddingRight="10" mode="manual" indeterminate="true" />
+		<s:Button label="Cancel" id="cancelButton" enabled="false"/>
+	</s:VGroup>
+	
+	<s:VGroup id="view_2" width="100%" height="100%" paddingBottom="15" paddingLeft="15" paddingRight="15" paddingTop="15" visible="false">
+		<mx:HTML id="eulaText"  width="100%" height="100%"/>	
+		<s:HGroup width="100%">
+			<s:CheckBox id="checkbox" label="I have read and agree to the terms and conditions"/>
+			<s:Spacer width="100%" height="10"/>
+			<s:Button id="disagreeButton" label="Disagree" />
+			<s:Button id="continueButton" label="Continue" enabled="{checkbox.selected}"/>
+		</s:HGroup>
+	</s:VGroup>
+
+</Windows:GeneralWindow>

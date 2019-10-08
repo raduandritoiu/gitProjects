@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:WindowedApplication xmlns:fx="http://ns.adobe.com/mxml/2009" 
+							xmlns:s="library://ns.adobe.com/flex/spark" 
+							xmlns:mx="library://ns.adobe.com/flex/mx" 
+							xmlns:UI="Swizzard.UI.*" 
+							xmlns:ProductDragDropper="Swizzard.UI.Components.ProductDragDropper.*" 
+							xmlns:BoxSlider="Swizzard.UI.Components.BoxSlider.*" 
+							xmlns:DataGridClasses="Swizzard.UI.Components.DataGridClasses.*" 
+							xmlns:Forms="Swizzard.UI.Forms.*" xmlns:Utils="Swizzard.System.Utils.*" 
+							xmlns:Components="Swizzard.UI.Components.*" 
+							xmlns:Controls="Swizzard.UI.Controls.*" 
+							xmlns:ui="Swizzard.System.Search.ui.*" 
+							xmlns:UI1="Swizzard.System.ContentDownload.UI.*" 
+							xmlns:GridsBox="Swizzard.UI.Components.GridsBox.*" 
+							xmlns:ScheduleBox="Swizzard.UI.Components.ScheduleBox.*"
+							skinClass="mainSkin.SimpleSelectSkin" 
+							width="1080" height="746"
+							minWidth="864" minHeight="746"
+							showStatusBar="false"
+							preinitialize="preinitializeHandler(event)"
+							applicationComplete="main()">
+	
+	<fx:Style source="/assets/style.css"/>
+	
+	
+	<fx:Script>
+		<![CDATA[
+			import com.greensock.plugins.TransformAroundCenterPlugin;
+			import com.greensock.plugins.TweenPlugin;
+			
+			import flash.utils.setTimeout;
+			
+			import mx.events.FlexEvent;
+			
+			import spark.components.Group;
+			import spark.components.Image;
+			import spark.components.supportClasses.ButtonBarBase;
+			
+			import Swizzard.Images.EmbeddedImages;
+			import Swizzard.System.ApplicationFacade;
+			import Swizzard.System.ContentDownload.UI.ContentDownloadView;
+			import Swizzard.System.Search.ui.SearchBox;
+			import Swizzard.UI.Components.AppMenuBar;
+			import Swizzard.UI.Components.AppWindowControls;
+			import Swizzard.UI.Components.SplashScreen.SplashScreen;
+			
+			
+			[SkinPart(required="true")]
+			public var rootCanvas:Group; 				// done
+			
+			[SkinPart(required="true")]
+			public var headerBox:Group; 				// done
+			
+			[SkinPart(required="true")]
+			public var logoImage:Image;					// done
+			
+			[SkinPart(required="true")]
+			public var searchBox:SearchBox;				// done
+			
+			[SkinPart(required="true")]
+			public var windowControls:AppWindowControls; //done
+			
+			[SkinPart(required="true")]
+			public var productsBar:ButtonBarBase;		// done
+			
+			[SkinPart(required="true")]
+			public var menubar:AppMenuBar; 				// half to nothing done, but started twards that
+			
+			[SkinPart(required="true")]
+			public var statusView:ContentDownloadView; 	// half done
+			
+			[SkinPart(required="true")]
+			public var resizeHandle:Image;				// done
+			
+
+			
+			private var splashCloseTimeout:int;
+			private var facade:ApplicationFacade = ApplicationFacade.getInstance();
+			
+			
+			protected function preinitializeHandler(event:FlexEvent):void {	
+				SplashScreen.Show(true, true);
+			}
+			
+			
+			private function main():void {
+				TweenPlugin.activate([TransformAroundCenterPlugin]);
+				splashCloseTimeout  = setTimeout(closeSplashScreen, 5000);
+				facade.startup(this);
+			}
+			
+			
+			private function closeSplashScreen():void {
+				SplashScreen.close();
+				splashCloseTimeout = -1;
+			}
+			
+			
+			private function childHolderMouseDownHandler(event:MouseEvent):void {
+				if (event.target == contentGroup || event.target == headerBox)
+					nativeWindow.startMove();
+			}
+			
+			
+			private function toggleMaximize(e:Event):void {
+				windowControls.toggleMaximize();
+			}
+			
+			
+			private function onResizeMouseDown(e:Event):void  {
+				nativeWindow.startResize();
+			}
+			
+			
+			override protected function partAdded(partName:String, instance:Object):void {
+				super.partAdded(partName, instance);
+				
+				if (instance == headerBox) {
+					headerBox.addEventListener(MouseEvent.MOUSE_DOWN, childHolderMouseDownHandler, false, 0, true);
+					headerBox.addEventListener(MouseEvent.DOUBLE_CLICK, toggleMaximize, false, 0, true);
+				}
+				
+				if (instance == contentGroup) {
+					contentGroup.addEventListener(MouseEvent.MOUSE_DOWN, childHolderMouseDownHandler, false, 0, true);
+				}
+				
+				if (instance == windowControls) {
+					windowControls.setAppWindiw(nativeWindow);
+				}
+				
+				if (instance == resizeHandle) {
+					resizeHandle.addEventListener(MouseEvent.MOUSE_DOWN, onResizeMouseDown, false, 0, true);
+				}
+			}
+		]]>
+	</fx:Script>
+	
+	
+	<ProductDragDropper:ProductDragDrop id="productDragDrop" width="100%" height="110" depth="1"/>
+	
+	<s:Group width="100%" height="170">
+		<BoxSlider:ValveParamsSlider id="valveParamsSlider" width="100%" height="170"/>
+		
+		<BoxSlider:DamperParamsSlider id="damperParamsSlider" width="100%" height="170"/>
+		
+		<BoxSlider:PneumaticParamsSlider id="pneumaticParamsSlider" width="100%" height="170"/>
+	</s:Group>
+	
+	
+	<mx:VDividedBox width="100%" height="100%" liveDragging="true" 
+					verticalGap="4" dividerThickness="4">
+			
+		<s:Group width="100%" height="100%" minHeight="175">
+			<GridsBox:ValveGridsBox id="valveGridsBox" width="100%" height="100%"/>
+			
+			<GridsBox:DamperGridsBox id="damperGridsBox" width="100%" height="100%"/>
+			
+			<GridsBox:PneumaticGridBox id="pneumaticGridsBox" width="100%" height="100%"/>
+		</s:Group>
+		
+	
+		<!-- Schedule Part -->
+		<s:HGroup width="100%" height="80%" minHeight="175" gap="0">
+			
+			<!-- Schedule Grids -->
+			<s:Group width="100%" height="100%">
+				<ScheduleBox:ScheduleGridBox id="valveScheduleBox" width="100%" height="100%"
+											 title="Valve Schedule"/>
+				
+				<ScheduleBox:ScheduleGridBox id="damperScheduleBox" width="100%" height="100%"
+											 title="Damper Actuators Schedule" visible="false"/>
+				
+				<ScheduleBox:ScheduleGridBox id="pneumaticScheduleBox" width="100%" height="100%"
+											 title="Pneumatic Actuators Schedule" visible="false"/>
+			</s:Group>
+			
+			
+			<!-- Export Buttons -->
+			<Controls:AddButtonGroup height="100%" paddingLeft="7" paddingRight="7" verticalAlign="middle">
+	
+				<UI:AddButton id="exportExcelButton" width="40" enabled="false"
+							  icon="{EmbeddedImages.EXPORT_EXCEL}"
+							  toolTip="Export schedule To Excel"/>
+	
+				<UI:AddButton id="exportPDFButton" width="40" enabled="false"
+							  icon="{EmbeddedImages.EXPORT_PDF}"
+							  toolTip="Export schedule to PDF"/>
+	
+				<UI:AddButton id="exportWebshopButton" width="40" enabled="false"
+							  icon="{EmbeddedImages.EXPORT_WEBSHOP}"
+							  toolTip="Create file for Webshop"/>
+	
+				<UI:AddButton id="saveButton" width="40" enabled="false"
+							  icon="{EmbeddedImages.SAVE_PROJECT}"
+							  toolTip="Save schedule"/>
+			</Controls:AddButtonGroup>
+		</s:HGroup>
+	
+	</mx:VDividedBox>
+
+</s:WindowedApplication>

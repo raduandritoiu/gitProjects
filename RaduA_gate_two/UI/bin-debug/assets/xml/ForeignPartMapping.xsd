@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema targetNamespace="http://www.siemens.com/ForeignPartMap" elementFormDefault="qualified" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.siemens.com/ForeignPartMap">
+
+    <xsd:complexType name="ForeignPart">
+    	<xsd:sequence>
+    		<xsd:element name="Replacement" type="ReplacementPart"
+    			maxOccurs="unbounded" minOccurs="1">
+    		</xsd:element>
+    	</xsd:sequence>
+    	<xsd:attribute name="isObsolete" type="xsd:boolean" use="optional"></xsd:attribute>
+    	<xsd:attribute name="partNumber" type="xsd:string" use="required"></xsd:attribute>
+    	<xsd:attribute name="manufacturer" type="xsd:string" use="optional"></xsd:attribute>
+    </xsd:complexType>
+
+    <xsd:complexType name="ReplacementPart">
+    	<xsd:attribute name="partNumber" type="xsd:string" use="required"></xsd:attribute>
+    </xsd:complexType>
+
+    <xsd:complexType name="ListOfForeignParts">
+    	<xsd:sequence>
+    		<xsd:element name="ForeignPart" type="ForeignPart" maxOccurs="unbounded" minOccurs="0"></xsd:element>
+    	</xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:element name="PartMap" type="ListOfForeignParts"></xsd:element>
+</xsd:schema>

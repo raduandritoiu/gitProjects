@@ -1,0 +1,321 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:HGroup xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		  xmlns:s="library://ns.adobe.com/flex/spark" 
+		  xmlns:mx="library://ns.adobe.com/flex/mx" 
+		  xmlns:Controls="Swizzard.UI.Controls.*"
+		  creationComplete="main()">
+	
+	<fx:Script>
+		<![CDATA[
+			import mx.collections.ArrayCollection;
+			import mx.core.EventPriority;
+			import mx.core.UIComponent;
+			import mx.events.PropertyChangeEvent;
+			
+			import Swizzard.Data.Models.Enumeration.Pneumatic.PneumaticSelection;
+			import Swizzard.Data.Models.Query.PneumaticQueryModel;
+			import Swizzard.Data.Utils.PneumaticTypeInfoUtil;
+			import Swizzard.System.Utils.PneumaticFormUtil;
+			
+			
+			private var typesDp:ArrayCollection 		= new ArrayCollection();
+			private var strokeDp:ArrayCollection 		= new ArrayCollection();
+			private var springRangeDp:ArrayCollection 	= new ArrayCollection();
+			private var ulCertDp:ArrayCollection 		= new ArrayCollection();
+			private var posRelayDp:ArrayCollection 		= new ArrayCollection();
+			private var maxThrustDp:ArrayCollection 	= new ArrayCollection();
+			private var mountingDp:ArrayCollection 		= new ArrayCollection();
+			
+			
+			private var _pneumaticQueryModel:PneumaticQueryModel;
+			private var pneumaticModelChanged:Boolean;
+			
+			
+			public function set pneumaticQueryModel(val:PneumaticQueryModel):void {
+				if (_pneumaticQueryModel == val) return;
+				
+				if (_pneumaticQueryModel != null) {
+					_pneumaticQueryModel.removeEventListener(PropertyChangeEvent.PROPERTY_CHANGE, pneumaticModelChangeHandler);
+				}
+				_pneumaticQueryModel = val;
+				if (_pneumaticQueryModel) {
+					_pneumaticQueryModel.addEventListener(PropertyChangeEvent.PROPERTY_CHANGE, pneumaticModelChangeHandler, false, EventPriority.EFFECT, true);
+				}
+				pneumaticModelChanged = true;
+				invalidateProperties();
+			}
+			
+			public function get pneumaticQueryModel():PneumaticQueryModel {
+				return _pneumaticQueryModel;
+			}
+			
+			
+			private function main():void {
+				// maybe also set sorters onto the data providers
+				typeSelector.dataProvider 			= typesDp;
+				strokeSelector.dataProvider 		= strokeDp;
+				springRangeSelector.dataProvider 	= springRangeDp;
+				ulCertSelector.dataProvider 		= ulCertDp;
+				posRelaySelector.dataProvider 		= posRelayDp;
+				maxThrustSelector.dataProvider 		= maxThrustDp;
+				mountingSelector.dataProvider 		= mountingDp;
+			}
+			
+			
+			override protected function commitProperties():void {
+				super.commitProperties();0
+				if (pneumaticModelChanged) {
+					pneumaticModelChanged = false;
+					reconstructDataProviders();
+				}
+			}
+			
+			
+			private function reconstructDataProviders():void {
+				// remember current values for selectors
+				var typeValue:int 			= pneumaticQueryModel.pneumType;
+				var strokeValue:int 		= pneumaticQueryModel.stroke;
+				var springRangeValue:int 	= pneumaticQueryModel.springRange;
+				var ulCertValue:int 		= pneumaticQueryModel.ULCert;
+				var posRelayValue:int 		= pneumaticQueryModel.posRelay;
+				var maxThrustValue:int 		= pneumaticQueryModel.maxThrust;
+				var mountingValue:int 		= pneumaticQueryModel.mountingStyle;
+				
+				// remove all items from data providers
+				typesDp.removeAll();
+				strokeDp.removeAll();
+				springRangeDp.removeAll();
+				ulCertDp.removeAll();
+				posRelayDp.removeAll();
+				maxThrustDp.removeAll();
+				mountingDp.removeAll();
+				
+				// add items to data providers
+				// Enabling Advanced filtering
+				// var typeInfo:PneumaticTypeInfoUtil = PneumaticFormUtil.getPneumaticEnumInfo(pneumaticQueryModel.selection);
+				var typeInfo:PneumaticTypeInfoUtil = PneumaticFormUtil.getPneumaticEnumInfo2(pneumaticQueryModel);
+				// add types
+				addSelectableItems(typesDp, typeInfo.selectableTypes);
+				// add stroke
+				addSelectableItems(strokeDp, typeInfo.selectableStroke);
+				// add spring range
+				addSelectableItems(springRangeDp, typeInfo.selectableSpringRange);
+				// add UL Certified
+				addSelectableItems(ulCertDp, typeInfo.selectableULCert);
+				// add positioning relay
+				addSelectableItems(posRelayDp, typeInfo.selectablePosRelay);
+				// add positioning relay
+				addSelectableItems(maxThrustDp, typeInfo.selectableMaxThrust);
+				// add mounting style
+				addSelectableItems(mountingDp, typeInfo.selectableMountingStyle);
+				
+				// refresh data providers
+				typesDp.refresh();
+				strokeDp.refresh();
+				springRangeDp.refresh();
+				ulCertDp.refresh();
+				posRelayDp.refresh();
+				maxThrustDp.refresh();
+				mountingDp.refresh();
+				
+				// set enabled 
+				typeSelector.enabled 		= typesDp.length > 0;
+				strokeSelector.enabled 		= strokeDp.length > 0;
+				springRangeSelector.enabled = springRangeDp.length > 0;
+				ulCertSelector.enabled 		= ulCertDp.length > 0;
+				posRelaySelector.enabled 	= posRelayDp.length > 0;
+				maxThrustSelector.enabled 	= maxThrustDp.length > 0;
+				mountingSelector.enabled 	= mountingDp.length > 0;
+				
+				// set visible
+				var isNone:Boolean = (pneumaticQueryModel.selection == PneumaticSelection.NONE);
+				typeHolder.visible 			= (typesDp.length > 0) || isNone;
+				strokeHolder.visible 		= (strokeDp.length > 0) || isNone;
+				springRangeHolder.visible 	= (springRangeDp.length > 0) || isNone;
+				ulCertHolder.visible 		= (ulCertDp.length > 0) || isNone;
+				posRelayHolder.visible 		= (posRelayDp.length > 0) || isNone;
+				maxThrustHolder.visible 	= (maxThrustDp.length > 0) || isNone;
+				mountingHolder.visible 		= (mountingDp.length > 0) || isNone;
+				
+				// set type
+				for each (var item:Object in typesDp) {
+					if (item.value == typeValue)
+						typeSelector.selectedItem = item;
+				}
+				
+				// set stroke
+				for each (var item:Object in strokeDp) {
+					if (item.value == strokeValue)
+						strokeSelector.selectedItem = item;
+				}
+				
+				// set spring range
+				for each (var item:Object in springRangeDp) {
+					if (item.value == springRangeValue)
+						springRangeSelector.selectedItem = item;
+				}
+				
+				// set  UL Certified
+				for each (var item:Object in ulCertDp) {
+					if (item.value == ulCertValue)
+						ulCertSelector.selectedItem = item;
+				}
+				
+				// set positioning relay
+				for each (var item:Object in posRelayDp) {
+					if (item.value == posRelayValue)
+						posRelaySelector.selectedItem = item;
+				}
+				
+				// set max thrust
+				for each (var item:Object in maxThrustDp) {
+					if (item.value == maxThrustValue)
+						maxThrustSelector.selectedItem = item;
+				}
+				
+				// set mounting style
+				for each (var item:Object in mountingDp) {
+					if (item.value == mountingValue)
+						mountingSelector.selectedItem = item;
+				}
+				
+				// why do you validate it now and not wait???
+				// this.validateNow(); - do not validate anymore
+				
+				if (pneumaticQueryModel.selection != PneumaticSelection.NONE) {
+					syncPneumaticModel();
+				}
+				else {
+					pneumaticQueryModel.reset(false);
+				}			
+			}
+			
+			
+			private function addSelectableItems(targetDp:ArrayCollection, sourceArr:Array):void {
+				for each (var src:Object in sourceArr) {
+					var found:Boolean = false;
+					for each (var trg:Object in targetDp) {
+						if (trg is Number && src is Number) {
+							if (trg == src) {
+								found = true;
+								break;
+							}
+						}
+						else if (trg.value == src.value) {
+							found = true;
+							break;
+						}
+					}
+					if (!found) {
+						targetDp.addItem(src);
+					}
+				}
+			}
+			
+			
+			private function syncPneumaticModel():void {
+				// synchronize the query model with the selectors
+				pneumaticQueryModel.suppressEvents 	= true;
+				pneumaticQueryModel.pneumType 	= typeSelector.enabled 			? typeSelector.selectedItem.value 	: 0;
+				pneumaticQueryModel.stroke 		= strokeSelector.enabled 		? strokeSelector.selectedItem.value 	: 0;
+				pneumaticQueryModel.springRange = springRangeSelector.enabled 	? springRangeSelector.selectedItem.value : 0;
+				pneumaticQueryModel.ULCert 		= ulCertSelector.enabled 		? ulCertSelector.selectedItem.value 	: 0;
+				pneumaticQueryModel.posRelay 	= posRelaySelector.enabled 		? posRelaySelector.selectedItem.value 	: 0;
+				pneumaticQueryModel.maxThrust 	= maxThrustSelector.enabled 	? maxThrustSelector.selectedItem.value 	: 0;
+				pneumaticQueryModel.mountingStyle = mountingSelector.enabled 	? mountingSelector.selectedItem.value 	: 0;
+				pneumaticQueryModel.suppressEvents	= false;
+				
+				// apply the selection constraints after the sync, 
+				// this will override some of the selections from before
+				PneumaticSelection.ApplySelection(pneumaticQueryModel);
+			}
+			
+			
+			private function pneumaticModelChangeHandler(evt:PropertyChangeEvent):void {
+				if (evt.property != null) {
+					switch (evt.property.toString()) {
+						case "selection":
+							reconstructDataProviders();
+							break;
+					}
+				}
+				// this is called at RESET and it will reconstruct everything
+				else {
+					reconstructDataProviders();
+				}
+			}
+			
+			
+			private function changeHandler(event:Event):void {
+				var component:UIComponent = event.target as UIComponent;
+				switch (component) {
+					case typeSelector:
+						pneumaticQueryModel.pneumType = typeSelector.selectedItem.value;
+						break;
+					
+					case strokeSelector:
+						pneumaticQueryModel.stroke = strokeSelector.selectedItem.value;
+						break;
+					
+					case springRangeSelector:
+						pneumaticQueryModel.springRange = springRangeSelector.selectedItem.value;
+						break;
+					
+					case ulCertSelector:
+						pneumaticQueryModel.ULCert = ulCertSelector.selectedItem.value;
+						break;
+					
+					case posRelaySelector:
+						pneumaticQueryModel.posRelay = posRelaySelector.selectedItem.value;
+						break;
+					
+					case maxThrustSelector:
+						pneumaticQueryModel.maxThrust = maxThrustSelector.selectedItem.value;
+						break;
+					
+					case mountingSelector:
+						pneumaticQueryModel.mountingStyle = mountingSelector.selectedItem.value;
+						break;
+				}
+				
+				// Enabling Advanced filtering
+				callLater(reconstructDataProviders);
+			}
+		]]>
+	</fx:Script>
+	
+	
+	<s:Form width="100%" height="100%">
+		<Controls:CustomFormItem id="strokeHolder" label="Stroke Length:">
+			<s:DropDownList id="strokeSelector" width="140" change="changeHandler(event)" requireSelection="true"/>
+		</Controls:CustomFormItem>
+		
+		<Controls:CustomFormItem id="maxThrustHolder" label="Force @ 18psi:">
+			<s:DropDownList id="maxThrustSelector" width="140" change="changeHandler(event)" requireSelection="true"/>
+		</Controls:CustomFormItem>
+	</s:Form>
+	
+	<s:Form width="100%" height="100%">
+		<Controls:CustomFormItem id="springRangeHolder" label="Spring Range:">
+			<s:DropDownList id="springRangeSelector" width="140" change="changeHandler(event)" requireSelection="true"/>
+		</Controls:CustomFormItem>
+		
+		<Controls:CustomFormItem id="posRelayHolder" label="Positioner:">
+			<s:DropDownList id="posRelaySelector" width="140" change="changeHandler(event)" requireSelection="true"/>
+		</Controls:CustomFormItem>
+		
+		<Controls:CustomFormItem id="ulCertHolder" label="UL Fire-Smoke Listing:">
+			<s:DropDownList id="ulCertSelector" width="140" change="changeHandler(event)" requireSelection="true"/>
+		</Controls:CustomFormItem>
+	</s:Form>
+	
+	<s:Form width="100%" height="100%">
+		<Controls:CustomFormItem id="typeHolder" label="Actuator Size:">
+			<s:DropDownList id="typeSelector" width="140" change="changeHandler(event)" requireSelection="true"/>
+		</Controls:CustomFormItem>
+		
+		<Controls:CustomFormItem id="mountingHolder" label="Mounting Style:">
+			<s:DropDownList id="mountingSelector" width="140" change="changeHandler(event)" requireSelection="true"/>
+		</Controls:CustomFormItem>		
+	</s:Form>
+</s:HGroup>

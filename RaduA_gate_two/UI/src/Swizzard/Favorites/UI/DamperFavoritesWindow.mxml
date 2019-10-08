@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Windows:GeneralWindow xmlns:fx="http://ns.adobe.com/mxml/2009" 
+					   xmlns:s="library://ns.adobe.com/flex/spark" 
+					   xmlns:mx="library://ns.adobe.com/flex/mx" 
+					   xmlns:Windows="Swizzard.UI.Windows.*" 
+					   implements="Swizzard.Favorites.Interfaces.IFavoritesWindow"
+					   title="Favorite Dampers" alwaysInFront="true" resizable="true" 
+					   width="680" height="480">
+	<fx:Script>
+		<![CDATA[
+			/**
+			 * DEPRECATED. NOT USED ANYMORE.
+			 */
+
+			
+			import Swizzard.Data.UI.Renderers.PDFColumnRenderer;
+			import Swizzard.Favorites.Interfaces.IFavoritesWindow;
+			import Swizzard.System.ApplicationFacade;
+			import Swizzard.System.Mediators.Dampers.DamperFavoritesMediator;
+			import Swizzard.UI.Components.DataGridClasses.GridColumnsUtil;
+			
+			
+			private static var instance:IFavoritesWindow;
+			
+			
+			public static function Show():IFavoritesWindow {
+				if (instance) {
+					instance.orderToFront();
+					return instance;
+				}
+				instance = new DamperFavoritesWindow();
+				instance.open();
+				ApplicationFacade.getInstance().registerMediator(new DamperFavoritesMediator(instance));
+				return instance;
+			}
+			
+			
+			protected function closeHandler():void {
+				instance = null;
+				ApplicationFacade.getInstance().removeMediator(DamperFavoritesMediator.NAME);
+				dispose();
+			}
+			
+			
+			public function get list():DataGrid {
+				return innerDamperList;
+			}
+			
+			
+			public function get removeButton():Button {
+				return innerRemoveButton;
+			}
+			
+			
+			public function set infoText(str:String):void {
+				infoTextLbl.text = str;
+			}
+		]]>
+	</fx:Script>
+	
+	
+	<s:VGroup width="100%" height="100%" gap="6"
+			  paddingBottom="15" paddingLeft="15" paddingRight="15" paddingTop="18">
+		<s:Label id="infoTextLbl" height="15" 
+				 text="Drag any damper or accessory kit from the application into the grid below. They will be saved for quick access and future use."/>
+		
+		<mx:DataGrid id="innerDamperList" name="favoritesList"
+					 width="100%" height="100%"
+					 paddingTop="2" paddingBottom="2"
+					 allowMultipleSelection="true"
+					 horizontalScrollPolicy="on"
+					 dragEnabled="true"
+					 headerStyleName="scheduleHeaderStyle">
+			<mx:columns>
+				<mx:DataGridColumn headerStyleName="alignCenter"
+								   headerText="Part Number"
+								   dataField="product:partNumber"/>
+				
+				<mx:DataGridColumn width="100"
+								   headerStyleName="alignCenter"
+								   headerText="Type"
+								   dataField="damper:typeString"/>
+				
+				<mx:DataGridColumn width="80"
+								   headerStyleName="alignCenter"
+								   labelFunction="{GridColumnsUtil.torqueLabelFunction}"
+								   headerText="Torque"
+								   dataField="damper:torque"/>
+				
+				<mx:DataGridColumn width="120" 
+								   headerStyleName="alignCenter"
+								   headerText="Control Signal"
+								   dataField="damper:controlSignalString"/>
+				
+				<mx:DataGridColumn headerStyleName="alignCenter"
+								   textAlign="center"
+								   headerText="Multiplier"
+								   dataField="priceMultiplier"/>
+				
+				<mx:DataGridColumn labelFunction="{GridColumnsUtil.priceLabelFunction}"
+								   sortCompareFunction="{GridColumnsUtil.priceSortFunction}"
+								   textAlign="right"
+								   fontWeight="bold"
+								   headerStyleName="alignCenter"
+								   headerText="Price"
+								   dataField="price"/>
+				
+				<mx:DataGridColumn width="160"
+								   headerStyleName="alignCenter"
+								   headerText="Description"
+								   dataField="product:description"/>
+				
+				<mx:DataGridColumn width="110"
+								   headerStyleName="alignCenter"
+								   headerText="Tehnical Documents"
+								   sortable="false"
+								   dataField="product:dataSheetLink"
+								   itemRenderer="Swizzard.Data.UI.Renderers.PDFColumnRenderer"
+								   resizable="false"/>
+			</mx:columns>
+		</mx:DataGrid>
+		
+		<s:HGroup width="100%">
+			<s:Button label="Remove Selected" id="innerRemoveButton" enabled="{innerDamperList.selectedItem}" />
+			<s:Spacer width="100%"/>
+			<s:Button label="Close" click="closeHandler()"/>
+		</s:HGroup>
+	</s:VGroup>
+</Windows:GeneralWindow>

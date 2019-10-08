@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Skin xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		xmlns:s="library://ns.adobe.com/flex/spark" 
+		xmlns:mx="library://ns.adobe.com/flex/mx" 
+		xmlns:Forms="Swizzard.UI.Forms.*" 
+		xmlns:ui="Swizzard.System.Search.ui.*">
+	
+	<!-- host component -->
+	<fx:Metadata>
+		[HostComponent("Swizzard.System.Search.ui.SearchBox")]
+	</fx:Metadata>
+	
+	<fx:Script>
+		<![CDATA[
+			import Swizzard.Images.EmbeddedImages;
+		]]>
+	</fx:Script>
+	
+
+	<s:filters>
+		<s:DropShadowFilter distance="1" angle="90" color="0x000000" alpha="0.2" 
+							blurX="2" blurY="2" strength="1" quality="3" inner="true"/>
+		<s:DropShadowFilter distance="0" angle="0" color="0x1e9fd1" alpha="1" 
+							blurX="4" blurY="4" strength="2" quality="3" inner="false"/>
+	</s:filters>
+	
+	<!-- background-->
+	<s:Rect id="firstBg" left="0" right="0" top="0" bottom="0" radiusX="10" radiusY="10">
+		<s:fill> 
+			<s:LinearGradient rotation="90">
+				<s:GradientEntry color="0xbdbdbd"/>
+				<s:GradientEntry color="0x8d8d8d"/>
+			</s:LinearGradient>
+		</s:fill>
+	</s:Rect>
+
+	<s:Rect id="secondBg" left="1" right="0" top="1" bottom="1" radiusX="9" radiusY="9">
+		<s:fill> 
+			<s:SolidColor color="0xffffff"/>
+		</s:fill>
+	</s:Rect>
+	
+	<s:Rect id="rightBg" width="38" right="0" top="0" bottom="0" 
+			bottomRightRadiusX="10" bottomRightRadiusY="10" topRightRadiusX="10" topRightRadiusY="10">
+		<s:fill> 
+			<s:LinearGradient rotation="90">
+				<s:GradientEntry color="0x73787a" />
+				<s:GradientEntry color="0x212121" />
+			</s:LinearGradient>
+		</s:fill>
+	</s:Rect>
+
+	
+	<!-- The Search Image  -->
+	<s:Image id="searchIcon" width="13" height="13" top="4" right="13" source="{EmbeddedImages.magnifying_img}"
+			 mouseChildren="false" mouseEnabled="false"/>
+	
+	<!-- SkinPart: name=textField, type=Swizzard.UI.Forms.TextInputWithDefault, required=true -->
+	<Forms:TextInputWithDefault id="textField" left="8" top="4"  bottom="0" right="40"
+								defaultText="Cross-Reference or Part No. Search" fontSize="11"
+								focusEnabled="false" color="0x000000" defaultTextColor="0x4b4b4b"
+								skinClass="Swizzard.UI.Skins.controls.SearchTextInput"/>
+
+	
+	<!-- SkinPart: name=searchXButton, type=spark.components.Button, required=true -->
+	<s:Button id="searchXButton" width="14" height="14" top="4" right="41" visible="false"
+			  skinClass="Swizzard.System.Search.ui.skins.SearchXButtonSkin"/>
+	
+	
+	<!-- SkinPart: name=dropdown, type=Swizzard.System.Search.ui.SearchDropDown, required=true -->
+	<ui:SearchDropDown id="dropdown" width="100%" height="200" top="{this.height}"
+					   visible="false"/>
+	
+</s:Skin>

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:HGroup xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		  xmlns:s="library://ns.adobe.com/flex/spark" 
+		  xmlns:mx="library://ns.adobe.com/flex/mx" 
+		  xmlns:Controls="Swizzard.UI.Controls.*">
+	
+	<fx:Script>
+		<![CDATA[
+			import mx.core.UIComponent;
+			
+			import Swizzard.Data.Models.Query.DamperQueryModel;
+			
+			import utils.LogUtils;
+			
+			
+			private var _damperQueryModel:DamperQueryModel;
+			
+			private function changeHandler(event:Event):void {
+				var component:UIComponent = event.target as UIComponent;
+				switch (component)
+				{
+					case damperkitTypeSelector:
+						LogUtils.Info("add others here");
+						break
+				}
+			}
+		]]>
+	</fx:Script>
+	
+	<s:Form width="100%" height="100%">
+		<Controls:CustomFormItem label="Damper Kit Type:">
+			<s:DropDownList id="damperkitTypeSelector" prompt="All" change="changeHandler(event)" />
+		</Controls:CustomFormItem>
+		
+		<Controls:CustomFormItem label="Control Signal:">
+			<s:DropDownList id="controlSignalSelector" prompt="All" change="changeHandler(event)"/>
+		</Controls:CustomFormItem>
+	</s:Form>
+	
+	<s:Form width="100%" height="100%">
+		<Controls:CustomFormItem label="Fix Mechanism:">
+			<s:DropDownList id="mechanismSelector" prompt="All" change="changeHandler(event)" />
+		</Controls:CustomFormItem>
+		
+		<Controls:CustomFormItem label="Positioner:">
+			<s:DropDownList id="positionerSelector" width="125" prompt="All" 
+							change="changeHandler(event)"/>
+		</Controls:CustomFormItem>
+	</s:Form>
+
+</s:HGroup>

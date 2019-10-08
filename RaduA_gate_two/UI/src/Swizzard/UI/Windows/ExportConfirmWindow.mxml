@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Windows:GeneralWindow xmlns:fx="http://ns.adobe.com/mxml/2009" 
+					   xmlns:s="library://ns.adobe.com/flex/spark" 
+					   xmlns:mx="library://ns.adobe.com/flex/mx" 
+					   xmlns:Windows="Swizzard.UI.Windows.*" 
+					   width="480" height="250">
+	
+	<fx:Script>
+		<![CDATA[
+			import Swizzard.Ordering.Export.ExportAction;
+			import Swizzard.Ordering.Export.IExportTarget;
+			
+			
+			private static var instance:ExportConfirmWindow;
+			
+			private var exportTarget:IExportTarget;
+			private var exportFormat:String;
+			
+			
+			public static function Show(newExportTarget:IExportTarget, format:String):ExportConfirmWindow {
+				if (instance == null) {
+					instance = new ExportConfirmWindow();
+					instance.open();
+					
+					// initialize the calculator
+					instance.exportTarget 	= newExportTarget;
+					instance.exportFormat 	= format;
+					instance.title 			= "Export " + ExportAction.getExportString(format);
+					instance.questionLabel.text = "What schedule do you want to export " + ExportAction.getExportString(format) + "?";
+				}
+				instance.orderToFront();
+				return instance;
+			}
+			
+			
+			override public function dispose():void {
+				exportTarget = null;
+				instance = null;
+				super.dispose();
+			}
+			
+			
+			private function exportValves():void {
+				exportTarget.exportResult(exportFormat, ExportAction.VALVE_SCHEDULE);
+				dispose();
+			}
+			
+			
+			private function exportDampers():void {
+				exportTarget.exportResult(exportFormat, ExportAction.DAMPER_SCHEDULE);
+				dispose();
+			}
+			
+			
+			private function exportPneumatics():void {
+				exportTarget.exportResult(exportFormat, ExportAction.PNEUMATIC_SCHEDULE);
+				dispose();
+			}
+			
+			
+			private function exportAll():void {
+				exportTarget.exportResult(exportFormat, ExportAction.ALL_SCHEDULE);
+				dispose();
+			}
+			
+			
+			private function cancel():void {
+				dispose();
+			}
+			
+		]]>
+	</fx:Script>
+	
+	<s:Label id="questionLabel" y="50" left="20" right="20" 
+			 textAlign="center" fontSize="12" text="bla bla bla"/>
+	
+	<s:HGroup left="15" right="20" bottom="38" gap="11" verticalAlign="middle">
+		<s:Button width="80" height="35" label="Valves" click="exportValves()"
+				  skinClass="Swizzard.UI.Skins.controls.ExportButtonSkin"/>
+		<s:Button width="115" height="50" label="Electric Damper Actuators" click="exportDampers()"
+				  skinClass="Swizzard.UI.Skins.controls.ExportButtonSkin"/>
+		<s:Button width="125" height="50" label="Pneumatic Damper Actuators" click="exportPneumatics()"
+				  skinClass="Swizzard.UI.Skins.controls.ExportButtonSkin"/>
+		<s:Button width="80" height="35" label="All" click="exportAll()"
+				  skinClass="Swizzard.UI.Skins.controls.ExportButtonSkin"/>
+	</s:HGroup>
+	
+	<s:Button label="Close" click="cancel()" right="21" bottom="12"/>
+</Windows:GeneralWindow>

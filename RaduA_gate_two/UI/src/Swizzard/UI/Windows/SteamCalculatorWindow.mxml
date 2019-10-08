@@ -1,0 +1,271 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Window title="Calculators" backgroundColor="0xDBE8F0" systemChrome="none"
+	showStatusBar="false" transparent="true" type="normal" verticalGap="0" showGripper="false"
+	xmlns="Swizzard.UI.Windows.*" xmlns:mx="http://www.adobe.com/2006/mxml"
+	width="400" height="330" maximizable="false" 
+	close="closeHandler();" 
+	creationComplete="main();" 
+	resizable="false">
+	
+	
+	<mx:Script>
+		<![CDATA[
+			import mx.formatters.NumberBaseRoundType;
+			import mx.formatters.NumberFormatter;
+			
+			import Swizzard.System.UI.Calculators.Enumeration.SteamCalculatorType;
+			
+			private static var instance:SteamCalculatorWindow;
+			
+			protected var resultHandler:Function;
+			
+			private var formatter:NumberFormatter;
+			
+			private var quantityMode:String;
+			
+			private var _initialType:String;
+			private var initialTypeChanged:Boolean;
+			
+			private var _supplyPressure:Number;
+			private var supplyPressureChanged:Boolean;
+			
+			
+			private function main():void {
+				formatter			= new NumberFormatter();
+				formatter.precision	= 2;
+				formatter.rounding	= NumberBaseRoundType.NEAREST;
+			}	
+			
+			
+			public function set intialType(value:String):void {
+				this._initialType	= value;
+				initialTypeChanged	= true;
+				
+				invalidateProperties();
+			}
+			
+			public function get intialType():String {
+				return _initialType;
+			}
+			
+			
+			[Bindable]
+			public function set supplyPressure(value:Number):void {
+				if (isNaN(value))
+					value	= 0;
+					
+				_supplyPressure	= value;
+				supplyPressureChanged	= true;
+				invalidateProperties();
+			}
+			
+			public function get supplyPressure():Number {
+				return this._supplyPressure;
+			}
+			
+			
+			override protected function commitProperties():void {
+				super.commitProperties();
+				
+				if (initialTypeChanged) {
+					initialTypeChanged	= false;
+					switch (this._initialType) 
+					{
+						case SteamCalculatorType.PRESSURE_DROP:
+						{
+							tabNav.selectedIndex	= 0;
+							break;
+						}
+						
+						case SteamCalculatorType.STEAM_QUANTITY:
+						{
+							tabNav.selectedIndex	= 1;
+							break;
+						}
+					}
+				}
+				
+				if (supplyPressureChanged) {
+					supplyPressureChanged	= false;
+					if (supplyMainInput) {
+						supplyMainInput.text	= supplyPressure.toString();
+					}
+				}
+			}
+					
+			
+			private function calculate():void {
+				var result:Number	= 0;
+				var type:String;
+				
+				switch (tabNav.selectedIndex) {
+					case 0:
+					{
+						// Calculate Pressure Drop
+						var supplyPress:Number	= parseFloat(supplyMainInput.text);
+						var returnPress:Number	= parseFloat(returnInput.text);
+						
+						if (pressureType.selectedValue == "psig") {
+							supplyPress	+= 14.7;
+							returnPress	+= 14.7;	
+						}											
+						
+						var maxPressDrop:Number	= 0.500330846042578 * supplyPress + 0.000916786274826238;
+						
+						type	= SteamCalculatorType.PRESSURE_DROP;
+						result	= Math.min(0.8 * (supplyPress - returnPress), maxPressDrop);
+						break;
+					}
+					
+					case 1:
+					{
+						// Calculate Quantity
+						type	= SteamCalculatorType.STEAM_QUANTITY;
+						
+						switch (quantityMode)
+						{
+							case "btu":
+							{
+								// Null Unrelated Fields
+								this.deltaTempInput.text	= "";
+								this.cfmInput.text			= "";
+								
+								// Calcuate Valve
+								var btu:Number	= parseFloat(btuHrInput.text);
+								result			= btu / 1000;
+								break;
+							}
+							
+							case "deltaTemp":
+							{
+								// Null Unrelated Fields
+								this.btuHrInput.text	= "";
+								
+								// Calcuate Valve
+								var deltaTemp:Number	= parseFloat(deltaTempInput.text);
+								var cfm:Number			= parseFloat(cfmInput.text);
+								
+								result	= (cfm * deltaTemp * 1.08) / 1000;
+								
+								break;
+							}
+						}
+						break;
+					}
+				}
+				
+				resultLabel.text	= formatter.format(result);
+				
+				if (resultHandler != null)
+					resultHandler.apply(null, [type, result, supplyPressure]);
+			}
+			
+			
+			private function changeHandler(event:Event):void {
+				switch (event.target)
+				{
+					case btuHrInput:
+					{
+						quantityMode	= "btu";
+						break;
+					}
+					
+					case deltaTempInput:
+					case cfmInput:
+					{
+						quantityMode	= "deltaTemp";
+						break;
+					}
+					
+					case pressureType:
+					case supplyMainInput:
+					{
+						this._supplyPressure	= parseFloat(supplyMainInput.text);
+						this._supplyPressure	= Math.max(0, (pressureType.selectedValue == "psia") ? (this._supplyPressure - 14.7) : this._supplyPressure);
+						break;
+					}
+				}
+				
+				calculate();
+			}
+			
+			
+			private function closeHandler():void {
+				instance	= null;
+			}
+			
+		
+			public static function Show(resultHandler:Function, supplyPressure:Number = 0, type:String = SteamCalculatorType.PRESSURE_DROP):SteamCalculatorWindow {
+				if (!instance) {
+					instance							= new SteamCalculatorWindow();
+					instance.resultHandler				= resultHandler;
+					instance.intialType					= type;
+					instance.supplyPressure				= supplyPressure;
+				
+					var screen:Point	= new Point(Capabilities.screenResolutionX, Capabilities.screenResolutionY);
+					
+					instance.open();
+					instance.move((screen.x - instance.getExplicitOrMeasuredWidth()) / 2, (screen.y - instance.getExplicitOrMeasuredHeight()) / 2);
+				}
+				
+				instance.orderToFront();
+				
+				return instance;
+			}
+		]]>
+	</mx:Script>
+	
+	
+	<mx:RadioButtonGroup id="pressureType" change="changeHandler(event);" />
+	
+	<mx:TabNavigator id="tabNav" width="100%" height="100%">
+		<!-- Pressure Drop -->
+		<mx:VBox  label="Pressure Drop" width="100%" height="100%"
+			horizontalAlign="center" verticalAlign="middle">
+			
+			<mx:Form>
+				<mx:FormItem label="Pressure Type:">
+				<mx:RadioButton label="Gauge Pressure (psig)" value="psig" group="{pressureType}" selected="true" />
+					<mx:RadioButton label="Absolute Pressure (psia)" value="psia" group="{pressureType}" />
+				</mx:FormItem>
+				<mx:FormItem label="Supply Main Pressure:">
+					<mx:TextInput id="supplyMainInput" restrict="0-9." text="{supplyPressure}" change="changeHandler(event);" />
+				</mx:FormItem>
+				<mx:FormItem label="Return Pressure:">
+					<mx:TextInput id="returnInput" restrict="0-9." text="0" change="changeHandler(event);" />
+				</mx:FormItem>
+				<mx:FormItem>
+					<mx:Label color="0x777777" text="(psia = psig + 14.7)" fontStyle="italic" />
+				</mx:FormItem>
+			</mx:Form>
+			
+			<mx:Text paddingLeft="10" paddingRight="10" width="100%" selectable="false" htmlText="&lt;u&gt;Note:&lt;/u&gt; For variable flow applications the pressure drop used to calculate Cv is 80% of supply pressure - return pressure or the Critical Pressure Drop, whichever is less. The tool will enter the lower of the two into the Pressure Drop parameter window." />
+		</mx:VBox>
+		
+		
+		<!-- Quantity -->
+		<mx:VBox label="Steam Quantity" width="100%" height="100%" horizontalAlign="center" verticalAlign="middle">
+			<mx:Label text="Enter values in one of these two options:" fontSize="14" />
+			<mx:Form>
+				<mx:FormHeading label="BTU/Hr" />
+				<mx:FormItem label="BTU/Hr:">
+					<mx:TextInput id="btuHrInput" restrict="0-9." text="0" change="changeHandler(event);" />
+				</mx:FormItem>
+				
+				<mx:FormHeading label="ΔT and CFM" />
+				<mx:FormItem label="ΔT:">
+					<mx:TextInput id="deltaTempInput" restrict="0-9." text="0" change="changeHandler(event);" />
+				</mx:FormItem>
+				<mx:FormItem label="CFM:">
+					<mx:TextInput id="cfmInput" restrict="0-9." text="0" change="changeHandler(event);" />
+				</mx:FormItem>
+				
+			</mx:Form>
+		</mx:VBox>
+	</mx:TabNavigator>
+	
+	<mx:FormItem id="res" label="Result:" fontSize="15" fontWeight="bold" direction="horizontal" width="100%" paddingTop="2" paddingBottom="2" paddingRight="2">
+		<mx:Label id="resultLabel" fontSize="15" width="100%" />
+		<mx:Button id="closeButton" label="Close" fontSize="12" fontWeight="normal" click="this.close();" />
+	</mx:FormItem>
+</mx:Window>

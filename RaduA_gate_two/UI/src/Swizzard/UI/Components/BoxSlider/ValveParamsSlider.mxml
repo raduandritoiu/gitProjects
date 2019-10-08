@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<BoxSlider:SliderBox xmlns:fx="http://ns.adobe.com/mxml/2009" 
+					 xmlns:s="library://ns.adobe.com/flex/spark" 
+					 xmlns:mx="library://ns.adobe.com/flex/mx" 
+					 xmlns:BoxSlider="Swizzard.UI.Components.BoxSlider.*"
+					 xmlns:Forms="Swizzard.UI.Forms.*"
+					 width="100%" height="170">
+	
+	<BoxSlider:SliderGroup label="Go to Valve Parameters">
+		<s:Panel height="140" title="Valve Parameters">
+			<Forms:ValveParametersForm id="valveParameterForm"/>
+		</s:Panel>
+	</BoxSlider:SliderGroup>
+	
+	<BoxSlider:SliderGroup label="Go to Actuator Parameters">
+		<s:Panel height="140" title="Actuator Parameters">
+			<Forms:ActuatorParamaterForm id="actuatorParameterForm"/>
+		</s:Panel>
+	</BoxSlider:SliderGroup>
+
+</BoxSlider:SliderBox>

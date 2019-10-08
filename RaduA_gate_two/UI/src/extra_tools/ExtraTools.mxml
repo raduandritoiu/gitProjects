@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:WindowedApplication xmlns:fx="http://ns.adobe.com/mxml/2009" 
+					   xmlns:s="library://ns.adobe.com/flex/spark" 
+					   xmlns:mx="library://ns.adobe.com/flex/mx">
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	
+	<fx:Script>
+		<![CDATA[
+			import mx.controls.Alert;
+			
+			
+			private function testMeClick(evt:MouseEvent):void
+			{
+				Alert.show("Test Me pressed !!!");
+			}
+			
+			
+			private function testCompareProducts(evt:MouseEvent):void
+			{
+				CompareBacwardsProducts.compareObsolete();
+			}
+		]]>
+	</fx:Script>
+	
+	<s:VGroup x="10" y="10">
+		<s:Label text="Simple Select Tools"/>
+		<s:Button label="Test Me" click="testMeClick(event)"/>
+		<s:Button label="Compare products" click="testCompareProducts(event)"/>
+	</s:VGroup>
+	
+</s:WindowedApplication>

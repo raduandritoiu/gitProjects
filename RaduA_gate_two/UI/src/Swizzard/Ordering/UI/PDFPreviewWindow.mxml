@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Window xmlns:mx="http://www.adobe.com/2006/mxml" layout="absolute" width="680" height="500"
+		   title="Schedule Preview">
+	
+	<mx:Script>
+		<![CDATA[
+			import mx.core.UIComponent;
+			import mx.events.ResizeEvent;
+			
+			
+			public static function Show():PDFPreviewWindow
+			{
+				var ppw:PDFPreviewWindow	= new PDFPreviewWindow();
+				ppw.open();
+				
+				return ppw;
+			}
+			
+			private var _pdf:UIComponent;
+			private var pdfUpdated:Boolean;
+			
+			public function set pdf(value:UIComponent):void
+			{
+				_pdf		= value;
+				pdfUpdated	= true;
+				invalidateProperties();
+			}
+			
+			override protected function commitProperties():void
+			{
+				super.commitProperties();
+				if(pdfUpdated)
+				{
+					pdfUpdated	= false;
+					winContent.addChild(_pdf);
+				}
+			}
+			
+			private function onContentResize(e:ResizeEvent):void
+			{
+				var cb:VBox	= e.target as VBox;
+				
+				for each(var ch:UIComponent in cb.getChildren())
+				{
+					ch.setActualSize(cb.width, cb.height);
+					if(ch.getChildAt(0) && ch.getChildAt(0) is HTMLLoader)
+					{
+						var ldr:HTMLLoader	= ch.getChildAt(0) as HTMLLoader;
+						ldr.width			= ch.width;
+						ldr.height			= ch.height;
+					}
+				}
+			}
+			
+		]]>
+	</mx:Script>
+	
+	<mx:VBox width="100%" height="100%" id="winContent" resize="onContentResize(event)"/>
+	
+</mx:Window>

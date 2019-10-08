@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:VGroup xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx"
+		 xmlns:ui="Swizzard.System.Search.ui.*"
+		 gap="0">
+	
+	<fx:Script>
+		<![CDATA[
+			import mx.collections.IList;
+			
+			import spark.components.List;
+			private var _dataProvider:IList;
+			private var dataProviderChanged:Boolean;
+			
+			private var _crossReferencedItems:IList;
+			private var crossReferencedItemsChanged:Boolean;
+			
+			private var _showCrossReferenceItems:Boolean;
+			private var showCrossReferenceItemsChanged:Boolean;
+
+
+			public function set dataProvider(value:IList):void {
+				_dataProvider = value;
+				dataProviderChanged	= true;
+				invalidateProperties();
+			}
+			
+			public function get dataProvider():IList {
+				return _dataProvider;
+			}
+			
+			
+			public function set showCrossReferenceItems(value:Boolean):void {
+				_showCrossReferenceItems 		= value;
+				showCrossReferenceItemsChanged	= true;
+				invalidateProperties();
+				invalidateDisplayList();
+			}
+			
+			public function get showCrossReferenceItems():Boolean {
+				return _showCrossReferenceItems;
+			}
+			
+			
+			public function set crossReferencedItems(value:IList):void {
+				_crossReferencedItems 		= value;
+				crossReferencedItemsChanged	= true;
+				invalidateProperties();
+			}
+			
+			public function get crossReferencedItems():IList {
+				return _crossReferencedItems;
+			}
+			
+			
+			override protected function commitProperties():void {
+				super.commitProperties();
+				
+				if (dataProviderChanged) {
+					dataProviderChanged	= false;
+					searchContainer.dataProvider = dataProvider;
+				}
+				
+				if (crossReferencedItemsChanged) {
+					crossReferencedItemsChanged	= false;
+					crossReferenceButton.visible = 			(crossReferencedItems && crossReferencedItems.length > 0);
+					crossReferenceButton.includeInLayout = 	(crossReferencedItems && crossReferencedItems.length > 0);
+					crossReferenceButton.selected			= false;
+					if (crossReferencedItems) {
+						crossReferenceButton.label			= "Cross Reference Results (" + crossReferencedItems.length + ")";
+					}
+					crossreferenceContainer.dataProvider	= crossReferencedItems;
+					showCrossReferenceItems					= false;
+				}
+				
+				if (showCrossReferenceItemsChanged) {
+					showCrossReferenceItemsChanged			= false;
+					crossreferenceContainer.visible			= showCrossReferenceItems;
+					crossreferenceContainer.includeInLayout	= showCrossReferenceItems;
+					height = (showCrossReferenceItems) ? 350 : 200; 
+				}
+			}
+			
+			
+			private function crossReferenceButtonClickHandler():void {
+				showCrossReferenceItems	= crossReferenceButton.selected;	
+			}
+			
+			
+			private function crossReferenceListkeyboardEventHandler(event:KeyboardEvent):void {
+				if (event.keyCode != Keyboard.LEFT && event.keyCode != Keyboard.RIGHT)
+					return;
+				
+				var idx:int = crossreferenceContainer.selectedIndex;
+				var renderer:CrossReferenceItemRenderer = crossreferenceContainer.dataGroup.getElementAt(idx) as CrossReferenceItemRenderer;
+				if (renderer == null) {
+					return;
+				}
+				
+				switch (event.keyCode) {
+					case Keyboard.LEFT:
+						renderer.isOpen	= false;
+						break;
+					
+					case Keyboard.RIGHT:
+						renderer.isOpen	= true;
+						break;
+				}
+			}
+		]]>
+	</fx:Script>
+	
+	
+	<s:filters>
+		<s:DropShadowFilter distance="3" angle="90" color="0x000000" alpha="0.7" blurX="5" blurY="5" strength="1" quality="3"/>
+	</s:filters>
+	
+	
+	<s:List id="searchContainer" width="100%" height="100%"
+			dragEnabled="true" name="searchBoxList"
+			itemRenderer="Swizzard.System.Search.ui.SearchBoxItemRenderer"/>
+	
+	<ui:ArrowToggleButton id="crossReferenceButton" width="100%" label="Cross Reference Results"
+						  selected="false" visible="false" includeInLayout="false"
+						  useHandCursor="true" buttonMode="true" focusEnabled="false"
+						  fontWeight="bold" click="crossReferenceButtonClickHandler()"/>
+	
+	<s:List id="crossreferenceContainer" width="100%" height="150"
+			dragEnabled="false" visible="false" includeInLayout="false"
+			itemRenderer="Swizzard.System.Search.ui.CrossReferenceItemRenderer"
+			contentBackgroundColor="0xE8E8E8"
+			keyUp="crossReferenceListkeyboardEventHandler(event)"/>
+</s:VGroup>

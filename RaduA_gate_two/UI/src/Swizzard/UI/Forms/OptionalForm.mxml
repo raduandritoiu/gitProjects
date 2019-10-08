@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:VBox xmlns:mx="http://www.adobe.com/2006/mxml" width="100%" height="100%">
+	
+	<mx:Form width="100%" height="100%" paddingBottom="5" paddingLeft="5" paddingRight="5"
+		paddingTop="5" indicatorGap="4">
+	
+		<mx:FormItem label="Limits for Differential Pressure:">
+			<mx:ComboBox>
+				<mx:dataProvider>
+					<mx:String>Little</mx:String>
+					<mx:String>Very Much</mx:String>
+				</mx:dataProvider>
+			</mx:ComboBox>
+		</mx:FormItem>
+		
+		<mx:FormItem label="Pipe Size:">
+			<mx:ComboBox>
+				<mx:dataProvider>
+					<mx:String>Good</mx:String>
+					<mx:String>Fine</mx:String>
+					<mx:String>Amazing</mx:String>
+				</mx:dataProvider>
+			</mx:ComboBox>
+		</mx:FormItem>
+		
+	</mx:Form>
+	
+</mx:VBox>

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<update xmlns="http://ns.adobe.com/air/framework/update/description/1.0"> 
+    <version>1.9.0</version> 
+    <url>https://www.swizzard.usa.siemens.com/Data2/versions/SimpleSelect_1_9_0.air</url> 
+    <description>Siemens Valve Sizing And Selection Tool</description> 
+</update> 

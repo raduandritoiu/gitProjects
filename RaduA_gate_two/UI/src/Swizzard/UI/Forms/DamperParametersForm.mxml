@@ -1,0 +1,345 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:HGroup xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		  xmlns:s="library://ns.adobe.com/flex/spark" 
+		  xmlns:mx="library://ns.adobe.com/flex/mx"
+		  xmlns:Controls="Swizzard.UI.Controls.*"
+		  implements="Swizzard.System.UI.Calculators.ITorqueResult"
+		  creationComplete="main()">
+	
+	<fx:Script>
+		<![CDATA[
+			import mx.collections.ArrayCollection;
+			import mx.core.EventPriority;
+			import mx.core.UIComponent;
+			import mx.events.PropertyChangeEvent;
+			
+			import Swizzard.Data.Models.Query.DamperQueryModel;
+			import Swizzard.Data.Utils.DamperTypeInfoUtil;
+			import Swizzard.Images.EmbeddedImages;
+			import Swizzard.System.UI.Calculators.ITorqueResult;
+			import Swizzard.System.Utils.DamperFormUtil;
+			import Swizzard.UI.Components.DataGridClasses.GridColumnsUtil;
+			import Swizzard.UI.Windows.ElectricTorqueCalculator;
+			
+			
+			private var torqueDp:ArrayCollection 			= new ArrayCollection();
+			private var controlSignalDp:ArrayCollection 	= new ArrayCollection();
+			private var systemSupplyDp:ArrayCollection 		= new ArrayCollection();
+			private var plenumRatingDp:ArrayCollection 		= new ArrayCollection();
+			private var auxilarySwitchDp:ArrayCollection 	= new ArrayCollection();
+			private var positionFeedbackDp:ArrayCollection 	= new ArrayCollection();
+			private var scalableSignalDp:ArrayCollection 	= new ArrayCollection();
+			
+			private var _damperQueryModel:DamperQueryModel;
+			private var damperModelChanged:Boolean;
+			
+			
+			public function set damperQueryModel(val:DamperQueryModel):void {
+				if (_damperQueryModel == val) return;
+				
+				if (_damperQueryModel != null) {
+					_damperQueryModel.removeEventListener(PropertyChangeEvent.PROPERTY_CHANGE, damperModelChangeHandler);
+				}
+				_damperQueryModel = val;
+				if (_damperQueryModel) {
+					_damperQueryModel.addEventListener(PropertyChangeEvent.PROPERTY_CHANGE, damperModelChangeHandler, false, EventPriority.EFFECT, true);
+				}
+				damperModelChanged = true;
+				invalidateProperties();
+			}
+			
+			public function get damperQueryModel():DamperQueryModel {
+				return _damperQueryModel;
+			}
+			
+			
+			private function main():void {
+				// maybe also set sorters onto the data providers
+				
+				torqueSelector.dataProvider 		= torqueDp;
+				controlSignalSelector.dataProvider 	= controlSignalDp;
+				systemSupplySelector.dataProvider 	= systemSupplyDp;
+				plenumRatingSelector.dataProvider 	= plenumRatingDp;
+				auxilarySwitchSelector.dataProvider = auxilarySwitchDp;
+				positionFeedbackSelector.dataProvider = positionFeedbackDp;
+				scalableSignalSelector.dataProvider = scalableSignalDp;
+			}
+			
+			
+			override protected function commitProperties():void {
+				super.commitProperties();
+				if (damperModelChanged) {
+					damperModelChanged = false;
+					reconstructDataProviders();
+				}
+			}
+			
+			
+			private function reconstructDataProviders():void {
+				// remember current values for selectors
+				// small hack - made default -1 ; a value that can never be set 
+				var torqueValue:Number 			= (torqueSelector.selectedItem != null) 	? parseFloat(torqueSelector.selectedItem.toString()) 	: -1;
+				var controlSignalValue:int 		= (controlSignalSelector.selectedItem != null) 		? controlSignalSelector.selectedItem.value 		: -1;
+				var systemSupplyValue:int 		= (systemSupplySelector.selectedItem != null) 		? systemSupplySelector.selectedItem.value 		: -1;
+				var plenumRatingValue:int 		= (plenumRatingSelector.selectedItem != null) 		? plenumRatingSelector.selectedItem.value 		: -1;
+				var auxilarySwitchValue:int 	= (auxilarySwitchSelector.selectedItem != null) 	? auxilarySwitchSelector.selectedItem.value 	: -1;
+				var positionFeedbackValue:int 	= (positionFeedbackSelector.selectedItem != null) 	? positionFeedbackSelector.selectedItem.value 	: -1;
+				var scalableSignalValue:int 	= (scalableSignalSelector.selectedItem != null) 	? scalableSignalSelector.selectedItem.value 	: -1;
+//				var torqueValue:Number 			= damperQueryModel.torque;
+//				var controlSignalValue:int 		= damperQueryModel.controlSignal;
+//				var systemSupplyValue:int 		= damperQueryModel.systemSupply;
+//				var plenumRatingValue:int 		= damperQueryModel.plenumRating;
+//				var auxilarySwitchValue:int 	= damperQueryModel.auxilarySwitch;
+//				var positionFeedbackValue:int 	= damperQueryModel.positionFeedback;
+//				var scalableSignalValue:int 	= damperQueryModel.scalableSignal;
+				
+				// remove all items from data providers
+				torqueDp.removeAll();
+				controlSignalDp.removeAll();
+				systemSupplyDp.removeAll();
+				plenumRatingDp.removeAll();
+				auxilarySwitchDp.removeAll();
+				positionFeedbackDp.removeAll();
+				scalableSignalDp.removeAll();
+				
+				// add items to data providers
+				for each (var type:int in damperQueryModel.damperTypes) {
+					var typeInfo:DamperTypeInfoUtil = DamperFormUtil.getDamperEnumInfo(type);
+					
+					// add torques
+					addSelectableItems(torqueDp, typeInfo.selectableTorque);
+					
+					// add control signal
+					addSelectableItems(controlSignalDp, typeInfo.selectableControlSignal);
+					
+					// add system supply
+					addSelectableItems(systemSupplyDp, typeInfo.selectableSystemSupply);
+					
+					// add plenum rating
+					addSelectableItems(plenumRatingDp, typeInfo.selectablePlenumRating);
+					
+					// add auxilary switch
+					addSelectableItems(auxilarySwitchDp, typeInfo.selectableAuxilarySwitch);
+					
+					// add position feedback
+					addSelectableItems(positionFeedbackDp, typeInfo.selectablePositionFeedback);
+					
+					// add scalable signal
+					addSelectableItems(scalableSignalDp, typeInfo.selectableScalableSignal);
+				}
+				
+				// refresh data providers
+				torqueDp.refresh();
+				controlSignalDp.refresh();
+				systemSupplyDp.refresh();
+				plenumRatingDp.refresh();
+				auxilarySwitchDp.refresh();
+				positionFeedbackDp.refresh();
+				scalableSignalDp.refresh();
+				
+				// set enabled 
+				torqueSelector.enabled 			= damperQueryModel.damperTypes.length > 0;
+				torqueCalculatorBtn.enabled 	= damperQueryModel.damperTypes.length > 0;
+				torqueUnitLabel.enabled 		= damperQueryModel.damperTypes.length > 0;
+				controlSignalSelector.enabled 	= controlSignalDp.length > 0;
+				systemSupplySelector.enabled 	= systemSupplyDp.length > 0;
+				plenumRatingSelector.enabled 	= plenumRatingDp.length > 0;
+				auxilarySwitchSelector.enabled 	= auxilarySwitchDp.length > 0;
+				positionFeedbackSelector.enabled = positionFeedbackDp.length > 0;
+				scalableSignalSelector.enabled 	= scalableSignalDp.length > 0;
+				
+				// special set for torque
+				if (torqueSelector.enabled && !isNaN(torqueValue) && torqueValue >= 0) {
+					torqueSelector.selectedItem = torqueValue;
+				}
+				
+				// set control signal
+				for each (var item:Object in controlSignalDp) {
+					if (item.value == controlSignalValue)
+						controlSignalSelector.selectedItem = item;
+				}
+				
+				// set system supply
+				for each (var item:Object in systemSupplyDp) {
+					if (item.value == systemSupplyValue)
+						systemSupplySelector.selectedItem = item;
+				}
+				
+				// set plenum rating
+				for each (var item:Object in plenumRatingDp) {
+					if (item.value == plenumRatingValue)
+						plenumRatingSelector.selectedItem = item;
+				}
+				
+				// set auxilary switch
+				for each (var item:Object in auxilarySwitchDp) {
+					if (item.value == auxilarySwitchValue)
+						auxilarySwitchSelector.selectedItem = item;
+				}
+				
+				// set position feedback
+				for each (var item:Object in positionFeedbackDp) {
+					if (item.value == positionFeedbackValue)
+						positionFeedbackSelector.selectedItem = item;
+				}
+				
+				// set scalable signal
+				for each (var item:Object in scalableSignalDp) {
+					if (item.value == scalableSignalValue)
+						scalableSignalSelector.selectedItem = item;
+				}
+				
+				// why do you validate it now and not wait???
+				// this.validateNow(); - do not validate anymore
+				
+				if (damperQueryModel.damperTypes.length > 0) {
+					syncDamperModel();
+				}
+				else {
+					damperQueryModel.reset(false);
+				}
+			}
+			
+			
+			private function addSelectableItems(targetDp:ArrayCollection, sourceArr:Array):void {
+				for each (var src:Object in sourceArr) {
+					var found:Boolean = false;
+					for each (var trg:Object in targetDp) {
+						if (trg is Number && src is Number) {
+							if (trg == src) {
+								found = true;
+								break;
+							}
+						}
+						else if (trg.value == src.value) {
+							found = true;
+							break;
+						}
+					}
+					if (!found) {
+						targetDp.addItem(src);
+					}
+				}
+			}
+			
+			
+			private function syncDamperModel():void {
+				damperQueryModel.suppressEvents 	= true;
+				damperQueryModel.torque 			= (!isNaN(parseFloat(torqueSelector.selectedItem))) 						? parseFloat(torqueSelector.selectedItem.toString()) 	: 0;
+				damperQueryModel.controlSignal 		= (controlSignalSelector.enabled 	&& controlSignalSelector.selectedItem != null) 	? controlSignalSelector.selectedItem.value 		: 0;
+				damperQueryModel.systemSupply 		= (systemSupplySelector.enabled 	&& systemSupplySelector.selectedItem != null) 	? systemSupplySelector.selectedItem.value 		: 0;
+				damperQueryModel.plenumRating 		= (plenumRatingSelector.enabled 	&& plenumRatingSelector.selectedItem != null) 	? plenumRatingSelector.selectedItem.value 		: 0;
+				damperQueryModel.auxilarySwitch 	= (auxilarySwitchSelector.enabled 	&& auxilarySwitchSelector.selectedItem != null) ? auxilarySwitchSelector.selectedItem.value 	: 0;
+				damperQueryModel.positionFeedback 	= (positionFeedbackSelector.enabled && positionFeedbackSelector.selectedItem != null) ? positionFeedbackSelector.selectedItem.value : 0;
+				damperQueryModel.scalableSignal 	= (scalableSignalSelector.enabled 	&& scalableSignalSelector.selectedItem != null) ? scalableSignalSelector.selectedItem.value 	: 0;
+				damperQueryModel.suppressEvents		= false;
+			}
+			
+			
+			private function damperModelChangeHandler(evt:PropertyChangeEvent):void {
+				if (evt.property != null) {
+					switch (evt.property.toString()) {
+						case "damperTypes":
+							reconstructDataProviders();
+							break;
+					}
+				}
+				// this is called at RESET and it will reconstruct everything
+				else {
+					reconstructDataProviders();
+				}
+			}
+			
+			
+			private function changeHandler(event:Event):void {
+				var component:UIComponent = event.target as UIComponent;
+				switch (component) {
+					case torqueSelector:
+						damperQueryModel.torque = parseFloat(torqueSelector.selectedItem.toString());
+						break;
+					
+					case controlSignalSelector:
+						damperQueryModel.controlSignal = controlSignalSelector.selectedItem.value;
+						break;
+					
+					case systemSupplySelector:
+						damperQueryModel.systemSupply = systemSupplySelector.selectedItem.value;
+						break;
+						
+					case plenumRatingSelector:
+						damperQueryModel.plenumRating = plenumRatingSelector.selectedItem.value;
+						break;
+					
+					case auxilarySwitchSelector:
+						damperQueryModel.auxilarySwitch = auxilarySwitchSelector.selectedItem.value;
+						break;
+					
+					case positionFeedbackSelector:
+						damperQueryModel.positionFeedback = positionFeedbackSelector.selectedItem.value;
+						break;
+					
+					case scalableSignalSelector:
+						damperQueryModel.scalableSignal = scalableSignalSelector.selectedItem.value;
+						break;
+				}
+			}
+			
+			
+			private function openTorqueCalculator():void {
+				ElectricTorqueCalculator.Show(this);
+			}
+			
+			
+			public function returnTorque(val:Number):void {
+				torqueSelector.selectedItem = val;
+				damperQueryModel.torque = val;
+			}
+			
+			
+			private function torqueLabelFunction(item:Object):String {
+				if (item == null) return null;
+				return GridColumnsUtil.numberFormatter.format(item.toString());
+			}
+		]]>
+	</fx:Script>
+	
+	
+	<s:Form width="100%" height="100%">
+		<Controls:CustomFormItem label="Torque:">
+			<Controls:CustomComboBox id="torqueSelector" change="changeHandler(event)" 
+									 labelFunction="torqueLabelFunction" width="100" height="22"/>
+			<s:Button id="torqueCalculatorBtn" width="16" icon="{EmbeddedImages.calculatorIcon_img}"
+					  click="openTorqueCalculator()" height="22"
+					  skinClass="Swizzard.UI.Skins.spark.ButtonFromTextSkin"/>
+			<s:Label id="torqueUnitLabel" text="lb-in"/>
+		</Controls:CustomFormItem>
+	</s:Form>
+	
+	<s:Form width="100%" height="100%">
+		<Controls:CustomFormItem label="Control Signal:">
+			<s:DropDownList id="controlSignalSelector" change="changeHandler(event)" requireSelection="true"/>
+		</Controls:CustomFormItem>
+		
+		<Controls:CustomFormItem label="Supply Voltage:">
+			<s:DropDownList id="systemSupplySelector" change="changeHandler(event)" requireSelection="true"/>
+		</Controls:CustomFormItem>
+		
+		<Controls:CustomFormItem label="Plenum Rating:">
+			<s:DropDownList id="plenumRatingSelector" change="changeHandler(event)" requireSelection="true"/>
+		</Controls:CustomFormItem>
+	</s:Form>
+	
+	<s:Form width="100%" height="100%">
+		<Controls:CustomFormItem label="Auxilary Switch:">
+			<s:DropDownList id="auxilarySwitchSelector" change="changeHandler(event)" requireSelection="true"/>
+		</Controls:CustomFormItem>
+		
+		<Controls:CustomFormItem label="Position Feedback:">
+			<s:DropDownList id="positionFeedbackSelector" change="changeHandler(event)" requireSelection="true"/>
+		</Controls:CustomFormItem>		
+		
+		<Controls:CustomFormItem label="Scalable Control Signal:">
+			<s:DropDownList id="scalableSignalSelector" change="changeHandler(event)" requireSelection="true"/>
+		</Controls:CustomFormItem>
+	</s:Form>
+</s:HGroup>

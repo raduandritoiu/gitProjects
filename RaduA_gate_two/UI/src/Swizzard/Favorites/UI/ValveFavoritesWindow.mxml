@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Windows:GeneralWindow xmlns:fx="http://ns.adobe.com/mxml/2009" 
+					   xmlns:s="library://ns.adobe.com/flex/spark" 
+					   xmlns:mx="library://ns.adobe.com/flex/mx" 
+					   xmlns:Windows="Swizzard.UI.Windows.*" 
+					   implements="Swizzard.Favorites.Interfaces.IFavoritesWindow"
+					   title="Favorite Valves" alwaysInFront="true" resizable="true" 
+					   width="680" height="480">
+	<fx:Script>
+		<![CDATA[
+			/**
+			 * DEPRECATED. NOT USED ANYMORE.
+			 */
+
+			
+			import Swizzard.Favorites.Interfaces.IFavoritesWindow;
+			import Swizzard.System.ApplicationFacade;
+			import Swizzard.System.Mediators.Valves.ValveFavoritesMediator;
+			import Swizzard.UI.Components.DataGridClasses.GridColumnsUtil;
+			
+			
+			private static var instance:IFavoritesWindow;
+			
+			
+			public static function Show():IFavoritesWindow {
+				if (instance) {
+					instance.orderToFront();
+					return instance;
+				}
+				instance = new ValveFavoritesWindow();
+				instance.open();
+				ApplicationFacade.getInstance().registerMediator(new ValveFavoritesMediator(instance));
+				return instance;
+			}
+			
+			
+			protected function closeHandler():void {
+				instance = null;
+				ApplicationFacade.getInstance().removeMediator(ValveFavoritesMediator.NAME);
+				dispose();
+			}
+			
+			
+			public function get list():DataGrid {
+				return innerValveList;
+			}
+			
+			
+			public function get removeButton():Button {
+				return innerRemoveButton;
+			}
+			
+			
+			public function set infoText(str:String):void {
+				infoTextLbl.text = str;
+			}
+		]]>
+	</fx:Script>
+	
+
+	<s:VGroup width="100%" height="100%" gap="6"
+			  paddingBottom="15" paddingLeft="15" paddingRight="15" paddingTop="18">
+		<s:Label id="infoTextLbl" height="15"
+				 text="Drag any valve, actuator, or assembly from the application into the grid below. They will be saved for quick access and future use."/>
+		
+		<mx:DataGrid id="innerValveList" name="favoritesList"
+					 width="100%" height="100%"
+					 paddingTop="2" paddingBottom="2"
+					 allowMultipleSelection="true"
+					 horizontalScrollPolicy="on"
+					 dragEnabled="true"
+					 headerStyleName="scheduleHeaderStyle">
+			<mx:columns>
+				<mx:DataGridColumn headerStyleName="alignCenter"
+								   headerText="Part Number"
+								   dataField="partNumber"/>
+				
+				<mx:DataGridColumn width="100"
+								   headerStyleName="alignCenter"
+								   headerText="Valve Size"
+								   dataField="valve:size"/>
+				
+				<mx:DataGridColumn width="50"
+								   headerStyleName="alignCenter"
+								   headerText="Cv"
+								   dataField="valve:cv"/>
+				
+				<mx:DataGridColumn width="120"
+								   headerStyleName="alignCenter"
+								   headerText="Port Config"
+								   dataField="valve:portConfigurationString"/>
+				
+				<mx:DataGridColumn headerStyleName="alignCenter"
+								   headerText="Trim"
+								   dataField="valve:plugMaterialString"/>
+				
+				<mx:DataGridColumn headerStyleName="alignCenter"
+								   textAlign="center"
+								   headerText="Multiplier"
+								   dataField="priceMultiplier"/>
+				
+				<mx:DataGridColumn labelFunction="{GridColumnsUtil.priceLabelFunction}"
+								   fontWeight="bold"
+								   headerStyleName="alignCenter"
+								   textAlign="right"
+								   headerText="Price"
+								   dataField="price"
+								   sortCompareFunction="{GridColumnsUtil.priceSortFunction}"/>
+				
+				<mx:DataGridColumn width="160"
+								   headerStyleName="alignCenter"
+								   headerText="Description"
+								   dataField="description"/>
+				
+				<mx:DataGridColumn width="160"
+								   headerStyleName="alignCenter"
+								   headerText="Assembly Data Sheet"
+								   sortable="false"
+								   dataField="dataSheetLink"
+								   itemRenderer="Swizzard.Data.UI.Renderers.PDFColumnRenderer"
+								   resizable="false"/>
+				
+				<mx:DataGridColumn width="120"
+								   headerStyleName="alignCenter"
+								   headerText="Pressure Class"
+								   dataField="valve:maxPress"/>
+				
+				<mx:DataGridColumn headerStyleName="alignCenter"
+								   headerText="Medium"
+								   dataField="valve:mediumString"/>
+				
+				<mx:DataGridColumn width="100"
+								   headerStyleName="alignCenter"
+								   headerText="Flow Char"
+								   dataField="valve:flowCharString"/>
+				
+				<mx:DataGridColumn width="120"
+								   headerStyleName="alignCenter"
+								   headerText="Actuator Part#"
+								   dataField="actuator:actualPartNumber"/>
+				
+				<mx:DataGridColumn width="140"
+								   headerStyleName="alignCenter"
+								   headerText="Actuator Data Sheet"
+								   sortable="false"
+								   dataField="actuator:dataSheetLink"
+								   itemRenderer="Swizzard.Data.UI.Renderers.PDFColumnRenderer"
+								   resizable="false"/>
+				
+				<mx:DataGridColumn headerStyleName="alignCenter"
+								   headerText="Fail Position"
+								   dataField="actuator:safetyFunctionString"/>
+				
+				<mx:DataGridColumn width="150"
+								   headerStyleName="alignCenter"
+								   headerText="Close Off Pressure"
+								   dataField="actuator:closeOff"/>
+				
+				<mx:DataGridColumn headerStyleName="alignCenter"
+								   headerText="Valve Part#"
+								   dataField="valve:partNumber"/>
+				
+				<mx:DataGridColumn width="150"
+								   headerStyleName="alignCenter"
+								   headerText="Valve Data Sheet"
+								   sortable="false"
+								   dataField="valve:dataSheetLink"
+								   itemRenderer="Swizzard.Data.UI.Renderers.PDFColumnRenderer"
+								   resizable="false"/>
+			</mx:columns>
+		</mx:DataGrid>
+		
+		<s:HGroup width="100%">
+			<s:Button label="Remove Selected" id="innerRemoveButton" enabled="{innerValveList.selectedItem}" />
+			<s:Spacer width="100%"/>
+			<s:Button label="Close" click="closeHandler()"/>
+		</s:HGroup>
+	</s:VGroup>
+</Windows:GeneralWindow>

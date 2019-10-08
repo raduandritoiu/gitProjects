@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:HBox xmlns:mx="http://www.adobe.com/2006/mxml"
+	horizontalGap="0"
+	paddingRight="0" paddingLeft="0"
+	horizontalScrollPolicy="off" verticalScrollPolicy="off" 
+	creationComplete="creationCompleteHandler(event)">
+	<mx:Script>
+		<![CDATA[
+			import mx.core.Application;
+			import mx.events.FlexEvent;
+			
+			import Swizzard.UI.Skins.AppCloseButtonSkin;
+			import Swizzard.UI.Skins.MaximizeButtonSkin;
+			import Swizzard.UI.Skins.MinimizeButtonSkin;
+			import Swizzard.UI.Skins.RestoreButtonSkin;
+					
+			
+			public function toggleMaximize(displayState:String = null):void
+			{
+				if (displayState) 
+				{
+					if (displayState == NativeWindowDisplayState.MAXIMIZED) 
+					{
+						Object(parentApplication).nativeWindow.maximize();
+					} 
+					else 
+					{
+						Object(parentApplication).nativeWindow.restore();
+					}
+					return;
+				}
+
+				if (NativeApplication.nativeApplication.openedWindows[0].displayState == NativeWindowDisplayState.MAXIMIZED)
+				{
+					Object(parentApplication).nativeWindow.restore();
+				}
+				else
+				{
+					Object(parentApplication).nativeWindow.maximize();
+				}
+			}
+		
+
+			protected function creationCompleteHandler(event:FlexEvent):void
+			{
+				Application.application.nativeWindow.addEventListener(NativeWindowDisplayStateEvent.DISPLAY_STATE_CHANGE, displayStateChangingHandler, false, 0, true);
+			}
+			
+			
+			private function displayStateChangingHandler(e:NativeWindowDisplayStateEvent):void
+			{
+				if (e.afterDisplayState == NativeWindowDisplayState.MAXIMIZED)
+				{
+					maximizeBtn.toolTip = "Restore";
+					maximizeBtn.setStyle("skin", RestoreButtonSkin);
+					
+				} 
+				else
+				{
+					maximizeBtn.toolTip = "Maximize";
+					maximizeBtn.setStyle("skin", MaximizeButtonSkin);
+				}
+			}
+
+		]]>
+	</mx:Script>
+
+	<mx:Button height="14" width="14" click="Object(parentApplication).nativeWindow.minimize()" tabEnabled="false" toolTip="Minimize"
+			   skin="{MinimizeButtonSkin}" useHandCursor="true" buttonMode="true"/>
+	
+	<mx:Button id="maximizeBtn" height="14" width="14" click="toggleMaximize();" tabEnabled="false" toolTip=" "
+			   skin="{MaximizeButtonSkin}" useHandCursor="true" buttonMode="true"/>
+	
+			 
+	<mx:Button id="closeButton" height="14" width="14" styleName="appCloseButton" tabEnabled="false" toolTip="Close"
+			   skin="{AppCloseButtonSkin}" useHandCursor="true" buttonMode="true"/>
+	
+</mx:HBox>

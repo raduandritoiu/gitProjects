@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Windows:GeneralWindow xmlns:fx="http://ns.adobe.com/mxml/2009" 
+					   xmlns:s="library://ns.adobe.com/flex/spark" 
+					   xmlns:mx="library://ns.adobe.com/flex/mx" 
+					   xmlns:Windows="Swizzard.UI.Windows.*" 
+					   title="Save Schedule" width="450" height="200">
+	
+	<fx:Script>
+		<![CDATA[
+			import Swizzard.Ordering.Export.ExportAction;
+			import Swizzard.Ordering.Export.IExportTarget;
+			
+			
+			private static var instance:SaveConfirmWindow;
+			
+			private var exportResult:IExportTarget;
+			private var exportType:String;
+			
+			
+			public static function Show(newSaveHolder:IExportTarget, type:String):ExportConfirmWindow {
+				if (instance == null) {
+					instance = new ExportConfirmWindow();
+					instance.open();SaveConfirmWindow
+					
+					// initialize the calculator
+					instance.exportResult 	= newSaveHolder;
+					instance.exportType 	= type;
+				}
+				instance.orderToFront();
+				return instance;
+			}
+			
+			
+			override public function dispose():void {
+				exportResult = null;
+				instance = null;
+				super.dispose();
+			}
+			
+			
+			private function exportValves():void {
+				exportResult.exportResult(exportType, ExportAction.VALVE_SCHEDULE);
+				dispose();
+			}
+			
+			
+			private function exportDampers():void {
+				exportResult.exportResult(exportType, ExportAction.DAMPER_SCHEDULE);
+				dispose();
+			}
+			
+			
+			private function exportAll():void {
+				exportResult.exportResult(exportType, ExportAction.ALL_SCHEDULE);
+				dispose();
+			}
+			
+			
+			private function exportNone():void {
+				exportResult.exportResult(exportType, ExportAction.NO);
+				dispose();
+			}
+			
+			
+			private function cancel():void {
+				exportResult.exportResult(exportType, ExportAction.CANCEL);
+				dispose();
+			}
+		]]>
+	</fx:Script>
+	
+	<s:Label id="questionLabel" y="50" left="20" right="20" 
+			 textAlign="center" fontSize="12"
+			 text="Do you want to save your current schedule?"/>
+	
+	<s:HGroup left="15" right="20" bottom="20" gap="10">
+		<s:Button label="Valves" click="exportValves()"/>
+		<s:Button label="Dampers" click="exportDampers()"/>
+		<s:Button label="All" click="exportAll()"/>
+		
+		<s:Spacer width="100%" height="10"/>
+		
+		<s:Button label="No" click="exportNone()"/>
+		<s:Button label="Cancel" click="cancel()"/>
+	</s:HGroup>
+</Windows:GeneralWindow>

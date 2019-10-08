@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Windows:GeneralWindow xmlns:fx="http://ns.adobe.com/mxml/2009" 
+					   xmlns:s="library://ns.adobe.com/flex/spark" 
+					   xmlns:mx="library://ns.adobe.com/flex/mx" 
+					   xmlns:Windows="Swizzard.UI.Windows.*" 
+					   xmlns:Controls="Swizzard.UI.Controls.*" xmlns:Forms="Swizzard.UI.Forms.*" 
+					   title="My Info" alwaysInFront="true"
+					   width="330" height="380">
+	
+	<fx:Script>
+		<![CDATA[
+			import org.osmf.layout.LayoutMode;
+			
+			private static var instance:UserInfoEditorForm;
+			
+			
+			public static function Show():UserInfoEditorForm {
+				if (instance) {
+					instance.orderToFront();
+					return instance;
+				}
+				instance = new UserInfoEditorForm();
+				instance.open();
+				return instance;
+			}
+			
+			
+			override public function dispose():void {
+				instance = null;
+				super.dispose();
+			}
+		]]>
+	</fx:Script>
+	
+	
+	<s:Form width="100%" y="10" height="100%" minWidth="10" minHeight="10" >
+		<Controls:CustomFormItem label="Name" width="100%" labelGap="15">
+			<Forms:TextInputWithDefault id="nameTextInput" defaultText="Your name..." width="100%"/>
+		</Controls:CustomFormItem>
+		
+		<Controls:CustomFormItem label="Address" width="100%" labelGap="15" contentGap="7" contentLayout="{LayoutMode.VERTICAL}">
+			<Forms:TextInputWithDefault id="address1TextInput" defaultText="Your Address..." width="100%"/>
+			<Forms:TextInputWithDefault id="address2TextInput" defaultText="P.O. Box, Unit #, Apt #...." width="100%"/>
+		</Controls:CustomFormItem>
+		
+		<Controls:CustomFormItem label="City" width="100%" labelGap="15">
+			<Forms:TextInputWithDefault id="cityTextInput" defaultText="City..." width="100%"/>
+		</Controls:CustomFormItem>
+		
+		<Controls:CustomFormItem label="State" width="100%" labelGap="15">
+			<Forms:TextInputWithDefault id="stateTextInput" defaultText="State..." width="100%"/>
+		</Controls:CustomFormItem>
+		
+		<Controls:CustomFormItem label="Zip" width="100%" labelGap="15">
+			<Forms:TextInputWithDefault id="zipTextInput" defaultText="Zip/Postal Code..." width="100%"/>
+		</Controls:CustomFormItem>
+		
+		<Controls:CustomFormItem label="Phone" width="100%" labelGap="15">
+			<Forms:TextInputWithDefault id="phoneTextInput" defaultText="Your phone number..." width="100%"/>
+		</Controls:CustomFormItem>
+		
+		<Controls:CustomFormItem label="Job Details" width="100%" labelGap="15" contentGap="7" contentLayout="{LayoutMode.VERTICAL}">
+			<Forms:TextInputWithDefault id="jobNameTextInput" defaultText="Job name..." width="100%"/>
+			<Forms:TextInputWithDefault id="jobNumberTextInput" defaultText="Job number..." width="100%"/>
+		</Controls:CustomFormItem>
+	</s:Form>
+	
+	
+	<s:HGroup horizontalAlign="right" left="10" right="10" bottom="10" gap="8">
+		<s:Button label="Save" id="saveButton" width="54"/>			
+		<s:Button label="Close" id="closeButton" width="54"/>
+	</s:HGroup>
+
+</Windows:GeneralWindow>

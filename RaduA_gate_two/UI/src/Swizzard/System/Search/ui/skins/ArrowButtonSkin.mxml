@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+
+  Licensed to the Apache Software Foundation (ASF) under one or more
+  contributor license agreements.  See the NOTICE file distributed with
+  this work for additional information regarding copyright ownership.
+  The ASF licenses this file to You under the Apache License, Version 2.0
+  (the "License"); you may not use this file except in compliance with
+  the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+
+-->
+
+
+<!--- The default skin class for a Spark ToggleButton component.  
+
+     @see spark.components.ToggleButton
+        
+      @langversion 3.0
+      @playerversion Flash 10
+      @playerversion AIR 1.5
+      @productversion Flex 4
+-->
+<s:SparkButtonSkin xmlns:fx="http://ns.adobe.com/mxml/2009" 
+                   xmlns:s="library://ns.adobe.com/flex/spark" 
+                   xmlns:fb="http://ns.adobe.com/flashbuilder/2009"
+                   minWidth="21" minHeight="21" 
+                   alpha.disabledStates="0.5">
+	<fx:Metadata>
+		[HostComponent("Swizzard.System.Search.ui.ArrowToggleButton")]
+	</fx:Metadata>
+    
+    <!-- host component -->
+    <fx:Script fb:purpose="styling">
+		<![CDATA[
+        /* Define the skin elements that should not be colorized. 
+//           For toggle button, the graphics are colorized but the label is not. */
+//        static private const exclusions:Array = ["labelDisplay"];
+//
+//        /**
+//         * @private
+//         */    
+//        override public function get colorizeExclusions():Array {return exclusions;}
+//        
+//        /**
+//         * @private
+//         */
+//        override protected function initializationComplete():void
+//        {
+//            useChromeColor = true;
+//            super.initializationComplete();
+//        }
+//        
+		]]>
+    </fx:Script>
+    
+    <!-- states -->
+    <s:states>
+        <s:State name="up" stateGroups="notSelected"/>
+        <s:State name="over" stateGroups="overStates, notSelected" />
+        <s:State name="down" stateGroups="downStates, notSelected" />
+        <s:State name="disabled" stateGroups="disabledStates, notSelected" />
+        <s:State name="upAndSelected" stateGroups="selectedStates, selectedUpStates" />
+        <s:State name="overAndSelected" stateGroups="overStates, selectedStates" />
+        <s:State name="downAndSelected" stateGroups="downStates, selectedStates" />
+        <s:State name="disabledAndSelected" stateGroups="selectedUpStates, disabledStates, selectedStates" />
+    </s:states>
+	
+	
+	<s:transitions>
+		<s:Transition fromState="*" toState="*">
+			<s:Rotate target="{arrowHoder}" duration="500"/>
+		</s:Transition>
+	</s:transitions>
+    
+	
+
+    <!-- layer 2: fill -->
+    <!--- @private -->
+    <s:Rect id="fill" left="1" right="1" top="1" bottom="1" 
+			bottomLeftRadiusX="10" bottomLeftRadiusY="10" 
+			bottomRightRadiusX="10" bottomRightRadiusY="10"
+			bottomLeftRadiusX.selectedStates="0" bottomLeftRadiusY.selectedStates="0" 
+			bottomRightRadiusX.selectedStates="0" bottomRightRadiusY.selectedStates="0"
+			>
+        <s:fill>
+            <s:LinearGradient rotation="90">
+                <s:GradientEntry color="0xFFB900"/>
+                <s:GradientEntry color="0xFFB900"/>
+            </s:LinearGradient>
+        </s:fill>
+    </s:Rect>
+    
+	<!-- no more fill low light and fill high light -->
+	<!-- no more border  -->
+	
+	
+    
+    <!-- layer 8: text -->
+    <!--- @copy spark.components.supportClasses.ButtonBase#labelDisplay -->
+    <s:Label id="labelDisplay"
+             textAlign="center"
+             verticalAlign="middle"
+             maxDisplayedLines="1"
+             horizontalCenter="0" verticalCenter="1"
+             left="30" right="10" top="2" bottom="2">
+    </s:Label>
+    
+	
+	<!-- the arrow -->
+	<s:Group width="28" left="0" top="0" bottom="0">
+		
+		<s:filters>
+			<s:DropShadowFilter distance="1" angle="90" color="0x000000" alpha="0.75" 
+								blurX="2" blurY="2" strength="2" quality="3"/>
+		</s:filters>
+		
+		<s:Group id="arrowHoder" width="10" height="6"
+				 rotation="180" rotation.notSelected="180" rotation.selectedStates="0"
+				 verticalCenter="-2" horizontalCenter="0">
+			<s:Path id="arrow" width="10" height="6" verticalCenter="0" horizontalCenter="0" 
+					data="M 5 0 L 0 6 L 10 6 Z">
+				<s:fill> <s:SolidColor color="0x000000"/> </s:fill>
+			</s:Path>
+		</s:Group>
+	</s:Group>
+	
+</s:SparkButtonSkin>

@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 xmlns:ProductDragDropper="Swizzard.UI.Components.ProductDragDropper.*" 
+		 xmlns:Controls="Swizzard.UI.Controls.*">
+	
+	<fx:Script>
+		<![CDATA[
+			import com.greensock.TweenMax;
+			
+			import Swizzard.Images.EmbeddedImages;
+			
+			
+			override protected function updateDisplayList(w:Number, h:Number):void {
+				super.updateDisplayList(w, h);
+				
+				// setting new colors on the add and reset buttons:
+				// RADU_TODO: I have to add them inside the buttons themselves
+				with (addAllButton.graphics) {
+					clear();
+					beginFill(0x363636, 0.8);
+					drawRoundRect(1, 1, addAllButton.width - 2, addAllButton.height - 2, 6, 6);
+					endFill();
+				}
+				
+				with (resetButton.graphics) {
+					clear();
+					beginFill(0x363636, 0.8);
+					drawRoundRect(1, 1, addAllButton.width - 2, addAllButton.height - 2, 6, 6);
+					endFill();
+				}
+			}
+			
+			
+			/**
+			 * Event handlers for reset & add buttons - graphic interactions
+			 * RADU_TODO_TWEEN: I have to add them inside the buttons themselves
+			 */		
+			private function resetAddButtonRollOverHandler(e:MouseEvent):void {
+				//var image:Image	= e.currentTarget as Image;
+			 	//with (image.graphics) {
+				//	clear();
+				//	beginFill(0x363636, 0.8);
+				//	drawRoundRect(1, 1, image.width - 2, image.height - 2, 6, 6);
+				//	endFill();
+				//} 
+				
+				e.currentTarget.addEventListener(MouseEvent.ROLL_OUT, onRollOut);
+				e.currentTarget.addEventListener(MouseEvent.MOUSE_DOWN, onMouseDown);
+				TweenMax.to(e.currentTarget, 0.25 , { colorMatrixFilter:{brightness:0.75, contrast: 1.5 } });
+			}
+			
+			
+			private function onRollOut(e:MouseEvent):void {
+				//var image:Image	= e.currentTarget as Image;
+				//with (image.graphics) {
+				//	clear();
+				//	beginFill(0x363636, 0.8);
+				//	drawRoundRect(1, 1, addAllButton.width - 2, addAllButton.height - 2, 6, 6);
+				//	endFill();
+				//} 
+				
+				e.currentTarget.removeEventListener(MouseEvent.MOUSE_DOWN, onMouseDown);
+				e.currentTarget.removeEventListener(MouseEvent.MOUSE_UP, onMouseUp);
+				e.currentTarget.removeEventListener(MouseEvent.ROLL_OUT, onRollOut);
+				TweenMax.to(e.currentTarget, 0.25 , { colorMatrixFilter:{ brightness:1, contrast: 1 } });
+			}
+			
+			
+			private function onMouseDown(e:MouseEvent):void {
+				TweenMax.to(e.currentTarget, 0.25 , { colorMatrixFilter:{brightness:0.2, contrast: 1 } });
+				e.currentTarget.addEventListener(MouseEvent.MOUSE_UP, onMouseUp);
+			}
+			
+			
+			private function onMouseUp(e:MouseEvent):void {
+				TweenMax.to(e.currentTarget, 0.25 , { colorMatrixFilter:{brightness:0.75, contrast: 1.5 } });
+			}
+		]]>
+	</fx:Script>
+	
+	
+	<!-- Background-->
+	<s:Rect left="0" right="0" top="0" bottom="0" radiusX="5" radiusY="5">
+		<s:fill> 
+			<s:SolidColor color="0xb0bac0"/> 
+		</s:fill>
+	</s:Rect>
+	
+	<s:Rect left="1" right="1" top="1" bottom="1" radiusX="5" radiusY="5">
+		<s:fill>
+			<s:LinearGradient rotation="270">
+				<s:GradientEntry color="0xffffff" ratio="0.0784"/>
+				<s:GradientEntry color="0xeaeaea" ratio="0.4980"/>
+				<s:GradientEntry color="0xf2f2f2" ratio="0.5019"/>
+				<s:GradientEntry color="0xffffff" ratio="0.9215"/>
+			</s:LinearGradient>
+		</s:fill>
+	</s:Rect>
+	
+		
+	<ProductDragDropper:ProductTargetContainer id="productTarget" width="100%" height="100%"/>
+
+	<s:Image id="addAllButton" height="41" width="71" verticalCenter="0" right="25" 
+			 source="{EmbeddedImages.ADD_ALL_BUTTON_IMG}"
+			 toolTip="Add all valve types to form"
+			 useHandCursor="true" buttonMode="true"
+			 rollOver="{resetAddButtonRollOverHandler(event)}"/>
+	
+	<s:Image id="resetButton" height="41" width="71" verticalCenter="0" left="25" 
+			 source="{EmbeddedImages.RESET_BUTTON_IMG}"
+			 toolTip="Remove all valves and reset form parameters to default"
+			 useHandCursor="true" buttonMode="true"
+			 rollOver="{resetAddButtonRollOverHandler(event)}"/>
+
+	<ProductDragDropper:ProductSourceContainer id="productSource" x="0" y="-30" 
+											 closeOffset="27" innerWidth="150" innerHeight="652"/>
+</s:Group>

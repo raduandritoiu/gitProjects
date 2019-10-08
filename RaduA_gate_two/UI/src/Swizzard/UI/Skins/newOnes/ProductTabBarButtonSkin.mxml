@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+
+  Licensed to the Apache Software Foundation (ASF) under one or more
+  contributor license agreements.  See the NOTICE file distributed with
+  this work for additional information regarding copyright ownership.
+  The ASF licenses this file to You under the Apache License, Version 2.0
+  (the "License"); you may not use this file except in compliance with
+  the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+
+-->
+
+
+<!--- 
+The default skin class for Spark TabBar buttons.  
+
+@see spark.components.TabBar
+@see spark.skins.spark.TabBarSkin
+
+@langversion 3.0
+@playerversion Flash 10
+@playerversion AIR 1.5
+@productversion Flex 4
+-->
+
+<s:SparkButtonSkin xmlns:fx="http://ns.adobe.com/mxml/2009"
+				   xmlns:s="library://ns.adobe.com/flex/spark"
+				   xmlns:fb="http://ns.adobe.com/flashbuilder/2009"
+				   minWidth="21" minHeight="21"
+				   alpha.disabled="0.5">
+    
+    <!-- host component -->
+    <fx:Metadata>
+        <![CDATA[ 
+	        [HostComponent("spark.components.ButtonBarButton")]
+        ]]>
+    </fx:Metadata>
+    
+    <fx:Script fb:purpose="styling">
+        
+        import spark.components.ButtonBarButton;
+
+        static private const exclusions:Array = ["labelDisplay"];
+        
+        private var cornerRadius:Number = 4
+			
+		
+        private function updateBorderTop(width:Number, height:Number):void {
+            var path:String = createPathData(true);
+            borderTop.data = path;
+            borderTop.setLayoutBoundsSize(width, height, false);
+            borderTop.setLayoutBoundsPosition(0, 0, false);
+        }
+        
+/*		
+        private function updateSelectedHighlight(width:Number, height:Number):void {
+            selectedHighlightH1.setLayoutBoundsSize(width - (2 * cornerRadius), 1, false);
+            selectedHighlightH1.setLayoutBoundsPosition(cornerRadius, 1, false);
+            selectedHighlightH2.setLayoutBoundsSize(width - (2 * cornerRadius), 1, false);
+            selectedHighlightH2.setLayoutBoundsPosition(cornerRadius, 2, false);
+        }  
+*/        
+		
+        private function createPathData(isBorder:Boolean):String {
+            var left:Number = 0;
+            var right:Number = width;
+            var top:Number = 0.5;
+            var bottom:Number = height;
+            
+            var a:Number = cornerRadius * 0.292893218813453;
+            var s:Number = cornerRadius * 0.585786437626905;
+            
+            var path:String = "";
+            path +=  "M " + left + " " + bottom;
+            path += " L " + left + " " + (top + cornerRadius);
+            path += " Q " + left + " " + (top + s) + " " + (left + a) + " " + (top + a);
+            path += " Q " + (left + s) + " " + top + " " + (left + cornerRadius) + " " + top;
+            
+            if (isBorder)
+                path += " L " + (right - cornerRadius) + " " + top;
+            else
+                path += " M " + (right - cornerRadius) + " " + top;
+            
+            path += " Q " + (right - s) + " " + top + " " + (right - a) + " " + (top + a);
+            path += " Q " + right + " " + (top + s) + " " + right + " " + (top + cornerRadius);
+            path += " L " + right + " " + bottom;
+            
+            return path;
+        }
+        
+		
+        private function updateCornerRadius():void {
+            var cr:Number = getStyle("cornerRadius");
+            if (cornerRadius != cr) {
+                cornerRadius = cr;
+                fill.topLeftRadiusX = cornerRadius;
+                fill.topRightRadiusX = cornerRadius;
+                highlightStroke.topLeftRadiusX = cornerRadius;
+                highlightStroke.topRightRadiusX = cornerRadius;
+            }
+        }
+		
+		
+        override protected function updateDisplayList(unscaledWidth:Number, unscaleHeight:Number):void {
+            updateCornerRadius();
+//          updateSelectedHighlight(unscaledWidth, unscaledHeight); 
+            updateBorderTop(unscaledWidth, unscaledHeight);
+            super.updateDisplayList(unscaledWidth, unscaledHeight);
+        }
+    </fx:Script>
+    
+    <!-- states -->
+    <s:states>
+        <s:State name="up"/>
+        <s:State name="over" stateGroups="overStates"/>
+        <s:State name="down" stateGroups="downStates"/>
+        <s:State name="disabled" stateGroups="disabledStates"/>
+        <s:State name="upAndSelected" stateGroups="selectedStates, selectedUpStates"/>
+        <s:State name="overAndSelected" stateGroups="overStates, selectedStates"/>
+        <s:State name="downAndSelected" stateGroups="downStates, selectedStates"/>
+        <s:State name="disabledAndSelected"
+				 stateGroups="selectedUpStates, disabledStates, selectedStates"/>
+    </s:states>
+
+	
+    <!--- layer 2: fill - the MAIN BACKGROUND COLORS -->
+    <s:Rect id="fill" left="1" right="1" top="1" bottom="1" width="70" height="22" topLeftRadiusX="4"
+			topRightRadiusX="4">
+        <s:fill>
+            <s:LinearGradient rotation="90">
+                <s:GradientEntry alpha="1" color="0xe1e1e1"
+								 color.down="0xAAAAAA"
+								 color.over="0xc3c3c3"
+								 color.selectedStates="0xe5e5e5"/>
+                <s:GradientEntry alpha="1" color="0xc1c1c1" ratio="0.7"
+								 color.down="0xededed"
+								 color.over="0xededed"
+								 color.selectedStates="0xededed"/>
+            </s:LinearGradient>
+        </s:fill>
+    </s:Rect>
+    
+	
+    
+	
+    <!--- highlight stroke - it is like an inward haylow because nly the stroke has color -->
+	<!--- the alpha differs for different states and is excluded from "down" state -->
+    <s:Rect id="highlightStroke" excludeFrom="downStates" left="1" right="1" top="1" bottom="0"
+			topLeftRadiusX="4" topRightRadiusX="4">
+        <s:stroke>
+            <s:LinearGradientStroke rotation="90" weight="1">
+                <s:GradientEntry alpha="1" color="0xFFFFFF"
+								 alpha.overStates="0.22"
+								 alpha.selectedUpStates="0.33"/>
+                <s:GradientEntry alpha="1" color="0xb2b2b2"
+								 alpha.overStates="0.22"
+								 alpha.selectedUpStates="0.33"/>
+            </s:LinearGradientStroke>
+        </s:stroke>
+    </s:Rect>
+	
+    
+	<!--- These are two veery thin rectangles that apear in the selected states -->
+<!--    
+	<s:Rect id="selectedHighlightH1" top="1" height="1" includeInLayout="false">
+        <s:fill>
+            <s:SolidColor color="0x000000" alpha="0.0" 
+						  alpha.downStates="0.25" alpha.selectedUpStates="0.25" alpha.overAndSelected="0.25" />                                    
+        </s:fill>
+    </s:Rect>
+-->
+<!--    
+	<s:Rect id="selectedHighlightH2" top="2" height="1" includeInLayout="false">
+        <s:fill>
+            <s:SolidColor color="0x000000" alpha="0.0"
+						  alpha.downStates="0.05" alpha.selectedUpStates="0.05" alpha.overAndSelected="0.05" />  
+        </s:fill>
+    </s:Rect>
+-->	
+	
+    <!--- bottom border line - put on top of the fill so it doesn't disappear when scale is less than 1 -->
+    <s:Line id="borderBottom" left="0" right="0" bottom="0">
+        <s:stroke>
+            <s:SolidColorStroke alpha="1" color="0x98a2a7" weight="1"
+								color.selectedStates="0xededed"/>
+        </s:stroke>
+    </s:Line>
+    
+	
+	<!--- Set includeInLayout="false" as we regenerate the path data and lay out the path in
+          the updateDisplayList() override and we don't want it to affect measurement. @private
+    -->
+    <s:Path id="borderTop" left="0" right="0" top="0" bottom="0" includeInLayout="false">
+        <s:stroke>
+            <s:LinearGradientStroke rotation="90" weight="1">
+                <s:GradientEntry alpha="0.5625" color="0x232323"
+								 alpha.down="0.6375"
+								 alpha.selectedStates="0.6375"/>
+                <s:GradientEntry alpha="0.75" color="0x90a7ac"
+								 alpha.down="0.85"
+								 alpha.selectedStates="0.85"/>
+            </s:LinearGradientStroke>
+        </s:stroke>
+    </s:Path>
+	
+	
+	<!-- layer 8: text -->
+	<!--- @copy spark.components.supportClasses.ButtonBase#labelDisplay -->
+	<s:Label id="labelDisplay" left="19" right="19" top="2" bottom="2" color="0x5e6467" fontSize="12"
+			 fontWeight="bold" horizontalCenter="0" maxDisplayedLines="1" textAlign="center"
+			 verticalAlign="middle" verticalCenter="2"
+			 color.selectedStates="0x4d5356" verticalCenter.selectedStates="3">
+		<s:filters>
+			<s:DropShadowFilter alpha="0.3" angle="45" blurX="0" blurY="0" color="0xffffff"
+								distance="1"
+								color.selectedStates="0xffffff"/>
+		</s:filters>
+	</s:Label>
+
+    
+</s:SparkButtonSkin>

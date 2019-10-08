@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<BoxSlider:SliderBox xmlns:fx="http://ns.adobe.com/mxml/2009" 
+					 xmlns:s="library://ns.adobe.com/flex/spark" 
+					 xmlns:mx="library://ns.adobe.com/flex/mx" 
+					 xmlns:BoxSlider="Swizzard.UI.Components.BoxSlider.*"
+					 xmlns:Forms="Swizzard.UI.Forms.*"
+					 width="100%" height="170">
+	
+	<BoxSlider:SliderGroup label="Go to Damper Parameters">
+		<s:Panel height="115" title="Damper Actuators Parameters">
+			<Forms:DamperParametersForm id="damperParameterForm"/>
+		</s:Panel>
+	</BoxSlider:SliderGroup>
+</BoxSlider:SliderBox>

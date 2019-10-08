@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx"
+		 useHandCursor="true" buttonMode="true">
+	
+	<fx:Script>
+		<![CDATA[
+			import spark.effects.Rotate;
+			
+			public static const UP:String = "UpDirection";
+			public static const DOWN:String = "DownDirection";
+			
+			
+			private var arrowAnim:Rotate;
+			private var _arrowDirection:String = UP;
+			private var directionChanged:Boolean = false;
+			
+			private var _text:String = "Select Valve Type";
+			private var textChanged:Boolean = true;
+			
+			private var _showCorner:Boolean = true;
+			private var leftChanged:Boolean = false;
+			private var rightChanged:Boolean = false;
+			
+			private var _changeLeftCorner:Boolean = false;
+			private var _changeRightCorner:Boolean = false;
+			
+			
+			public function set text(val:String):void {
+				_text = val;
+				textChanged = true;
+				invalidateProperties();
+			}
+			
+			public function get text():String {
+				return _text;
+			}
+			
+			
+			public function set arrowDirection(val:String):void {
+				_arrowDirection = val;
+				directionChanged = true;
+				invalidateProperties();
+			}
+			
+			public function get arrowDirection():String {
+				return _arrowDirection;
+			}
+			
+			
+			public function set showCorner(val:Boolean):void {
+				_showCorner = val;
+				if (changeLeftCorner) leftChanged = true;
+				if (changeRightCorner) rightChanged = true;
+				invalidateProperties();
+			}
+			
+			public function get showCorner():Boolean {
+				return _showCorner;
+			}
+			
+			
+			public function set changeLeftCorner(val:Boolean):void {
+				_changeLeftCorner = val;
+			}
+			
+			public function get changeLeftCorner():Boolean {
+				return _changeLeftCorner;
+			}
+			
+			
+			public function set changeRightCorner(val:Boolean):void {
+				_changeRightCorner = val;
+			}
+			
+			public function get changeRightCorner():Boolean {
+				return _changeRightCorner;
+			}
+			
+			
+			override protected function commitProperties():void {
+				super.commitProperties();
+				
+				if (textChanged) {
+					textChanged = false;
+					testLabel.text = text;
+				}
+				
+				if (leftChanged) {
+					leftChanged = false;
+					//bgShadow.blRadius = (showCorner ? 8 : 0);
+					bgRect.bottomLeftRadiusX = (showCorner ? 8 : 0);
+					bgRect.bottomLeftRadiusY = (showCorner ? 8 : 0);
+				}
+				
+				if (rightChanged) {
+					rightChanged = false;
+					//bgShadow.brRadius = (showCorner ? 8 : 0);
+					bgRect.bottomRightRadiusX = (showCorner ? 8 : 0);
+					bgRect.bottomRightRadiusY = (showCorner ? 8 : 0);
+				}
+				
+				if (directionChanged) {
+					directionChanged = false;
+					if (arrowAnim == null) {
+						initArrow();
+					}
+					arrowAnim.stop();
+					if (arrowDirection == UP) {
+						arrowAnim.angleTo = 0
+					}
+					else if (arrowDirection == DOWN) {
+						arrowAnim.angleTo = 180;
+					}
+					arrowAnim.play();
+				}
+			}
+			
+			
+			private function initArrow():void {
+				arrowAnim = new Rotate(arrow);
+				arrowAnim.autoCenterTransform = true;
+				arrowAnim.duration = 500;
+				arrowAnim.startDelay = 250;
+			}
+			
+		]]>
+	</fx:Script>
+	
+	<s:Rect id="bgRect" left="0" right="0" top="0" bottom="0" 
+			bottomLeftRadiusX="8" bottomLeftRadiusY="8" 
+			bottomRightRadiusX="8" bottomRightRadiusY="8">
+		<s:fill>
+			<s:LinearGradient rotation="90">
+				<s:GradientEntry color="0x73787A"/>
+				<s:GradientEntry color="0x212121"/>
+			</s:LinearGradient>
+		</s:fill>
+		<s:stroke>
+			<s:SolidColorStroke color="0x000000" alpha="0.2"/>
+		</s:stroke>
+	</s:Rect>
+	
+<!--
+	<s:RectangularDropShadow id="bgShadow" left="0" right="0" top="0" bottom="0" alpha="0.3"
+							 angle="90" distance="2" brRadius="8" blRadius="8"/>
+-->	
+	<s:Label id="testLabel" color="0xF2F2F2" fontWeight="bold" 
+			 mouseEnabled="false" verticalCenter="0" horizontalCenter="4">
+		<s:filters>
+			<s:DropShadowFilter distance="1" angle="270" color="0x000000" blurX="0" blurY="0"/>
+		</s:filters>
+	</s:Label>
+	
+	<s:Path id="arrow" left="10" top="10"
+			data="M 5 0 L 10 6 L 0 6 Z">
+		<s:filters>
+			<s:DropShadowFilter distance="1" alpha="90" blurX="0" blurY="0" strength="1"/>
+		</s:filters>
+		<s:fill>
+			<s:SolidColor color="0xF2F2F2" alpha="0.4"/>
+		</s:fill>
+	</s:Path>
+</s:Group>

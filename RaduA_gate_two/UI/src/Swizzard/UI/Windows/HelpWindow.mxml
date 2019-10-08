@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Window xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:s="library://ns.adobe.com/flex/spark" xmlns:mx="library://ns.adobe.com/flex/mx"
+		  width="905" height="543" minWidth="905" minHeight="543" maxWidth="905" maxHeight="543"
+		  resizable="false" showStatusBar="false" 
+		  title="Help" titleIcon="{EmbeddedImages.damper_assembly16_img}">
+	
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	
+	
+	<fx:Script>
+		<![CDATA[
+			import Swizzard.Images.EmbeddedImages;
+			private static var instance:HelpWindow;
+			
+			public static function Show(alwaysInFront:Boolean=false, centerToScreen:Boolean=true):HelpWindow {
+				// just reinstantiate the window each time so we don't
+				// have to worry about the system setting instance to null
+				// every time the window is closed.
+				instance = new HelpWindow();
+				instance.open();
+				return instance;
+			}
+		]]>
+	</fx:Script>
+	
+	<s:Image source="./assets/runtime/help_screen_v2.png" width="100%" height="100%" 
+			 scaleMode="stretch" fillMode="scale"/>
+</s:Window>

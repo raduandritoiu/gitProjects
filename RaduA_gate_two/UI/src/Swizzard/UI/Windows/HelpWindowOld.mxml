@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Window xmlns:mx="http://www.adobe.com/2006/mxml" 
+		   layout="vertical" 
+		   width="905" height="543" 
+		   minWidth="905" minHeight="543"
+		   maxWidth="905" maxHeight="543"
+		   type="{NativeWindowType.UTILITY}" 
+		   resizable="false" minimizable="false" 
+		   showStatusBar="false" showGripper="false"
+		   backgroundColor="0xffffff" title="Help">
+	
+	<mx:Script>
+		<![CDATA[
+			private static var instance:HelpWindowOld;
+			
+			public static function Show(alwaysInFront:Boolean=false, centerToScreen:Boolean=true):HelpWindowOld {
+				// just reinstantiate the window each time so we don't
+				// have to worry about the system setting instance to null
+				// every time the window is closed.
+				instance = new HelpWindowOld();
+				instance.open();
+				return instance;
+			}
+		]]>
+	</mx:Script>
+	
+	<mx:Image source="./assets/runtime/help-screen.png" width="100%" height="100%" 
+			  scaleContent="true" maintainAspectRatio="true" />
+</mx:Window>

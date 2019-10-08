@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 mouseChildren="false" mouseEnabled="false">
+	
+	
+	<fx:Script>
+		<![CDATA[
+			import mx.core.FlexGlobals;
+			import mx.events.EffectEvent;
+			import mx.managers.PopUpManager;
+			
+			import spark.effects.Animate;
+			import spark.effects.Fade;
+			import spark.effects.animation.MotionPath;
+			import spark.effects.animation.SimpleMotionPath;
+			
+			
+			private static var instance:TextOverlayPlacard;
+			
+			
+			private var _text:String;
+			private var textChanged:Boolean;
+			
+			private var blurAnim:Animate;
+			private var fadeAnim:Fade;
+			private var isAdded:Boolean;
+			private var manualStop:Boolean;
+			
+			
+			public static function Show(text:String, target:DisplayObject):void {
+				if (instance == null) {
+					instance = new TextOverlayPlacard();
+				}
+				instance.show(text, target);
+			}
+			
+			
+			public static function Remove():void {
+				if (instance == null) return;
+				instance.remove();
+			}
+			
+			
+			public function show(text:String, target:DisplayObject):void {
+				// reset properties
+				textLabel.alpha = 0.6;
+				textLabel.text = text;
+				shadowFilter.blurX = 32;
+				shadowFilter.blurY = 32;
+				
+				// add it 
+				if (!isAdded) {
+					PopUpManager.addPopUp(this, FlexGlobals.topLevelApplication as DisplayObject);
+					isAdded = true;
+				}
+				
+				// set position
+				var off:Point = new Point();
+				off = target.localToGlobal(off);
+				x = off.x + (target.width - width)/2;
+				y = off.y + (target.height - height)/2;
+				
+				// reset animations
+				if (blurAnim == null) {
+					blurAnim = new Animate(shadowFilter);
+					blurAnim.duration = 500;
+					blurAnim.startDelay = 1000;
+					var v:Vector.<MotionPath> = new Vector.<MotionPath>();
+					v.push(new SimpleMotionPath("blurX", 0, 8));
+					v.push(new SimpleMotionPath("blurY", 0, 8));
+					blurAnim.motionPaths = v;
+				}
+				else {
+					blurAnim.stop();
+				}
+				
+				if (fadeAnim == null) {
+					fadeAnim = new Fade(textLabel);
+					fadeAnim.duration = 500;
+					fadeAnim.startDelay = 1000;
+					fadeAnim.alphaFrom = 0.6;
+					fadeAnim.alphaTo = 0;
+					fadeAnim.addEventListener(EffectEvent.EFFECT_END, remove, false, 0, true);
+				}
+				else {
+					manualStop = true;
+					fadeAnim.stop();
+					manualStop = false;
+				}
+				
+				// start animations
+				blurAnim.play();
+				fadeAnim.play();
+			}
+			
+			
+			public function remove(evt:Event=null):void {
+				if (!isAdded) return;
+				if (manualStop) return;
+				isAdded = false;
+				PopUpManager.removePopUp(this);
+			}
+		]]>
+	</fx:Script>
+	
+	<s:Label id="textLabel" fontSize="50" color="0x000000" alpha="1">
+		<s:filters>
+			<s:DropShadowFilter id="shadowFilter" distance="0" angle="90" color="0x000000" 
+								blurX="32" blurY="32" strength="1" quality="1"/>
+		</s:filters>
+	</s:Label>
+</s:Group>
