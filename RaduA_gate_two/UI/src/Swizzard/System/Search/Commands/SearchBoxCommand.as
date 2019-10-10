@@ -69,7 +69,6 @@ package Swizzard.System.Search.Commands
 					assemblyOnly.addItem(SQLQueryItem.Build("assemblyOnly", QueryOperations.EQUAL_TO, 0, "t"));
 					assemblyOnly.addItem(SQLQueryItem.Build("productType", QueryOperations.EQUAL_TO, 3, "t", QueryPredicates.OR));
 					query.addItem(assemblyOnly);
-					
 					var proxy:DataProxy	= facade.retrieveProxy(DataProxy.NAME) as DataProxy;
 					proxy.queryData(query, new Responder(partsResultHandler, statusHandler));
 					
@@ -93,7 +92,6 @@ package Swizzard.System.Search.Commands
 						
 						referenceQuery.addTable(productTable);
 						referenceQuery.addItem(SQLQueryItem.Build("competitorPartNumber", QueryOperations.LIKE, partNumber, "t"));
-						
 						proxy.queryData(referenceQuery, new Responder(crossReferenceItemsHandler, statusHandler));
 					}
 					else

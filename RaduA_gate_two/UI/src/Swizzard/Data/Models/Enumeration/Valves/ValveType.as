@@ -7,7 +7,10 @@ package Swizzard.Data.Models.Enumeration.Valves
 		public static const GLOBE:uint		= 2;
 		public static const ZONE:uint		= 3;
 		public static const MAGNETIC:uint	= 4;
-		public static const BUTTERFLY:uint	= 5;
+		
+		// RADUA 
+//		public static const BUTTERFLY:uint	= 5;
+		
 		public static const PICV:uint		= 6;
 		
 		
@@ -31,9 +34,10 @@ package Swizzard.Data.Models.Enumeration.Valves
 					return "Magnetic";
 					break;
 				
-				case BUTTERFLY:
-					return "Butterfly";
-					break;
+				//RADUA
+//				case BUTTERFLY:
+//					return "Butterfly";
+//					break;
 				
 				case PICV:
 					return "PICV";

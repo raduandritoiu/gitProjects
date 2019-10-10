@@ -17,11 +17,8 @@ public class Main
   
   
   public static void runParse() throws Exception {
-//  String absolutePathBase = "C:\\radua\\work_related_projects\\simple_select\\data_bases\\2018-11-02";
-//    String absolutePathBase = "C:\\radua\\home_proj\\de_la_mine\\work_related_projects\\simple_select\\data_bases\\2018-11-02";
-    String absolutePathBase = "C:\\radua\\home_proj\\de_la_mine\\work_related_projects\\simple_select\\data_bases\\2019-09-22";
-    
-    String targetFileName = "parts_with_removes_3";
+    String absolutePathBase = "C:\\radua\\home_proj\\simple_select_sources\\work_related_projects\\simple_select\\data_bases\\2019-10-09";
+    String targetFileName = "parts_123123";
     
     
     System.out.println("=== " + absolutePathBase);

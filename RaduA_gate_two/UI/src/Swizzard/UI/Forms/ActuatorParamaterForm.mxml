@@ -151,8 +151,6 @@
 				var positionerCursor:IViewCursor = positionerDp.createCursor();
 				var endSwitchCursor:IViewCursor	= endSwitchDp.createCursor();
 				
-				
-				var hasButterFly:Boolean 		= false;
 				var endSwitchEnabled:Boolean	= false;
 				var positionerEnabled:Boolean	= false;
 				
@@ -164,11 +162,6 @@
 					
 					switch (typeInfo.valveType)
 					{
-						case ValveType.BUTTERFLY:
-							hasButterFly		= true;
-							endSwitchEnabled	= true;
-							break;
-							
 						case ValveType.BALL:
 							endSwitchEnabled	= true;
 							break;
@@ -244,28 +237,12 @@
 					}
 				}
 				
-				
-				heaterSelector.enabled 		= hasButterFly;
 				endSwitchesSelector.enabled	= endSwitchEnabled;
 				positionerSelector.enabled 	= (positionerDp.length > 0) && positionerEnabled;
 				
-				
-				// Butterfly Mixture
-				if ((valveQueryModel.valveTypes.length > 1) && hasButterFly) {
-					pneumaticSignalForm.label	= "Air Supply/Spring Range:";
-				}
-				
-				if (!hasButterFly) {
-					// No Butterfly at all
-					pneumaticSignalForm.label = "Spring Range:";
-					heaterSelector.selectedIndex = -1;
-					// WEIRD_TODO: I really do not understand why reset this if no butterfly; what about ball?
-					endSwitchesSelector.selectedIndex = -1;
-				}
-				else if (valveQueryModel.valveTypes.length == 1) {
-					// Butterfly Only
-					pneumaticSignalForm.label	= "Air Supply Range:";
-				}
+				pneumaticSignalForm.label = "Spring Range:";
+				// WEIRD_TODO: I really do not understand why reset this if no butterfly; what about ball?
+				endSwitchesSelector.selectedIndex = -1;
 				
 				if (reconstructType) {
 					actuatorTypes.refresh();
@@ -344,7 +321,7 @@
 				actuatorQueryModel.supplyVoltage	= (supplyVoltageSelector.enabled && supplyVoltageSelector.selectedItem) ? supplyVoltageSelector.selectedItem.value 	: 0;
 				actuatorQueryModel.positioner		= (positionerSelector.enabled 	&& positionerSelector.selectedItem) 	? positionerSelector.selectedItem.value 	: -1;
 				actuatorQueryModel.endSwitch		= (endSwitchesSelector.enabled 	&& endSwitchesSelector.selectedItem) 	? endSwitchesSelector.selectedItem.value 	: -1;
-				actuatorQueryModel.hasHeater		= (heaterSelector.enabled 		&& heaterSelector.selectedItem) 		? heaterSelector.selectedItem.value 		: -1;
+				actuatorQueryModel.hasHeater		= -1;
 				
 				actuatorQueryModel.suppressEvents	= false;
 			}
@@ -415,10 +392,6 @@
 					case endSwitchesSelector:
 						actuatorQueryModel.endSwitch	= endSwitchesSelector.selectedItem.value;
 						break;
-					
-					case heaterSelector:
-						actuatorQueryModel.hasHeater	= heaterSelector.selectedItem.value;
-						break;
 				}
 			}
 			
@@ -479,11 +452,6 @@
 		<Controls:CustomFormItem label="End Switches:">
 			<s:DropDownList id="endSwitchesSelector" width="160" prompt="All" 
 							dataProvider="{endSwitchDp}" change="changeHandler(event)"/>
-		</Controls:CustomFormItem>
-		
-		<Controls:CustomFormItem label="Heater:">
-			<s:DropDownList id="heaterSelector" width="62" prompt="All" 
-							dataProvider="{hasHeaterDp}" change="changeHandler(event)"/>
 		</Controls:CustomFormItem>
 	</s:Form>
 </s:HGroup>

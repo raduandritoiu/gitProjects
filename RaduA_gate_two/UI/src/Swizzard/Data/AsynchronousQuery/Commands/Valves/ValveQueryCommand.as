@@ -11,7 +11,6 @@ package Swizzard.Data.AsynchronousQuery.Commands.Valves
 	 * This command is registered to execute for the "executeValveQuery" notificaiton.
 	 *  
 	 * @see Swizzard.Data.AsynchronousQuery.Commands.Valves.BallValveQueryCommand
-	 * @see Swizzard.Data.AsynchronousQuery.Commands.Valves.ButterflyValveQueryCommand
 	 * @see Swizzard.Data.AsynchronousQuery.Commands.Valves.GlobeValveQueryCommand
 	 * @see Swizzard.Data.AsynchronousQuery.Commands.Valves.MagneticValveQueryCommand
 	 * @see Swizzard.Data.AsynchronousQuery.Commands.Valves.ZoneValveQueryCommand
@@ -52,7 +51,6 @@ package Swizzard.Data.AsynchronousQuery.Commands.Valves
 			addSubCommand(ValveQueryPreinitializationCommand);
 			
 			addSubCommand(BallValveQueryCommand);
-			addSubCommand(ButterflyValveQueryCommand);
 			addSubCommand(GlobeValveQueryCommand);
 			addSubCommand(MagneticValveQueryCommand);
 			addSubCommand(ZoneValveQueryCommand);

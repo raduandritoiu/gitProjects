@@ -44,6 +44,7 @@ import siemens.vsst.data.parsers.dbs.ProductDBParser;
 import siemens.vsst.data.parsers.dbs.ValveDBParser;
 import siemens.vsst.data.parsers.dbs.ValveMediumDBParser;
 import siemens.vsst.data.parsers.dbs.ValveMixDivDBParser;
+import siemens.vsst.data.parsers.remove.CustomRemove;
 import siemens.vsst.data.parsers.remove.RemoveValves;
 import siemens.vsst.data.parsers.utils.StaticParameters;
 import siemens.vsst.data.parsers.utils.VSSTLogger;
@@ -157,8 +158,7 @@ public class DBFReader
 		// read Products Database (This gives us the rest of the information on all products)
 		readDbFile("Products", basePath + "/PRODUCT.DBF", productMap, true, ProductDBParser.newInstance());
 		// read Medium Database. This gives us the valve's medium flags
-//		readXLSFile("Prices_old", basePath + "/Prices_old.xls", productMap, true, PricesXlsParser.newInstance());
-		readXLSFile("Prices_new", basePath + "/Prices_new.xls", productMap, true, PricesXlsParser.newInstance());
+		readXLSFile("Prices", basePath + "/Prices.xls", productMap, true, PricesXlsParser.newInstance());
 
 		
 		// ==================================================
@@ -174,10 +174,15 @@ public class DBFReader
 
 		// ========================================
 		// === Remove products ====================
-		// remove Emerson PNs
+		// remove Emerson PNs from file
 		if (StaticParameters.EXTENDED_VERSION) {
 			removeXLSFile("Emerson PNs", basePath + "/Emerson_PNs.xls", productMap, new RemoveValves());
 		}		
+
+		// remove Butterfly Valves
+		if (StaticParameters.EXTENDED_VERSION) {
+			CustomRemove.RemoveButterfly(productMap);
+		}
 		
 		
 		// ==================================================

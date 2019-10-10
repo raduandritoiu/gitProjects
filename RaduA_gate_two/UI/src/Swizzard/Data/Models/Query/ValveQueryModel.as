@@ -39,7 +39,6 @@ package Swizzard.Data.Models.Query
 		private var _pressureClass:uint;			// Pressure Class
 		private var _discType:int;					// Disc Type
 		private var _minSteamSupplyPressure:int;	// Maximum Steam Supply Pressure
-		private var _butterflyConfig:String;		// Butterfly Config
 		private var _requiredFlowTolerance:Number;  // 								- used only by PICV
 		
 		
@@ -261,14 +260,6 @@ package Swizzard.Data.Models.Query
 		}
 		public function get discType():int {
 			return _discType;
-		}
-		
-		public function set butterflyConfig(value:String):void {
-			_butterflyConfig = value;
-			changedFields["butterflyConfig"] = value;
-		}
-		public function get butterflyConfig():String {
-			return _butterflyConfig;
 		}
 		
 		public function set requiredFlowTolerance(value:Number):void {

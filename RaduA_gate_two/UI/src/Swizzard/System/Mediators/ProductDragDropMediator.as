@@ -100,7 +100,6 @@ package Swizzard.System.Mediators
 			addNewFamily(ValveType.GLOBE, 		3, ProductType.VALVE, "/assets/ValveImages/globe-70x70.png");
 			addNewFamily(ValveType.BALL, 		4, ProductType.VALVE, "/assets/ValveImages/ball-70x70.png");
 			addNewFamily(ValveType.MAGNETIC, 	5, ProductType.VALVE, "/assets/ValveImages/magnetic-70x70.png");
-			addNewFamily(ValveType.BUTTERFLY, 	6, ProductType.VALVE, "/assets/ValveImages/butterfly-70x70.png");
 			
 			// add the Damper type and all the dampers
 			addNewProduct(ProductType.DAMPER, 	"/assets/DamperImages/non_spring_return.png", "Electric Actuators");

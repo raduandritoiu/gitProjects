@@ -23,7 +23,6 @@
 			
 			import Swizzard.Data.Models.Enumeration.Valves.MixingDiverting;
 			import Swizzard.Data.Models.Enumeration.Valves.ValveConnection;
-			import Swizzard.Data.Models.Enumeration.Valves.ValveDiscType;
 			import Swizzard.Data.Models.Enumeration.Valves.ValveMedium;
 			import Swizzard.Data.Models.Enumeration.Valves.ValveNormalState;
 			import Swizzard.Data.Models.Enumeration.Valves.ValvePattern;
@@ -35,7 +34,6 @@
 			import Swizzard.System.UI.Calculators.Enumeration.SteamCalculatorType;
 			import Swizzard.System.Utils.ValveFormUtil;
 			import Swizzard.UI.Skins.spark.ButtonFromTextSkin;
-			import Swizzard.UI.Windows.Butterfly3WayTypeSelector;
 			import Swizzard.UI.Windows.SteamCalculatorWindow;
 			
 			import utils.LogUtils;
@@ -59,15 +57,7 @@
 			
 			private var pressureClassDp:ArrayCollection	= new ArrayCollection();
 			private var flowDp:ArrayCollection			= new ArrayCollection();
-			private var discTypeDp:ArrayCollection		= new ArrayCollection([
-																{label: "All", value: -1},
-																{label: "Full Cut", value: ValveDiscType.FULL_CUT},
-																{label: "Under Cut", value: ValveDiscType.UNDER_CUT}
-															]);
 			private var percentGlycolDp:ArrayCollection	= new ArrayCollection([25, 30, 40, 50]);
-			
-			[Bindable]
-			private var hasButterFly:Boolean;
 			
 			private var cvNumberFormatter:NumberFormatter;
 			
@@ -227,16 +217,12 @@
 				var pressureClassCursor:IViewCursor	= pressureClassDp.createCursor();
 				var flowCursor:IViewCursor			= flowDp.createCursor();
 				
-				hasButterFly = false;
 				var cvEnabled:Boolean = false;
 				
 				for each (var type:uint in valveQueryModel.valveTypes) {
 					var typeInfo:ValveTypeInformation = ValveFormUtil.getValveEnumInfo(type);
 					
 					cvEnabled = (cvEnabled || !typeInfo.disableCVForm);
-					
-					if (typeInfo.valveType == ValveType.BUTTERFLY)
-						hasButterFly = true;			
 					
 					// Medium
 					for each (var mediumItem:Object in typeInfo.selectableMedium) {
@@ -275,7 +261,6 @@
 					}
 				}
 				
-				discTypeSelector.enabled	= hasButterFly;
 				cvInput.enabled				= cvEnabled;
 				pressureDropInput.enabled	= cvEnabled;
 				
@@ -325,25 +310,6 @@
 				// why do you validate it now and not wait???
 				this.validateNow();
 				
-				if (hasButterFly) {
-					if (valveQueryModel.medium != ValveMedium.STEAM)
-						butterflyConfigButton.visible = true;
-						
-					if (valveQueryModel.pattern == 3) {
-						if (valveQueryModel.butterflyConfig)
-							portConfigSelector.text	= "3 Way | Type " + valveQueryModel.butterflyConfig;
-						else
-							portConfigSelector.text	= "3 Way";
-					}
-					else {
-						portConfigSelector.invalidateDisplayList();
-					}
-				}
-				else {
-					butterflyConfigButton.visible	= false;
-					discTypeSelector.selectedIndex	= -1;
-				}
-				
 				if (valveQueryModel.valveTypes.length < 1) {
 					valveQueryModel.reset(false);
 				}
@@ -382,7 +348,7 @@
 				valveQueryModel.trim				= (trimSelector.enabled 		&& trimSelector.selectedItem) 			? trimSelector.selectedItem.value 			: null;
 				valveQueryModel.connection			= (connectionSelector.enabled 	&& connectionSelector.selectedItem) 	? connectionSelector.selectedItem.value 	: null;
 				valveQueryModel.flowCharacteristic	= (flowSelector.enabled 		&& flowSelector.selectedItem) 			? flowSelector.selectedItem.value 			: null;
-				valveQueryModel.discType			= (discTypeSelector.enabled 	&& discTypeSelector.selectedItem) 		? discTypeSelector.selectedItem.value 		: -1;
+				valveQueryModel.discType			= -1;
 				valveQueryModel.pressureClass		= (pressureClassSelector.enabled && pressureClassSelector.selectedItem) ? pressureClassSelector.selectedItem.value 	: null;
 				valveQueryModel.CV					= (!isNaN(parseFloat(cvInput.selectedItem))) 							? parseFloat(cvInput.selectedItem) 			: null;
 				valveQueryModel.CVB					= (!isNaN(parseFloat(cvInput_B.selectedItem))) 							? parseFloat(cvInput_B.selectedItem) 		: null;
@@ -509,11 +475,8 @@
 					flowDp.removeAll();
 					
 					// because valveTypes changed is not called I have to do this manually
-					hasButterFly 				= false;
 					cvInput.enabled				= false;
 					pressureDropInput.enabled	= false;
-					discTypeSelector.enabled 	= false;
-					butterflyConfigButton.visible = false;
 					mediumSelector.selectedIndex = 0;
 					LogUtils.UiWorkflow(" === reset all ===");
 					computeVisibleItems();
@@ -557,7 +520,6 @@
 						valveQueryModel.pattern		= null;
 						valveQueryModel.normalState	= null;
 						valveQueryModel.application	= null;
-						valveQueryModel.butterflyConfig	= null;
 						break;
 					
 					/* ------------- TOO WAY ------------ */
@@ -565,21 +527,18 @@
 						valveQueryModel.pattern		= ValvePattern.TWO_WAY;
 						valveQueryModel.normalState	= null;
 						valveQueryModel.application	= null;
-						valveQueryModel.butterflyConfig	= null;
 						break;
 					
 					case 2:
 						valveQueryModel.pattern		= ValvePattern.TWO_WAY;
 						valveQueryModel.normalState	= ValveNormalState.NORMALLY_OPEN;
 						valveQueryModel.application	= null;
-						valveQueryModel.butterflyConfig	= null;
 						break;
 					
 					case 3:
 						valveQueryModel.pattern		= ValvePattern.TWO_WAY;
 						valveQueryModel.normalState	= ValveNormalState.NORMALLY_CLOSED;
 						valveQueryModel.application	= null;
-						valveQueryModel.butterflyConfig	= null;
 						break;
 					
 					/* ------------- THREE WAY ------------ */
@@ -587,27 +546,18 @@
 						valveQueryModel.pattern		= ValvePattern.THREE_WAY;
 						valveQueryModel.normalState	= null;
 						valveQueryModel.application	= null;
-						if (hasButterFly) {
-							if (!valveQueryModel.butterflyConfig)
-								Butterfly3WayTypeSelector.Show(valveQueryModel.butterflyConfig, butterflyConfigSelectedHandler);
-						}
-						else {
-							valveQueryModel.butterflyConfig	= null;
-						}
 						break;
 					
 					case 5:
 						valveQueryModel.pattern		= ValvePattern.THREE_WAY;
 						valveQueryModel.normalState	= null;
 						valveQueryModel.application	= MixingDiverting.MIXING;
-						valveQueryModel.butterflyConfig	= null;
 						break;
 					
 					case 6:
 						valveQueryModel.pattern		= ValvePattern.THREE_WAY;
 						valveQueryModel.normalState	= null;
 						valveQueryModel.application	= MixingDiverting.DIVERTING;
-						valveQueryModel.butterflyConfig	= null;
 						break;
 					
 					// BOTH 2-Way and 3-Way
@@ -615,7 +565,6 @@
 						valveQueryModel.pattern		= ValvePattern.BOTH;
 						valveQueryModel.normalState	= null;
 						valveQueryModel.application	= null;
-						valveQueryModel.butterflyConfig	= null;
 						break;
 					
 					// 6-Way
@@ -623,7 +572,6 @@
 						valveQueryModel.pattern		= ValvePattern.SIX_WAY;
 						valveQueryModel.normalState	= null;
 						valveQueryModel.application	= null;
-						valveQueryModel.butterflyConfig	= null;
 						break;
 				}
 			}
@@ -752,10 +700,6 @@
 					case flowSelector:
 						valveQueryModel.flowCharacteristic	= flowSelector.selectedItem.value;
 						break;
-					
-					case discTypeSelector:
-						valveQueryModel.discType = discTypeSelector.selectedItem.value;
-						break;				
 				}
 				
 				formChanged	= true;
@@ -904,24 +848,6 @@
 			}
 			
 			
-			private function butterflyConfigButtonClickHandler():void {
-				if (hasButterFly)
-					Butterfly3WayTypeSelector.Show(valveQueryModel.butterflyConfig, butterflyConfigSelectedHandler);
-			}
-			
-			
-			private function butterflyConfigSelectedHandler(config:String):void {
-				valveQueryModel.butterflyConfig	= config;
-				valveQueryModel.pattern			= ValvePattern.THREE_WAY;
-				if (valveQueryModel.butterflyConfig) {
-					portConfigSelector.text	= "3 Way | Type " + valveQueryModel.butterflyConfig;
-				}
-				else {
-					portConfigSelector.text	= "3 Way";
-				}
-			}
-			
-
 			private function pressureDropCalculatorClickHandler():void {
 				var supplyPressure:Number = (steamSupplyPressInput) ? parseFloat(steamSupplyPressInput.text) : 0;
 				SteamCalculatorWindow.Show(calculatorResultHandler, supplyPressure, SteamCalculatorType.PRESSURE_DROP);
@@ -1015,7 +941,7 @@
 	</s:states>
 	
 	
-	
+<!--	
 	<s:transitions>
 		<s:Transition fromState="*" toState="water">
 			<s:Parallel>
@@ -1035,7 +961,7 @@
 			</s:Parallel>
 		</s:Transition>
 	</s:transitions>
-	
+-->
 	
 	<s:Form id="mainForm" >
 		<Controls:CustomFormItem label="Medium:" id="mediumFormItem">
@@ -1152,9 +1078,6 @@
 			<Controls:CustomDropDown id="portConfigSelector" width="125"
 									 prompt="All" enabled="{portConfigDp.length > 0}" 
 									 dataProvider="{portConfigDp}" change="changeHandler(event)"/>
-			<s:Button id="butterflyConfigButton" width="16" height="22"
-					  visible="false" skinClass="Swizzard.UI.Skins.spark.PlusButtonSkin"
-					  click="butterflyConfigButtonClickHandler()"/> 
 		</Controls:CustomFormItem>
 		
 		<Controls:CustomFormItem label="Trim :">
@@ -1181,11 +1104,6 @@
 			<s:DropDownList id="flowSelector" width="100"
 							enabled="{flowDp.length > 0}" prompt="All" 
 							dataProvider="{flowDp}" change="changeHandler(event)"/>
-		</Controls:CustomFormItem>
-		
-		<Controls:CustomFormItem label="Disc Type:">
-			<s:DropDownList id="discTypeSelector" width="100" prompt="All" 
-							dataProvider="{discTypeDp}" change="changeHandler(event)"/>
 		</Controls:CustomFormItem>
 	</s:Form>
 </s:HGroup>

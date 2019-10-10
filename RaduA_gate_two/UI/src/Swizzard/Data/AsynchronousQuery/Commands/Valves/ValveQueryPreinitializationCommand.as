@@ -27,9 +27,6 @@ package Swizzard.Data.AsynchronousQuery.Commands.Valves
 				if (valve.valveTypes.indexOf(ValveType.BALL) > -1)
 					willRequery	||= BallValveQueryCommand.WillRequeryValves(token);
 				
-				if (!willRequery && valve.valveTypes.indexOf(ValveType.BUTTERFLY) > -1)
-					willRequery	||= ButterflyValveQueryCommand.WillRequeryValves(token);
-				
 				if (!willRequery && valve.valveTypes.indexOf(ValveType.GLOBE) > -1)
 					willRequery	||= GlobeValveQueryCommand.WillRequeryValves(token);
 				

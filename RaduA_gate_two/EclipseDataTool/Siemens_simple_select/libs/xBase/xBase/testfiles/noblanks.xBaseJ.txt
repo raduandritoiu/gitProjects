@@ -1,3 +1,0 @@
-ignoreDBFLengthCheck=true
-trimFields=false
-fieldFilledWithSpaces=yes

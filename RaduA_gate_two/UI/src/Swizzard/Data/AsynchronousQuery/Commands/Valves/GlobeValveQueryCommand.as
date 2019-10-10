@@ -93,7 +93,7 @@ package Swizzard.Data.AsynchronousQuery.Commands.Valves
 				}
 			}
 			
-			if (shouldSkip || (queryModel.valve.butterflyConfig) || (queryModel.valve.discType > -1) || 
+			if (shouldSkip || (queryModel.valve.discType > -1) || 
 				(queryModel.actuator.positioner > 1) || (queryModel.actuator.supplyVoltage == 120))
 			{
 				skip();

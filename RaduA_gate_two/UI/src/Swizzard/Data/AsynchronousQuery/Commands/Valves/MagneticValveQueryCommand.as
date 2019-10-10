@@ -100,7 +100,7 @@ package Swizzard.Data.AsynchronousQuery.Commands.Valves
 			}
 			
 			// if butterfly parameters selected
-			if ((queryModel.valve.butterflyConfig) || (queryModel.valve.discType > -1) || 
+			if ((queryModel.valve.discType > -1) || 
 				(queryModel.actuator.positioner > 1))
 			{
 				skip();

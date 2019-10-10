@@ -27,7 +27,7 @@ package utils
 		
 		//=============================
 		public static function ValveSQL(str:Object):void {
-//			trace(str);
+			trace(str);
 		}
 		public static function SQLResults(str:Object):void {
 //			trace(str);
