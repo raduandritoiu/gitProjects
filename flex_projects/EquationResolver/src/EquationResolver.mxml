@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:WindowedApplication xmlns:fx="http://ns.adobe.com/mxml/2009" 
+					   xmlns:s="library://ns.adobe.com/flex/spark" 
+					   xmlns:mx="library://ns.adobe.com/flex/mx">
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import com.equation.controller.EquationSystem;
+			import com.equation.model.EquationNode;
+			import com.equation.model.Operation;
+			import com.equation.model.Value;
+			import com.equation.model.Variable;
+			import com.equation.types.OperationTypes;
+			import com.equation.types.ValueTypes;
+			import com.equation.utils.EquationParser;
+			import com.equation.values.NumericValue;
+			import com.equation.values.ResultValue;
+			
+			
+			private function test():void {
+				
+				var eqSystem:EquationSystem = new EquationSystem(ValueTypes.NUMERIC);
+				
+				eqSystem.addVariable("a", "2*6/3");
+				eqSystem.addVariable("b", "2*5 + 3*(12 - 8/a )- 6*1");
+				eqSystem.addVariable("c", "2+2*2*2");
+			}
+		]]>
+	</fx:Script>
+	
+	<s:Button label="click" click="test()"/>
+</s:WindowedApplication>

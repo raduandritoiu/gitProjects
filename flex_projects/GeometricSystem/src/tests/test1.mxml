@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 width="100%" height="100%" xmlns:view="framework.view.*">
+	
+	<fx:Script>
+		<![CDATA[
+			import framework.model.Axis;
+			import framework.model.EngineController;
+			import framework.model.PointMobility;
+			import framework.model.PointParticle;
+			import framework.utils.CalculusUtils;
+			
+			import org.osmf.events.TimeEvent;
+			
+			
+			private var p1:PointParticle = new PointParticle(100, 200);
+			private var p2:PointParticle = new PointParticle(300, 200, PointMobility.AXIS_MOBILE, new Axis(1, -1));
+			private var p8:PointParticle = new PointParticle(200, 300, PointMobility.AXIS_MOBILE, new Axis(1, -1));
+			private var p9:PointParticle = new PointParticle(350, 300, PointMobility.AXIS_MOBILE, new Axis(1, -1));
+			
+			private var p3:PointParticle = new PointParticle(0, 0, PointMobility.OX_MOBILE);
+			private var p4:PointParticle = new PointParticle(100, 0, PointMobility.OX_MOBILE);
+			private var p5:PointParticle = new PointParticle(0, 100, PointMobility.OX_MOBILE);
+			private var p6:PointParticle = new PointParticle(800, 700, PointMobility.OX_MOBILE);
+			private var p7:PointParticle = new PointParticle(700, 800, PointMobility.OX_MOBILE);
+			
+			
+			private var engine:EngineController = new EngineController(p1, runFunction, false);
+			
+			
+			private function runFunction(coord:Point):Point {
+				coord.x += 1;
+				return coord;
+			}
+			
+		]]>
+	</fx:Script>
+	
+	<s:VGroup width="100%" height="100%">
+		<s:HGroup >
+			<s:Button click="engine.step()" label="Step"/>
+			<s:Button click="engine.start()" label="Start"/>
+			<s:Button click="engine.stop()" label="Stop"/>
+		</s:HGroup>
+		
+		<s:Group>
+			<view:LineComp firstPoint="{p1}" secondPoint="{p2}"/>
+			<view:LineComp firstPoint="{p8}" secondPoint="{p2}"/>
+			
+			<view:LineComp firstPoint="{p8}" secondPoint="{p9}"/>
+			<view:LineComp firstPoint="{p9}" secondPoint="{p2}"/>
+			
+			
+			<view:LineNoComp firstPoint="{p4}" secondPoint="{p6}"/>
+			<view:LineNoComp firstPoint="{p5}" secondPoint="{p7}"/>
+			
+			<view:CircleComp centerPoint="{p1}" radius="5">
+				<view:stroke>
+					<s:SolidColorStroke color="0xff0000"/>
+				</view:stroke>
+			</view:CircleComp>
+	
+			<view:CircleComp centerPoint="{p2}" radius="5">
+				<view:stroke>
+					<s:SolidColorStroke color="0x00ff00"/>
+				</view:stroke>
+			</view:CircleComp>
+			
+			<view:CircleComp centerPoint="{p3}" radius="5">
+				<view:stroke>
+					<s:SolidColorStroke color="0x0000ff"/>
+				</view:stroke>
+			</view:CircleComp>
+			
+			<view:CircleComp centerPoint="{p8}" radius="5">
+				<view:stroke>
+					<s:SolidColorStroke color="0x00ff00"/>
+				</view:stroke>
+			</view:CircleComp>
+			
+			<view:CircleComp centerPoint="{p9}" radius="5">
+				<view:stroke>
+					<s:SolidColorStroke color="0xff00ff"/>
+				</view:stroke>
+			</view:CircleComp>
+		</s:Group>
+		
+
+	</s:VGroup>
+</s:Group>

@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 width="100%" height="100%" xmlns:view="framework.view.*">
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	
+	<fx:Script>
+		<![CDATA[
+			import framework.model.EngineController;
+			import framework.model.PointMobility;
+			import framework.model.PointParticle;
+			import framework.utils.CalculusUtils;
+			
+			import org.osmf.events.TimeEvent;
+			
+			private static var r1:Number = 50;
+			private static var R2:Number = 100;
+			private static var r3:Number = 100;
+			
+			private static var mobility:int = PointMobility.FIXED;
+			private static var start:Boolean = true;
+			
+			
+			private var p2_0:PointParticle = new PointParticle(150, 150, mobility);
+			private var p1_0:PointParticle = new PointParticle(p2_0.x + r1, p2_0.y);
+			private var p3_0:PointParticle = new PointParticle(p2_0.x, p2_0.y + R2);
+			private var p4_0:PointParticle = new PointParticle(p2_0.x + r3, p2_0.y + r3);
+			private var engine:EngineController = new EngineController(p1_0, runFunction, start);
+			
+			private function runFunction(coord:Point):Point {
+				return runFunction_all(coord, p2_0.x, p2_0.y);
+			}
+			
+			
+			
+			private var p2_1:PointParticle = new PointParticle(150, 450, mobility);
+			private var p1_1:PointParticle = new PointParticle(p2_1.x + r1, p2_1.y);
+			private var p3_1:PointParticle = new PointParticle(p2_1.x, p2_1.y + R2);
+			private var p4_1:PointParticle = new PointParticle(p2_1.x + r3, p2_1.y + r3);
+			private var engine1:EngineController = new EngineController(p1_1, runFunction1, start);
+			
+			private function runFunction1(coord:Point):Point {
+				return runFunction_all(coord, p2_1.x, p2_1.y);
+			}
+			
+			
+			
+			private var p2_2:PointParticle = new PointParticle(450, 150, mobility);
+			private var p1_2:PointParticle = new PointParticle(p2_2.x + r1, p2_2.y);
+			private var p3_2:PointParticle = new PointParticle(p2_2.x, p2_2.y + R2);
+			private var p4_2:PointParticle = new PointParticle(p2_2.x + r3, p2_2.y + r3);
+			private var engine2:EngineController = new EngineController(p1_2, runFunction2, start);
+			
+			private function runFunction2(coord:Point):Point {
+				return runFunction_all(coord, p2_2.x, p2_2.y);
+			}
+			
+			
+			
+			private var p2_3:PointParticle = new PointParticle(450, 450, mobility);
+			private var p1_3:PointParticle = new PointParticle(p2_3.x + r1, p2_3.y);
+			private var p3_3:PointParticle = new PointParticle(p2_3.x, p2_3.y + R2);
+			private var p4_3:PointParticle = new PointParticle(p2_3.x + r3, p2_3.y + r3);
+			private var engine3:EngineController = new EngineController(p1_3, runFunction3, start);
+			
+			private function runFunction3(coord:Point):Point {
+				return runFunction_all(coord, p2_3.x, p2_3.y);
+			}
+			
+			
+			
+			
+			private var p2_4:PointParticle = new PointParticle(750, 150, mobility);
+			private var p1_4:PointParticle = new PointParticle(p2_4.x + r1, p2_4.y);
+			private var p3_4:PointParticle = new PointParticle(p2_4.x, p2_4.y + R2);
+			private var p4_4:PointParticle = new PointParticle(p2_4.x + r3, p2_4.y + r3);
+			private var engine4:EngineController = new EngineController(p1_4, runFunction4, start);
+			
+			private function runFunction4(coord:Point):Point {
+				return runFunction_all(coord, p2_4.x, p2_4.y);
+			}
+			
+			
+			
+			private var p2_5:PointParticle = new PointParticle(750, 450, mobility);
+			private var p1_5:PointParticle = new PointParticle(p2_5.x + r1, p2_5.y);
+			private var p3_5:PointParticle = new PointParticle(p2_5.x, p2_5.y + R2);
+			private var p4_5:PointParticle = new PointParticle(p2_5.x + r3, p2_5.y + r3);
+			private var engine5:EngineController = new EngineController(p1_5, runFunction5, start);
+			
+			private function runFunction5(coord:Point):Point {
+				return runFunction_all(coord, p2_5.x, p2_5.y);
+			}
+			
+			private function runFunction_all(coord:Point, jx:Number, jy:Number):Point {
+				var jointDist:Number = r1;
+				
+				var alfa:Number = CalculusUtils.arctan(coord.x, coord.y, jx, jy);
+				alfa = alfa + 0.03;
+				
+				var newX:Number = jx + jointDist * Math.cos(alfa);
+				var newY:Number = jy + jointDist * Math.sin(alfa);
+				var newX_tmp:Number = jx - jointDist * Math.cos(alfa);
+				var newY_tmp:Number = jy - jointDist * Math.sin(alfa);
+				
+				if (Math.abs(coord.x - newX) + Math.abs(coord.y - newY) > 
+					Math.abs(coord.x - newX_tmp) + Math.abs(coord.y - newY_tmp)) {
+					newX = newX_tmp;
+					newY = newY_tmp;
+				}
+				
+				coord.x = newX;
+				coord.y = newY;
+				//				
+				//				coord.x = coord.x + 1;
+				//				coord.y = coord.y + 1;
+				
+				return coord;
+			}
+			
+			
+		]]>
+	</fx:Script>
+	
+	<s:HGroup >
+		<s:Button click="engine5.step()" label="Step"/>
+		<s:Button click="engine5.start()" label="Start"/>
+		<s:Button click="engine5.stop()" label="Stop"/>
+	</s:HGroup>
+	
+	<!-- ### 1 -->
+	<view:RectangleComp firstPoint="{p1_0}" secondPoint="{p2_0}" thirdPoint="{p3_0}" fourthPoint="{p4_0}"/>
+	
+	<view:CircleComp centerPoint="{p1_0}" radius="3"/>
+	<view:CircleComp centerPoint="{p2_0}" radius="{r1}"/>
+	<view:CircleComp centerPoint="{p2_0}" radius="1"/>
+	<view:CircleComp centerPoint="{p2_0}" radius="{R2}"/>
+	<view:CircleComp centerPoint="{p3_0}" radius="3"/>
+	<view:CircleComp centerPoint="{p4_0}" radius="3"/>
+	
+	
+	<!-- ### 2 -->
+	<view:RectangleComp secondPoint="{p2_1}" thirdPoint="{p3_1}" firstPoint="{p1_1}" fourthPoint="{p4_1}"/>
+	
+	<view:CircleComp centerPoint="{p1_1}" radius="3"/>
+	<view:CircleComp centerPoint="{p2_1}" radius="{r1}"/>
+	<view:CircleComp centerPoint="{p2_1}" radius="1"/>
+	<view:CircleComp centerPoint="{p2_1}" radius="{R2}"/>
+	<view:CircleComp centerPoint="{p3_1}" radius="3"/>
+	<view:CircleComp centerPoint="{p4_1}" radius="3"/>
+	
+	
+	<!-- ### 1 -->
+	<view:RectangleComp secondPoint="{p1_2}" thirdPoint="{p2_2}" firstPoint="{p3_2}" fourthPoint="{p4_2}"/>
+	
+	<view:CircleComp centerPoint="{p1_2}" radius="3"/>
+	<view:CircleComp centerPoint="{p2_2}" radius="{r1}"/>
+	<view:CircleComp centerPoint="{p2_2}" radius="1"/>
+	<view:CircleComp centerPoint="{p2_2}" radius="{R2}"/>
+	<view:CircleComp centerPoint="{p3_2}" radius="3"/>
+	<view:CircleComp centerPoint="{p4_2}" radius="3"/>
+	
+	
+	<!-- ### 2 -->
+	<view:RectangleComp secondPoint="{p1_3}" thirdPoint="{p3_3}" firstPoint="{p2_3}" fourthPoint="{p4_3}"/>
+	
+	<view:CircleComp centerPoint="{p1_3}" radius="3"/>
+	<view:CircleComp centerPoint="{p2_3}" radius="{r1}"/>
+	<view:CircleComp centerPoint="{p2_3}" radius="1"/>
+	<view:CircleComp centerPoint="{p2_3}" radius="{R2}"/>
+	<view:CircleComp centerPoint="{p3_3}" radius="3"/>
+	<view:CircleComp centerPoint="{p4_3}" radius="3"/>
+	
+	
+	<!-- ### 1 -->
+	<view:RectangleComp secondPoint="{p3_4}" thirdPoint="{p1_4}" firstPoint="{p2_4}" fourthPoint="{p4_4}"/>
+	
+	<view:CircleComp centerPoint="{p1_4}" radius="3"/>
+	<view:CircleComp centerPoint="{p2_4}" radius="{r1}"/>
+	<view:CircleComp centerPoint="{p2_4}" radius="1"/>
+	<view:CircleComp centerPoint="{p2_4}" radius="{R2}"/>
+	<view:CircleComp centerPoint="{p3_4}" radius="3"/>
+	<view:CircleComp centerPoint="{p4_4}" radius="3"/>
+	
+	
+	<!-- ### 2 -->
+	<view:RectangleComp secondPoint="{p3_5}" thirdPoint="{p2_5}" firstPoint="{p1_5}" fourthPoint="{p4_5}"/>
+	
+	<view:CircleComp centerPoint="{p1_5}" radius="3"/>
+	<view:CircleComp centerPoint="{p2_5}" radius="{r1}"/>
+	<view:CircleComp centerPoint="{p2_5}" radius="1"/>
+	<view:CircleComp centerPoint="{p2_5}" radius="{R2}"/>
+	<view:CircleComp centerPoint="{p3_5}" radius="3"/>
+	<view:CircleComp centerPoint="{p4_5}" radius="3"/>
+	
+</s:Group>

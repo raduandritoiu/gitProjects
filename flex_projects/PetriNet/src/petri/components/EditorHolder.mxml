@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 width="100%" height="100%">
+	
+	<fx:Script>
+		<![CDATA[
+			import com.joeberkovitz.moccasin.service.BasicConfigurationService;
+			
+			import petri.controller.PetriController;
+			import petri.editor.PetriEditor;
+			import petri.view.MarkingTreeView;
+			
+			
+			private var editor:PetriEditor;
+			private var markingTreeView:MarkingTreeView;
+			
+			
+			public function createNewEditor():void {
+				if (editor != null)
+					return;
+				
+				editor = new PetriEditor();
+				editor.configurationService = new BasicConfigurationService(null, null);
+				
+				petriEditorContainer.viewport = editor;
+				editor.initializeEditor();
+				
+				markingTreeView = editor.petriController.treeView;
+				treeViewContainer.viewport = markingTreeView;
+			}
+			
+			
+			public function removeEditor():void {
+				if (editor == null)
+					return;
+				
+				editor.remove();
+				petriEditorContainer.viewport = null;
+				editor = null;
+				
+				treeViewContainer.viewport = null;
+				markingTreeView = null;
+			}
+			
+			
+			public function openEditor():void {
+				if (editor != null)
+					return;
+				
+				var file:File = File.desktopDirectory;
+				file.addEventListener(Event.SELECT, handleFileSelectedForOpen);
+				file.browseForOpen("Open Document ...");
+			}
+			
+			private function handleFileSelectedForOpen(e:Event):void {
+				var file:File = e.target as File;
+				file.removeEventListener(Event.SELECT, handleFileSelectedForOpen);
+				
+				createNewEditor();
+				editor.loadDocument(file.nativePath);
+			}
+			
+			
+			public function saveEditor():void {
+				if (editor == null)
+					return;
+				
+				var file:File = File.desktopDirectory;
+				file.addEventListener(Event.SELECT, handleFileSelectedForSave);
+				file.browseForSave("Save Document As...");
+			}
+			
+			private function handleFileSelectedForSave(e:Event):void {
+				var file:File = e.target as File;
+				file.removeEventListener(Event.SELECT, handleFileSelectedForSave);
+				editor.saveDocumentToFile(file.nativePath);
+			}
+
+		]]>
+	</fx:Script>
+	
+	<s:Group height="20" width="100" x="10" y="-20">
+		<s:Rect width="100%" height="100%" 
+				topLeftRadiusX="5" topLeftRadiusY="5"
+				topRightRadiusX="5" topRightRadiusY="5">
+			<s:fill>
+				<s:SolidColor color="0xddff00"/>
+			</s:fill>	
+		</s:Rect>
+		<s:Label verticalAlign="middle" verticalCenter="0" horizontalCenter="0" text="bla bla"/>
+	</s:Group>
+	
+	<s:HGroup width="100%" height="100%" gap="0">
+		
+		<s:Group id="petriEditorMainContainer" 
+				 width="100%" height="100%">
+			<s:Rect width="100%" height="100%">
+				<s:fill>
+					<s:SolidColor color="0xffffff"/>
+				</s:fill>	
+			</s:Rect>
+			
+			<s:Scroller id="petriEditorContainer"
+					 	width="100%" height="100%"
+						horizontalScrollPolicy="auto"
+						verticalScrollPolicy="auto"/>
+			<s:Label id="pnName" x="10" y="10" text="Petri NET" fontSize="14"/>
+		</s:Group>
+		
+		<s:Rect width="4" height="100%">
+			<s:fill> <s:SolidColor color="0x222222"/> </s:fill>
+		</s:Rect>
+		
+		<s:Group id="treeViewMainContainer" 
+				 width="200" height="100%">
+			<s:Rect width="100%" height="100%">
+				<s:fill> <s:SolidColor color="0xffffff"/> </s:fill>	
+			</s:Rect>
+			
+			<s:Scroller id="treeViewContainer"
+						left="0" right="0" bottom="0" top="25" 
+						horizontalScrollPolicy="off"
+						verticalScrollPolicy="auto"/>
+			<s:Label x="10" y="10" text="Reachability GRAPH" fontSize="14"/>
+		</s:Group>
+		
+	</s:HGroup>
+</s:Group>

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.Mobix" parent="@style/Theme.AppCompat.Light.NoActionBar">
+        <!--
+        <item name="windowActionBar">false</item>
+        <item name="windowActionModeOverlay">true</item>
+        -->
+        <item name="android:windowBackground">@color/global_bg_back</item>
+        <item name="actionModeBackground">@color/theme_action_mode_bg</item>
+
+        <item name="colorPrimary">@color/global_color_primary</item>
+        <item name="colorPrimaryDark">@color/global_color_primary_dark</item>
+        <item name="colorAccent">@color/global_color_accent</item>
+        <item name="colorControlNormal">@color/global_color_control_normal</item>
+        <item name="colorControlActivated">@color/global_color_control_activated</item>
+        <item name="colorControlHighlight">@color/global_color_control_highlight</item>
+        <item name="colorSwitchThumbNormal">@color/global_color_switch_thumb_normal</item>
+
+        <item name="android:textColorPrimary">@color/global_text_primary</item>
+        <item name="android:textColorPrimaryInverse">@color/global_text_primary_inverse</item>
+        <item name="android:textColorPrimaryDisableOnly">@color/global_text_primary_disable_only</item>
+        <item name="android:textColorSecondary">@color/global_text_secondary</item>
+        <item name="android:textColorSecondaryInverse">@color/global_text_secondary_inverse</item>
+        <item name="android:textColorTertiary">@color/global_text_tertiary</item>
+        <item name="android:textColorTertiaryInverse">@color/global_text_tertiary_inverse</item>
+        <item name="android:textColorHint">@color/global_text_hint</item>
+        <item name="android:textColorHintInverse">@color/global_text_hint_inverse</item>
+        <item name="android:textColorHighlight">@color/global_text_highlight</item>m>
+        <item name="android:textColorLink">@color/global_text_link</item>
+    </style>
+
+    <!-- main-carrot -->
+    <style name="Theme.Mobix.Main" parent="@style/Theme.Mobix">
+        <item name="colorPrimary">@color/global_color_carrot_primary</item>
+        <item name="colorPrimaryDark">@color/global_color_carrot_primary_dark</item>
+        <item name="colorAccent">@color/global_color_carrot_accent</item>
+        <item name="colorControlActivated">@color/global_color_carrot_control_activated</item>
+    </style>
+
+    <!-- red + slider -->
+    <style name="Theme.Mobix.Red" parent="@style/Theme.Mobix">
+    </style>
+
+    <!-- orange -->
+    <style name="Theme.Mobix.Orange" parent="@style/Theme.Mobix">
+    </style>
+
+    <!-- blue -->
+    <style name="Theme.Mobix.Blue" parent="@style/Theme.Mobix">
+    </style>
+
+    <!-- turquoise -->
+    <style name="Theme.Mobix.Turquoise" parent="@style/Theme.Mobix">
+    </style>
+
+    <!-- grayscale -->
+    <style name="Theme.Mobix.Grayscale" parent="@style/Theme.Mobix">
+    </style>
+</resources>

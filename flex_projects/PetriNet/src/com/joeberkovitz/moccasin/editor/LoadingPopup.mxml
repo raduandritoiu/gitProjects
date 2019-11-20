@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml" width="400" height="80"
+    backgroundColor="#333333"
+    horizontalScrollPolicy="off"
+>
+
+    <mx:Script>
+        <![CDATA[
+            import mx.events.ModuleEvent;
+            import mx.managers.PopUpManager;
+
+        public var sourceSpecs:Array = [];
+        
+        public function addProgressSource(source:IEventDispatcher, name:String):void
+        {
+            for (var i:int = 0; i < sourceSpecs.length; i++)
+            {
+                if (sourceSpecs[i].source == source)
+                {
+                    return;
+                }
+            }
+
+            trace("starting ", name);
+            sourceSpecs.push({source: source, name: name});
+            source.addEventListener(Event.COMPLETE, handleSourceComplete);
+            source.addEventListener(ModuleEvent.READY, handleSourceComplete);
+            updateIndicator();
+        }
+        
+        private function updateIndicator():void
+        {
+            if (sourceSpecs.length > 0 && progressIndicator.source == null)
+            {
+                var sourceSpec:Object = sourceSpecs[0];
+                progressIndicator.source = sourceSpec.source;
+                progressSourceName.text = sourceSpec.name;
+            }
+        }
+        
+        private function handleSourceComplete(e:Event):void
+        {
+            if (progressIndicator.source == e.target)
+            {
+                progressIndicator.source = null;
+            }
+
+            for (var i:int = 0; i < sourceSpecs.length; i++)
+            {
+                if (sourceSpecs[i].source == e.target)
+                {
+                    trace("completed " + sourceSpecs[i].name);
+                    sourceSpecs.splice(i, 1);
+                    break;
+                }
+            }
+            
+            if (sourceSpecs.length == 0 && progressIndicator.source == null)
+            {
+                PopUpManager.removePopUp(this);
+            }
+            else
+            {
+                updateIndicator();
+            }
+        }
+        ]]>
+    </mx:Script>
+
+    <mx:Label id="progressSourceName" color="#FFFFFF" left="20" right="20" y="12"/>    
+    <mx:ProgressBar id="progressIndicator"  left="20" right="20" y="33" height="32"
+          label="%3%%" labelPlacement="center" mode="event"/>
+</mx:Canvas>

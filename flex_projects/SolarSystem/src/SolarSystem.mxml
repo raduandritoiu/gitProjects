@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:WindowedApplication xmlns:fx="http://ns.adobe.com/mxml/2009" 
+					   xmlns:s="library://ns.adobe.com/flex/spark" 
+					   xmlns:mx="library://ns.adobe.com/flex/mx" 
+					   xmlns:components="components.*"
+					   creationComplete="init()"
+					   width="1600" height="900">
+	<fx:Script>
+		<![CDATA[
+			private var timer:Timer = new Timer(100, 0);
+			private var dayNo:int = 0;
+			private var cycleSpeed:Number = 1;
+			
+			private function init():void {
+				timer.addEventListener(TimerEvent.TIMER, timerFunction);
+			}
+			
+			
+			private function timerFunction(evt:Event):void {
+				sun.moveStar(cycleSpeed);
+				dayNo++;
+				day.text = "" + dayNo;
+			}
+			
+			
+			private function play():void {
+				speed.enabled = false;
+				playButt.enabled = false;
+				stopButt.enabled = true;
+				timer.start();
+			}
+			
+			
+			private function stop():void {
+				speed.enabled = true;
+				playButt.enabled = true;
+				stopButt.enabled = false;
+				timer.stop();
+			}
+			
+			
+			private function speedChanged():void {
+				if (speed.value == 0) {
+					timer.delay = 1;
+				}
+				else {
+					timer.delay = speed.value;
+				}
+			}
+			
+			
+			private function zoomChanged():void {
+				solarSystem.scaleX = 1 / zoom.value;
+				solarSystem.scaleY = 1 / zoom.value;
+			}
+			
+			
+			private function cyclesChanged():void {
+				cycleSpeed = 1 / cycles.value;
+			}
+
+		]]>
+	</fx:Script>
+	
+	<s:HGroup verticalAlign="middle" gap="30">
+		<s:VGroup>
+			<s:Button id="playButt" label="Play" click="play()"/>
+			<s:Button id="stopButt" label="Stop" click="stop()" enabled="false"/>
+		</s:VGroup>
+		
+		<s:VGroup>
+			<s:Label text="Day:"/>
+			<s:Label id="day"/>
+			<s:Rect width="100" height="2"/>
+		</s:VGroup>
+		
+		<s:VGroup>
+			<s:Label text="Speed:"/>
+			<s:HSlider id="speed" width="300" 
+					   minimum="0" maximum="1500" stepSize="10" value="100"
+					   change="speedChanged()" />
+		</s:VGroup>
+		
+		<s:VGroup>
+			<s:Label text="Cycles per day"/>
+			<s:HSlider id="cycles" width="300" 
+					   minimum="0.1" maximum="10" stepSize="0.1" value="1"
+					   change="cyclesChanged()" />
+		</s:VGroup>
+		
+		<s:VGroup>
+			<s:Label text="Zoom"/>
+			<s:HSlider id="zoom" width="300" 
+					   minimum="0.1" maximum="30" stepSize="0.001" value="1"
+					   change="zoomChanged()" />
+		</s:VGroup>
+		
+	</s:HGroup>
+	
+	<s:Group id="solarSystem"
+			 x="800" y="450">
+		
+		<components:Planet id="sun" 
+						   rotRadius="200">
+			<components:planets>
+				
+				<components:Planet id="venus" revSpeed="669" rotSpeed="72"
+								   rotRadius="30" revRadius="700"/>
+				
+				<components:Planet id="earth" revSpeed="360" rotSpeed="1"
+								   rotRadius="50" revRadius="1000">
+					<components:planets>
+						
+						<components:Planet id="moon" revSpeed="72" rotSpeed="72"
+										   rotRadius="10" revRadius="100"/>
+					</components:planets>
+				</components:Planet>
+				
+				<components:Planet id="mars" revSpeed="780" rotSpeed="72"
+								   rotRadius="28" revRadius="1500"/>
+			</components:planets>
+		</components:Planet>
+		
+		
+		<s:Rect width="5" height="5">
+			<s:fill>
+				<s:SolidColor color="0x00ff00"/>
+			</s:fill>
+		</s:Rect>
+	</s:Group>
+</s:WindowedApplication>

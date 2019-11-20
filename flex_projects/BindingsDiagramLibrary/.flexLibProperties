@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<flexLibProperties includeAllClasses="false" useMultiPlatformConfig="false" version="3">
+  <includeClasses>
+    <classEntry path="bindings.model.PointNode"/>
+    <classEntry path="bindings.model.ShapeNode"/>
+    <classEntry path="bindings.model.TranslatorNode"/>
+    <classEntry path="bindings.utils.BindingsModelFactoryImpl"/>
+    <classEntry path="bindings.utils.BindingsViewFactoryImpl"/>
+    <classEntry path="bindings.view.PointNodeView"/>
+    <classEntry path="bindings.view.ShapeNodeView"/>
+    <classEntry path="bindings.view.TranslatorNodeView"/>
+    <classEntry path="bindings.editors.BindingsEditor"/>
+    <classEntry path="bindings.mediators.drags.BindingsWorldDropMediator"/>
+    <classEntry path="bindings.utils.BindingsDataModel"/>
+    <classEntry path="bindings.utils.BindingsDataFactoryImpl"/>
+    <classEntry path="bindings.mediators.drags.BindingsSlotDragMediator"/>
+    <classEntry path="bindings.mediators.tools.BindingsWorldToolMediator"/>
+    <classEntry path="bindings.components.ModelPropertyItemRenderer"/>
+    <classEntry path="bindings.mediators.tools.BindingsDrawLinksTool"/>
+  </includeClasses>
+  <includeResources/>
+  <namespaceManifests/>
+</flexLibProperties>

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 width="100%" height="100%" xmlns:view="framework.view.*">
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	
+	<fx:Script>
+		<![CDATA[
+			import framework.model.EngineController;
+			import framework.model.PointParticle;
+			import framework.model.PointMobility;
+			import framework.utils.CalculusUtils;
+			
+			import org.osmf.events.TimeEvent;
+			
+			
+			private var p1:PointParticle = new PointParticle(200, 200);
+			private var p2:PointParticle = new PointParticle(200, 400);
+			private var p3:PointParticle = new PointParticle(400, 400);
+			private var p4:PointParticle = new PointParticle(400, 200);
+			
+			
+			private var engine:EngineController = new EngineController(p3, runFunction, false);
+			
+			
+			private function runFunction(coord:Point):Point {
+				coord.x = coord.x + 1;
+//				coord.y = coord.y + 1;
+				return coord;
+			}
+			
+		]]>
+	</fx:Script>
+	
+	<s:HGroup >
+		<s:Button click="engine.step()" label="Step"/>
+		<s:Button click="engine.start()" label="Start"/>
+		<s:Button click="engine.stop()" label="Stop"/>
+	</s:HGroup>
+	
+	<view:LineComp firstPoint="{p1}" secondPoint="{p2}" />
+	<view:LineComp firstPoint="{p2}" secondPoint="{p3}" />
+	<view:LineComp firstPoint="{p3}" secondPoint="{p4}" />
+	<view:LineComp firstPoint="{p4}" secondPoint="{p1}" />
+	
+	<view:CircleComp centerPoint="{p1}" radius="3">
+		<view:stroke> <s:SolidColorStroke color="0x00ff00"/> </view:stroke>
+	</view:CircleComp>
+	
+	<view:CircleComp centerPoint="{p2}" radius="6"/>
+	
+	<view:CircleComp centerPoint="{p3}" radius="3"/>
+	<view:CircleComp centerPoint="{p4}" radius="3"/>
+
+</s:Group>

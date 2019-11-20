@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:WindowedApplication xmlns:fx="http://ns.adobe.com/mxml/2009" 
+					   xmlns:s="library://ns.adobe.com/flex/spark" 
+					   xmlns:mx="library://ns.adobe.com/flex/mx"
+					   width="1200" height="650" xmlns:components="petri.components.*"
+					   creationComplete="{init()}" xmlns:utils="petri.components.utils.*" xmlns:utils1="petri.utils.*">
+	
+	<fx:Script>
+		<![CDATA[
+			import petri.utils.PetriModels;
+			private function init():void {
+			}
+			
+			
+			private function createEditorHandler(evt:Event = null):void {
+				testes.reset();
+				
+				editorHolder.removeEditor();
+				editorHolder.createNewEditor();
+			}
+			
+			
+			private function closeEditorHandler(evt:Event = null):void {
+				testes.reset();
+				
+				editorHolder.removeEditor();
+			}
+			
+			
+			private function openEditorHandler(evt:Event = null):void {
+				testes.reset();
+				
+				editorHolder.removeEditor();
+				editorHolder.openEditor();
+			}
+			
+			
+			private function saveEditorHandler(evt:Event = null):void {
+				testes.reset();
+				
+				editorHolder.saveEditor();
+			}
+		]]>
+	</fx:Script>
+	
+	<s:layout>
+		<s:HorizontalLayout gap="0"/>
+	</s:layout>
+	
+	
+	<s:VGroup id="header" gap="10" 
+			  width="120"
+			  horizontalAlign="center">
+		
+		<s:Group id="topPadding" height="5"/>
+		
+		<s:VGroup id="editTools" gap="1">
+			<s:Label text="Edit files" fontWeight="bold"/>
+			<s:Button id="newEditor" click="{createEditorHandler()}" label="New"/>
+			<s:Button id="openEditor" click="{openEditorHandler()}" label="Open"/>
+			<s:Button id="saveEditor" click="{saveEditorHandler()}" label="Save"/>
+			<s:Button id="closeEditor" click="{closeEditorHandler()}" label="Close"/>
+		</s:VGroup>
+		
+		<utils:HSeperator width="100%"/>
+		
+		<s:VGroup id="dataModelHolder" gap="3">
+			<s:Label text="Drag Component" fontWeight="bold"/>
+			<s:List id="dataModels" 
+					dataProvider="{PetriModels.modelData()}"
+					itemRenderer="petri.components.ModelItemRenderere"
+					dragEnabled="true"
+					borderAlpha="0">
+				<s:layout>
+					<s:VerticalLayout gap="3"/>
+				</s:layout>
+			</s:List>
+		</s:VGroup>
+		
+		<utils:HSeperator width="100%"/>
+
+		<components:RunTools>
+			<components:layout>
+				<s:VerticalLayout gap="3"/>
+			</components:layout>
+		</components:RunTools>
+		
+		<utils:HSeperator width="100%"/>
+		
+		<components:PropertiesEditorHolder >
+			<components:layout>
+				<s:VerticalLayout gap="3"/>
+			</components:layout>
+		</components:PropertiesEditorHolder>
+		
+		
+		<utils1:Tester id="testes" width="100%" height="100%"/>
+
+	</s:VGroup>
+	
+	<s:Rect height="100%" width="4">
+		<s:fill> <s:SolidColor color="0x000000"/> </s:fill>
+	</s:Rect>
+	<components:EditorHolder id="editorHolder"/>
+</s:WindowedApplication>

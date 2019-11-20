@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:WindowedApplication xmlns:fx="http://ns.adobe.com/mxml/2009" width="1200" height="650"
+					   xmlns:s="library://ns.adobe.com/flex/spark" 
+					   xmlns:mx="library://ns.adobe.com/flex/mx" 
+					   >
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import bindings.editors.BindingsEditor;
+			
+			import diagram.controller.DiagramController;
+			import diagram.enums.DiagramWorldTools;
+			import diagram.model.DiagramLink;
+			import diagram.model.DiagramNode;
+			import diagram.model.DiagramSlot;
+			import diagram.utils.DiagramModelFactory;
+			
+			import j2inn.builder.mapping.NumericVirtualPoint;
+			import j2inn.builder.mapping.propertyTranslators.NumericTranslator;
+			import j2inn.builder.model.J2BooleanShape;
+			import j2inn.builder.model.J2NumericShape;
+			
+			import mx.collections.ArrayCollection;
+			
+			
+			private var editor:BindingsEditor;
+			
+			
+			private function addSomething():void 
+			{
+				editor = new BindingsEditor();
+				testContainer.addElement(editor);
+				editor.initializeEditor();
+				var controller:DiagramController = editor.diagramController;
+				
+				
+				// nodes
+				var nodeA:DiagramNode = new DiagramNode();
+				nodeA.x = 100;
+				nodeA.y = 100;
+				nodeA.name = "Multiply";
+				controller.addModelToActiveContainer(nodeA);
+				
+				var nodeB:DiagramNode = new DiagramNode();
+				controller.addModelToActiveContainer(nodeB);
+				nodeB.x = 100; 
+				nodeB.y = 400;
+				nodeB.name = "Max";
+				controller.addModelToActiveContainer(nodeB);
+				
+				var nodeC:DiagramNode = new DiagramNode();
+				nodeC.x = 500;
+				nodeC.y = 100;
+				nodeC.name = "Min";
+				controller.addModelToActiveContainer(nodeC);
+				
+				var nodeD:DiagramNode = new DiagramNode();
+				nodeD.x = 300;
+				nodeD.y = 300;
+				nodeD.name = "Add";
+				controller.addModelToActiveContainer(nodeD);
+				
+				
+				// slots
+				var slot:DiagramSlot = new DiagramSlot();
+				slot.x = 10;
+				slot.y = 5;
+				nodeA.addChild(slot);
+				slot = new DiagramSlot();
+				slot.x = 10;
+				slot.y = 25;
+				nodeA.addChild(slot);
+				var slot:DiagramSlot = new DiagramSlot();
+				slot.x = 10;
+				slot.y = 45;
+				nodeA.addChild(slot);
+				var slot:DiagramSlot = new DiagramSlot();
+				slot.x = 50;
+				slot.y = 25;
+				nodeA.addChild(slot);
+
+				var slot:DiagramSlot = new DiagramSlot();
+				slot.x = 10;
+				slot.y = 5;
+				nodeB.addChild(slot);
+				var slot:DiagramSlot = new DiagramSlot();
+				slot.x = 10;
+				slot.y = 25;
+				nodeB.addChild(slot);
+				
+				slot = new DiagramSlot();
+				slot.x = 10;
+				slot.y = 5;
+				nodeC.addChild(slot);
+				slot = new DiagramSlot();
+				slot.x = 10;
+				slot.y = 25;
+				nodeC.addChild(slot);
+				var slot:DiagramSlot = new DiagramSlot();
+				slot.x = 10;
+				slot.y = 45;
+				nodeC.addChild(slot);
+				var slot:DiagramSlot = new DiagramSlot();
+				slot.x = 10;
+				slot.y = 65;
+				nodeC.addChild(slot);
+				
+				slot = new DiagramSlot();
+				slot.x = 10;
+				slot.y = 5;
+				nodeD.addChild(slot);
+				var slot:DiagramSlot = new DiagramSlot();
+				slot.x = 50;
+				slot.y = 25;
+				nodeD.addChild(slot);
+
+				
+				//links
+				var linkAD:DiagramLink = new DiagramLink();
+				linkAD.from = nodeA.slots.getItemAt(nodeA.slots.length-1) as DiagramSlot;
+				linkAD.to = nodeD.slots.getItemAt(0) as DiagramSlot;
+				controller.addModelToActiveContainer(linkAD);
+				
+				var linkBD:DiagramLink = new DiagramLink();
+				linkBD.from = nodeB.slots.getItemAt(nodeB.slots.length - 1) as DiagramSlot;
+				linkBD.to = nodeD.slots.getItemAt(1) as DiagramSlot;
+				controller.addModelToActiveContainer(linkBD);
+				
+				var linkDC:DiagramLink = new DiagramLink();
+				linkDC.from = nodeD.slots.getItemAt(nodeD.slots.length - 1) as DiagramSlot;
+				linkDC.to = nodeC.slots.getItemAt(1) as DiagramSlot;
+				controller.addModelToActiveContainer(linkDC);
+				
+				
+				var dp:ArrayCollection = DiagramModelFactory.dataModels;
+				
+				var boolComp:J2BooleanShape = new J2BooleanShape();
+				boolComp.name = "Boolean";
+				dp.addItem(boolComp);
+				
+				var numComp:J2NumericShape = new J2NumericShape();
+				numComp.name = "Numeric";
+				dp.addItem(numComp);
+				
+				var vp:NumericVirtualPoint = new NumericVirtualPoint();
+				vp.name = "blabla";
+				dp.addItem(vp);
+				
+				var trans:NumericTranslator = new NumericTranslator();
+				dp.addItem(trans);
+				
+				dp.addItem({label:"bogus"});
+				
+				dataModels.dataProvider = dp;
+				
+				
+				
+				var toolsDp:ArrayCollection = new ArrayCollection();
+				toolsDp.addItem({label:"select", tool: DiagramWorldTools.SELECTION_TOOL});
+				toolsDp.addItem({label:"link", tool: DiagramWorldTools.LINKS_TOOL});
+				
+				tools.dataProvider = toolsDp;
+			}
+			
+			
+			private function changeTool() {
+				var tool:int = tools.selectedItem.tool;
+				editor.diagramController.selectedTool = tool;
+			}
+			
+		]]>
+	</fx:Script>
+	
+	<s:layout>
+		<s:HorizontalLayout/>
+	</s:layout>
+	<s:VGroup>
+		<s:Button label="add" click="{addSomething()}"/>
+		
+		<s:Label text="Drag Component" fontWeight="bold"/>
+		<s:List id="dataModels" 
+				dragEnabled="true"
+				borderAlpha="1">
+			<s:layout>
+				<s:VerticalLayout gap="3"/>
+			</s:layout>
+		</s:List>
+		
+		<s:Label text="Select Tool" fontWeight="bold"/>
+		<s:List id="tools" 
+				borderAlpha="1"
+				change="{changeTool()}">
+			<s:layout>
+				<s:VerticalLayout gap="3"/>
+			</s:layout>
+		</s:List>
+		
+	</s:VGroup>
+	<s:Group id="testContainer" width="1000" height="650">
+		
+	</s:Group>
+</s:WindowedApplication>

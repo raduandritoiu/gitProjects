@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx"
+		 minHeight="2" height="2" maxHeight="2">
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			
+			private var colorsOrAlphasUpdated:Boolean;
+			
+			private var _colors:Array;
+			
+			public function get colors():Array
+			{
+				return _colors;
+			}
+			
+			public function set colors(value:Array):void
+			{
+				if(!value || value.length < 2)
+					return;
+				
+				_colors					= value;
+				colorsOrAlphasUpdated	= true;
+				invalidateProperties();
+			}
+			
+			private var _alphas:Array;
+			
+			public function get alphas():Array
+			{
+				return _alphas;
+			}
+			
+			public function set alphas(value:Array):void
+			{
+				if(!value || value.length < 2)
+					return;
+				
+				_alphas					= value;
+				colorsOrAlphasUpdated	= true;
+				invalidateProperties();
+			}
+			
+			override protected function commitProperties():void
+			{
+				super.commitProperties();
+				
+				if(colorsOrAlphasUpdated)
+				{
+					colorsOrAlphasUpdated	= false;
+					
+					firstStroke.color		= colors[0];
+					firstStroke.alpha		= alphas[0];
+					
+					secondStroke.color		= colors[1];
+					secondStroke.alpha		= alphas[1];
+				}
+			}
+			
+		]]>
+	</fx:Script>
+	
+	<s:Line left="0" right="0" top="0">
+		<s:stroke>
+			<s:SolidColorStroke color="#000000" id="firstStroke" alpha="0.5"/>
+		</s:stroke>
+	</s:Line>
+	
+	<s:Line left="0" right="0" bottom="0">
+		<s:stroke>
+			<s:SolidColorStroke color="#ffffff" id="secondStroke" alpha="0.15"/>
+		</s:stroke>
+	</s:Line>
+	
+</s:Group>

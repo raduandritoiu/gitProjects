@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 xmlns:controls="j2inn.fin.display.controls.*" 
+		 xmlns:utils="petri.components.utils.*">
+	
+	<fx:Metadata>
+		[DefaultProperty("viewChildren")]
+	</fx:Metadata>
+	
+	<fx:Script>
+		<![CDATA[
+			
+			import mx.core.IVisualElement;
+			import mx.events.PropertyChangeEvent;
+			
+			import petri.model.PetriBaseModel;
+			
+			
+			
+			public var viewChildren:Array;
+			
+			protected var propertyChangedViaEditor:Boolean;
+		
+			protected var _model:PetriBaseModel;
+			private var modelUpdated:Boolean = false
+				
+			
+			public function set model(value:PetriBaseModel):void {
+				if(_model)
+					_model.removeEventListener(PropertyChangeEvent.PROPERTY_CHANGE, onModelPropertyUpdate);
+				if(value) {
+					_model = value;
+					modelUpdated = true;
+					_model.addEventListener(PropertyChangeEvent.PROPERTY_CHANGE, onModelPropertyUpdate, false, 0, true);
+					invalidateProperties();
+				}
+			}
+			
+			public function get model():PetriBaseModel {
+				return _model;
+			}
+			
+			
+			override protected function createChildren():void {
+				super.createChildren();
+				
+				for each(var element:IVisualElement in viewChildren) {
+					content.addElement(element);
+				}
+			}
+			
+			
+			override protected function commitProperties():void {
+				super.commitProperties();
+				
+				if(modelUpdated && model) {
+					modelUpdated = false;
+					onModelUpdate();
+				}
+			}
+			
+			
+			protected function onModelUpdate():void	{
+				shapeName.text		= _model.name;
+				shapeX.value		= _model.x;
+				shapeY.value		= _model.y;
+				shapeHeight.value 	= _model.height;
+				shapeWidth.value 	= _model.width;
+				tokens.value		= _model.tokens;
+			}
+			
+			
+			protected function onModelPropertyUpdate(e:PropertyChangeEvent):Boolean {
+				var flag:Boolean = true;
+				
+				if (!propertyChangedViaEditor) {
+					flag	= false;
+					switch (e.property) {
+						case "name":
+							flag = true;
+							shapeName.text = _model.name;
+							break;
+						
+						case "x":
+							flag = true;
+							shapeX.value = _model.x;
+							break;
+						
+						case "y":
+							flag = true;
+							shapeY.value = _model.y;
+							break;
+						
+						case "height":
+							flag = true;
+							shapeHeight.value = _model.height;
+							break;
+						
+						case "width":
+							flag = true;
+							shapeWidth.value = _model.width;
+							break;
+						
+						case "tokens":
+							flag = true;
+							tokens.value = _model.y;
+							break;
+					}
+				}
+				
+				propertyChangedViaEditor = false;
+				return flag;
+			}
+			
+			
+			protected function onPropertyChange(e:Event):Boolean {
+				var flag:Boolean = false;
+				propertyChangedViaEditor = true;
+				
+				switch(e.currentTarget) {
+					case shapeName:
+						flag = true;
+						_model.name	= shapeName.text;
+						break;
+					
+					case shapeX:
+						flag = true;
+						_model.x = shapeX.value;
+						break;
+					
+					case shapeY:
+						flag = true;
+						_model.y = shapeY.value;
+						break;
+					
+					case shapeWidth:
+						flag = true;
+						_model.width = shapeWidth.value;
+						break;
+					
+					case shapeHeight:
+						flag = true;
+						_model.height = shapeHeight.value;
+						break;
+					
+					case tokens:
+						flag = true;
+						_model.tokens = tokens.value;
+						break;
+				}
+				
+				return flag;
+			}
+			
+		]]>
+	</fx:Script>
+	
+	
+	<s:Group width="100%" height="100%">
+		<s:VGroup gap="0" fontSize="11" id="content"
+				  width="100%" height="100%"
+				  paddingLeft="0" paddingRight="0">
+			
+			
+			<s:HGroup width="100%" verticalAlign="middle" paddingTop="5">
+				<s:Label text="NAME:"/>
+				<s:TextInput id="shapeName" change="onPropertyChange(event)"
+							 width="70"/>
+			</s:HGroup>
+			
+			
+			
+			<s:HGroup width="100%" verticalAlign="middle"
+					  paddingTop="5" paddingBottom="5">
+				<s:Label text="X-POSITION:"/>
+				<utils:NumericSlider minimum="-10000" maximum="20000" id="shapeX" 
+										change="onPropertyChange(event)"/>
+			</s:HGroup>
+			
+			<s:HGroup width="100%" verticalAlign="middle"
+					  paddingBottom="5">
+				<s:Label text="Y-POSITION:"/>
+				<utils:NumericSlider minimum="-10000" maximum="20000" id="shapeY" 
+										change="onPropertyChange(event)"/>
+			</s:HGroup>
+			
+			<s:HGroup width="100%" verticalAlign="middle"
+					  paddingBottom="5">
+				<s:Label text="WIDTH:" width="{heightLabel.width}"/>
+				<utils:NumericSlider minimum="0" maximum="10000" id="shapeWidth" 
+										change="onPropertyChange(event)"/>
+			</s:HGroup>
+			
+			<s:HGroup width="100%" verticalAlign="middle"
+					  paddingBottom="5">
+				<s:Label text="HEIGHT:" id="heightLabel"/>
+				<utils:NumericSlider minimum="0" maximum="10000" id="shapeHeight" 
+										change="onPropertyChange(event)"/>
+			</s:HGroup>
+			
+			<s:HGroup width="100%" verticalAlign="middle"
+					  paddingBottom="5">
+				<s:Label text="TOKENS:"/>
+				<utils:NumericSlider minimum="0" maximum="20000" id="tokens" 
+										change="onPropertyChange(event)"/>
+			</s:HGroup>
+		</s:VGroup>
+		
+	</s:Group>
+	
+</s:Group>

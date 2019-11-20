@@ -1,0 +1,272 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx">
+	
+	<fx:Script>
+		<![CDATA[
+			import mx.collections.ArrayCollection;
+			
+			import spark.formatters.NumberFormatter;
+			
+			
+			private var _savings:ArrayCollection = new ArrayCollection();
+			private var _sumGiven:Number = 0;
+			private var _sumWithInterest:Number = 0;
+			private var _sumWithDoubleInterest:Number = 0;
+			
+			protected var interest:Number = 0;
+			protected var steps:int = 0;
+			protected var monthlySum:Number = 0;
+			protected var filterStep:int = 1;
+			protected var chargedSums:ArrayCollection = new ArrayCollection();
+			
+			
+			public function set savings(value:ArrayCollection):void {
+				_savings = value;
+			}
+			public function get savings():ArrayCollection {
+				return _savings;
+			}
+			
+			
+			public function set sumGiven(value:Number):void {
+				_sumGiven = value;
+			}
+			public function get sumGiven():Number {
+				return _sumGiven;
+			}
+			
+			
+			public function set sumWithInterest(value:Number):void {
+				_sumWithInterest = value;
+			}
+			public function get sumWithInterest():Number {
+				return _sumWithInterest;
+			}
+			
+			
+			public function set sumWithDoubleInterest(value:Number):void {
+				_sumWithDoubleInterest = value;
+			}
+			public function get sumWithDoubleInterest():Number {
+				return _sumWithDoubleInterest;
+			}
+			
+			
+			private function initChargedSums():void {
+				chargedSums = new ArrayCollection();
+				for (var i:int = 0; i < steps; i++)
+					chargedSums.addItem(0);
+			}
+			
+			
+			private function initSums():void {
+				interest = parseFloat(interestImpt.text)/1200;
+				steps = parseFloat(stepsImpt.text);;
+				monthlySum = parseFloat(sumImpt.text);
+				
+				initChargedSums();
+				
+				calculateSavings();
+			}
+			
+			
+			private function addChargedSum():void {
+				var month:int = parseInt(chargedMonthImp.text);
+				var chargedSum:Number = parseFloat(chargedSumImp.text);
+				
+				if (isNaN(month))
+					return;
+				if (isNaN(chargedSum))
+					return;
+				if (chargedSums.length <= month)
+					return;
+				
+				var sum:Number = chargedSums.getItemAt(month) as Number;
+				sum += chargedSum;
+				chargedSums.setItemAt(sum, month);
+				
+				calculateSavings();
+			}
+			
+			
+			
+			private function calculateSavings():void {
+				var totalInterest:Number = 0;
+				
+				savings = new ArrayCollection();
+				sumGiven = 0;
+				sumWithInterest = 0;
+				sumWithDoubleInterest = 0;
+				
+				savings.addItem({
+					step: 0,
+					given: Math.round(sumGiven),
+					withInterest: Math.round(sumWithInterest + totalInterest),
+					doubleInterest: Math.round(sumWithDoubleInterest)
+				});
+				
+				for (var i:int = 0; i < steps; i++) {
+					var sum:Number = monthlySum + chargedSums.getItemAt(i);
+					
+					sumGiven = sumGiven + sum;
+					totalInterest = totalInterest + sumWithInterest * interest;
+					sumWithInterest = sumWithInterest + sum;
+					sumWithDoubleInterest = sumWithDoubleInterest * (1 + interest) + sum;
+					
+					savings.addItem({
+						step: i,
+						given: Math.round(sumGiven),
+						withInterest: Math.round(sumWithInterest + totalInterest),
+						doubleInterest: Math.round(sumWithDoubleInterest)
+					});
+				}
+				sumWithInterest = sumWithInterest + totalInterest;
+				
+				writeSums();
+				filterData();
+			}
+			
+			
+			protected function writeSums() {
+				totalSumLbl.text = format.format(sumGiven + "");
+				interestSumLbl.text = format.format(sumWithInterest + "");
+				interestToInterestSumLbl.text = format.format(sumWithDoubleInterest + "");
+			}
+			
+			
+			protected function redrewChart():void {
+				filterStep = parseInt(stepsImpt.text);
+				if (filterStep <= 0) 
+					return;
+				
+				filterData();
+			}
+			
+			protected function filterData():void {
+				var filteredSavings:ArrayCollection = new ArrayCollection();
+				for (var i:int = 0; i < savings.length; i++) {
+					if (i % filterStep == 0) {
+						filteredSavings.addItem(savings.getItemAt(i));
+					}
+				}
+				savingsChart.dataProvider = filteredSavings;
+			}
+		]]>
+	</fx:Script>
+	
+	
+	<fx:Declarations>
+		<s:NumberFormatter id="format"
+						   fractionalDigits="0"
+						   decimalSeparator="."
+						   groupingSeparator=" "/>
+	</fx:Declarations>	
+	
+	<s:layout>
+		<s:VerticalLayout/>
+	</s:layout>
+	
+	
+	<s:HGroup gap="40">
+		<s:VGroup horizontalAlign="left" gap="15">
+			<s:HGroup gap="15">
+				<s:VGroup horizontalAlign="left">
+					<s:Label text="Rata Lunara"/>
+					<s:TextInput id="sumImpt" width="70"
+								 text="300"/>
+				</s:VGroup>
+				
+				<s:VGroup horizontalAlign="left">
+					<s:Label text="Dobanda (% anuala)"/>
+					<s:TextInput id="interestImpt" width="70"
+								 text="8.4"/>
+				</s:VGroup>
+				
+				<s:VGroup horizontalAlign="left">
+					<s:Label text="Perioada (luni)"/>
+					<s:TextInput id="stepsImpt" width="70"
+								 text="360"/>
+				</s:VGroup>
+			</s:HGroup>
+			
+			<s:HGroup gap="15">
+				<s:VGroup horizontalAlign="left">
+					<s:Label text="Luna"/>
+					<s:TextInput id="chargedMonthImp" width="70"
+								 />
+				</s:VGroup>
+				
+				<s:VGroup horizontalAlign="left">
+					<s:Label text="Suma Debitata"/>
+					<s:TextInput id="chargedSumImp" width="70"
+								 />
+				</s:VGroup>
+				
+				<s:VGroup horizontalAlign="left">
+					<s:Label text=" "/>
+					<s:Button label="Adauga" click="addChargedSum()"/>
+				</s:VGroup>
+			</s:HGroup>
+			
+			<s:Button label="Calculeaza" click="initSums()"/>
+		</s:VGroup>
+		
+		
+		<s:VGroup width="300" gap="10">
+			<s:HGroup width="100%">
+				<s:Label text="Suma depusa:"/>
+				<s:Rect width="100%"/>
+				<s:Label id="totalSumLbl" text="..." width="100"/>
+			</s:HGroup>
+			
+			<s:HGroup width="100%">
+				<s:Label text="Suma cu dobanda:"/>
+				<s:Rect width="100%"/>
+				<s:Label id="interestSumLbl" text="..." width="100"/>
+			</s:HGroup>
+			
+			<s:HGroup width="100%">
+				<s:Label text="Suma dobanda la dobanda:"/>
+				<s:Rect width="100%"/>
+				<s:Label id="interestToInterestSumLbl" text="..." width="100"/>
+			</s:HGroup>
+		</s:VGroup>
+		
+		
+		<s:HGroup id="chartEdit">
+			<s:VGroup horizontalAlign="left">
+				<s:HGroup>
+					<s:Label text="Pas"/>
+					<s:Button label="Go" click="redrewChart()"/>
+				</s:HGroup>
+				<s:TextInput id="filterStepImp" width="70"
+							 />
+			</s:VGroup>
+			<s:VGroup horizontalAlign="left">
+				<s:Label text="Zoom"/>
+				<s:HSlider id="zoomImp" width="150"/>
+			</s:VGroup>
+		</s:HGroup>
+	</s:HGroup>
+	
+	<s:Rect height="10"/>
+	
+	<s:Scroller height="500" width="1300" id="savingChartScroller">
+		<s:Group>
+			<mx:AreaChart id="savingsChart" height="500" width="1200">
+				<mx:horizontalAxis>
+					<mx:CategoryAxis categoryField="step" displayName="Luna"/>
+				</mx:horizontalAxis>
+				<mx:series>
+					<mx:AreaSeries id="doubleInterestSeries" yField="doubleInterest" displayName="Suma cu dobanda dubla"
+								   />
+					<mx:AreaSeries id="sumGivenSeries" yField="given" displayName="Suma data"
+								   />
+				</mx:series>
+			</mx:AreaChart>
+		</s:Group>
+	</s:Scroller>
+
+</s:Group>

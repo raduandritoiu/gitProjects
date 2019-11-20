@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 width="100%" height="100%" xmlns:view="framework.view.*">
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	
+	<fx:Script>
+		<![CDATA[
+			import framework.model.EngineController;
+			import framework.model.PointParticle;
+			import framework.model.PointMobility;
+			import framework.utils.CalculusUtils;
+			
+			import org.osmf.events.TimeEvent;
+			
+			
+			private var p1:PointParticle = new PointParticle(350, 250);
+			private var p2:PointParticle = new PointParticle(300, 250, PointMobility.FIXED);
+			
+			private var p3:PointParticle = new PointParticle(200, 250, PointMobility.OX_MOBILE);
+			private var p4:PointParticle = new PointParticle(500, 250, PointMobility.OX_MOBILE);
+			
+			private var p5:PointParticle = new PointParticle(300, 100, PointMobility.OY_MOBILE);
+			private var p6:PointParticle = new PointParticle(300, 400, PointMobility.OY_MOBILE);
+
+			private var p7:PointParticle = new PointParticle(100, 250, PointMobility.OY_MOBILE);
+			private var p8:PointParticle = new PointParticle(550, 250, PointMobility.OX_MOBILE);
+			
+			private var p9:PointParticle = new PointParticle(750, 250);
+
+			private var p10:PointParticle = new PointParticle(650, 250, PointMobility.FIXED);
+
+			
+			private var engine:EngineController = new EngineController(p1, runFunction, false);
+			
+			
+			private function runFunction(coord:Point):Point {
+				var jx:Number = p2.x;
+				var jy:Number = p2.y;
+				var jointDist:Number = 50;
+				
+				var alfa:Number = CalculusUtils.arctan(coord.x, coord.y, jx, jy);
+				alfa = alfa + 0.03;
+				
+				var newX:Number = jx + jointDist * Math.cos(alfa);
+				var newY:Number = jy + jointDist * Math.sin(alfa);
+				var newX_tmp:Number = jx - jointDist * Math.cos(alfa);
+				var newY_tmp:Number = jy - jointDist * Math.sin(alfa);
+				
+				if (Math.abs(coord.x - newX) + Math.abs(coord.y - newY) > 
+					Math.abs(coord.x - newX_tmp) + Math.abs(coord.y - newY_tmp)) {
+					newX = newX_tmp;
+					newY = newY_tmp;
+				}
+				
+				coord.x = newX;
+				coord.y = newY;
+				
+				return coord;
+			}
+			
+		]]>
+	</fx:Script>
+	
+	<s:HGroup >
+		<s:Button click="engine.step()" label="Step"/>
+		<s:Button click="engine.start()" label="Start"/>
+		<s:Button click="engine.stop()" label="Stop"/>
+	</s:HGroup>
+	
+	<view:LineComp firstPoint="{p1}" secondPoint="{p2}" />
+	<view:LineComp firstPoint="{p1}" secondPoint="{p3}" />
+	<view:LineComp firstPoint="{p1}" secondPoint="{p4}" />
+	<view:LineComp firstPoint="{p1}" secondPoint="{p5}" />
+	<view:LineComp firstPoint="{p1}" secondPoint="{p6}" />
+	<view:LineComp firstPoint="{p3}" secondPoint="{p7}" />
+	<view:LineComp firstPoint="{p4}" secondPoint="{p8}" />
+	<view:LineComp firstPoint="{p8}" secondPoint="{p9}" />
+	<view:LineComp firstPoint="{p9}" secondPoint="{p10}" />
+	
+	<view:LineNoComp firstPoint="{p3}" secondPoint="{p5}" />
+	<view:LineNoComp firstPoint="{p3}" secondPoint="{p6}" />
+	<view:LineNoComp firstPoint="{p4}" secondPoint="{p5}" />
+	<view:LineNoComp firstPoint="{p4}" secondPoint="{p6}" />
+	
+	<view:CircleComp centerPoint="{p2}" radius="50"/>
+	<view:CircleComp centerPoint="{p2}" radius="1"/>
+	<view:CircleComp centerPoint="{p1}" radius="3"/>
+	<view:CircleComp centerPoint="{p3}" radius="3"/>
+	<view:CircleComp centerPoint="{p4}" radius="3"/>
+	<view:CircleComp centerPoint="{p5}" radius="3"/>
+	<view:CircleComp centerPoint="{p6}" radius="3"/>
+	<view:CircleComp centerPoint="{p7}" radius="3"/>
+	<view:CircleComp centerPoint="{p8}" radius="3"/>
+	<view:CircleComp centerPoint="{p9}" radius="3"/>
+	<view:CircleComp centerPoint="{p10}" radius="3"/>
+	<view:CircleComp centerPoint="{p10}" radius="100"/>
+
+</s:Group>

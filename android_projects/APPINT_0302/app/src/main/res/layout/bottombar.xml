@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.bigct.appint.view.BottomBar xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="wrap_content"
+    android:gravity="bottom|center_horizontal"
+    android:id="@+id/bottomBar">
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#6d2343"
+        android:layout_marginTop="10dp"></LinearLayout>
+
+    <ImageView
+        android:layout_width="@dimen/tab_size"
+        android:layout_height="@dimen/tab_size"
+        android:id="@+id/iv_tab_bg"
+        android:background="@drawable/tab_bg" />
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:weightSum="1"
+        android:paddingTop="10dp">
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.2"
+            android:gravity="center">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/iv_tab_1"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:background="@drawable/menu" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.2"
+            android:gravity="center">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/iv_tab_2"
+                android:background="@drawable/user"
+                android:layout_alignParentBottom="true"
+                android:layout_toRightOf="@+id/iv_main"
+                android:layout_toEndOf="@+id/iv_main" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.2"
+            android:gravity="center">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/iv_tab_3"
+                android:background="@drawable/dashboard"
+                android:layout_alignParentBottom="true"
+                android:layout_toRightOf="@+id/iv_menu"
+                android:layout_toEndOf="@+id/iv_menu" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.2"
+            android:gravity="center">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/iv_tab_4"
+                android:background="@drawable/settings"
+                android:layout_alignParentBottom="true"
+                android:layout_toRightOf="@+id/iv_photo"
+                android:layout_toEndOf="@+id/iv_photo" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.2"
+            android:gravity="center">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/iv_tab_5"
+                android:background="@drawable/logout"
+                android:layout_alignParentBottom="true"
+                android:layout_toRightOf="@+id/imageView5"
+                android:layout_toEndOf="@+id/imageView5" />
+        </LinearLayout>
+    </LinearLayout>
+</com.bigct.appint.view.BottomBar>

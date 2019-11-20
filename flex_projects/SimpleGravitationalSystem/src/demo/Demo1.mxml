@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:VGroup xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 width="800" height="500"
+		 xmlns:demo="demo.*"
+		 creationComplete="robotDemo()">
+	
+	
+	<fx:Script>
+		<![CDATA[
+			import org.cove.ape.APEngine;
+			import org.cove.ape.VectorF;
+			
+			
+			
+			private static var halfStageWidth:int = 325;
+			private var robot:Robot;
+			private var timer:Timer = new Timer(10, 0);
+			
+			
+			private function robotDemo():void {
+				APEngine.init(1/4);
+				APEngine.container = robotCanvas;
+				APEngine.addMasslessForce(new VectorF(0,4));
+				APEngine.damping = .99;
+				APEngine.constraintCollisionCycles = 10;
+				
+				robot = new Robot(200, 200, 1, 0.02);
+				APEngine.addGroup(robot);
+				
+				timer.addEventListener(TimerEvent.TIMER, run);			
+				timer.start();
+			}
+			
+			
+			private function run(evt:Event):void {
+				APEngine.step();
+				robot.run();
+				APEngine.paint();
+			}
+			
+		]]>
+	</fx:Script>
+	
+	<s:HGroup>
+		<s:Button label="Power" click="{robot.togglePower()}"/>
+		<s:Button label="Direction" click="{robot.toggleDirection()}"/>
+	</s:HGroup>
+	
+	<mx:UIComponent id="robotCanvas" width="800" height="500"/>
+</s:VGroup>

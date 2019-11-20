@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx">
+	
+	<fx:Script>
+		<![CDATA[
+			import petri.utils.PetriModels;
+			
+			import spark.layouts.supportClasses.LayoutBase;
+			
+			override public function set layout(value:LayoutBase):void {
+				super.layout = value;
+				dataModels.layout = value;
+			}
+		]]>
+	</fx:Script>
+	
+	
+	<s:Label text="Drag Component" />
+	
+	<s:List id="dataModels" 
+			dataProvider="{PetriModels.modelData()}"
+			itemRenderer="petri.components.ModelItemRenderere"
+			dragEnabled="true">
+	</s:List>
+
+</s:Group>

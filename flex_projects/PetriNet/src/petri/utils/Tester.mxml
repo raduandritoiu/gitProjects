@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx"
+		 creationComplete="init()" xmlns:utils="petri.components.utils.*">
+	
+	<fx:Script>
+		<![CDATA[
+			import spark.components.Label;
+			public static var instance:Tester;
+			
+			private function init():void {
+				instance = this;
+			}
+			
+			
+			public function reset():void {
+				removeAllElements();
+			}
+			
+			public function printMarking(code:String):void {
+				var lbl:Label = new Label();
+				lbl.text = code;
+				addElement(lbl);
+			}
+		]]>
+	</fx:Script>
+	
+	<s:layout>
+		<s:VerticalLayout/>
+	</s:layout>
+	
+</s:Group>

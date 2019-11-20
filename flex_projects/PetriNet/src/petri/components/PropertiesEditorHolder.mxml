@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx"
+		 creationComplete="init()" 
+		 xmlns:PropertiesEditors="petri.PropertiesEditors.*">
+	
+	<fx:Script>
+		<![CDATA[
+			import petri.PropertiesEditors.ArcPropertiesEditor;
+			import petri.PropertiesEditors.BasePropertiesEditor;
+			import petri.PropertiesEditors.StandardPropertiesEditor;
+			import petri.PropertiesEditors.WorldPropertiesEditor;
+			import petri.controller.MainEvent;
+			import petri.controller.MainEventController;
+			import petri.model.PetriBaseModel;
+			
+			
+			private static var editors:Array = [BasePropertiesEditor, ArcPropertiesEditor, 
+											WorldPropertiesEditor, StandardPropertiesEditor];
+			
+			private var selectedModel:PetriBaseModel;
+			private var selectedModelChanged:Boolean = false;
+			private var propertiesEditor:BasePropertiesEditor;
+			
+			private function init():void {
+				MainEventController.instance.addEventListener(MainEvent.SELECTION_CHANGE, selectionChangedHandler, false, 0, true);
+			}
+			
+			
+			private function selectionChangedHandler(evt:MainEvent):void {
+				selectedModel = evt.info as PetriBaseModel;
+				selectedModelChanged = true;
+				invalidateProperties();
+			}
+			
+			
+			override protected function commitProperties():void {
+				super.commitProperties();
+				
+				if (selectedModelChanged) {
+					selectedModelChanged = false;
+					
+					editorHolder.removeAllElements();
+					
+					if (selectedModel != null) {
+						modelName.text = "(" + selectedModel.name + ")";
+						var className:String = selectedModel.editorClass;
+						var editorClass:Class = getDefinitionByName(className) as Class;
+						propertiesEditor = new editorClass();
+						editorHolder.addElement(propertiesEditor);
+						
+						propertiesEditor.model = selectedModel;
+					}
+				}
+			}
+			
+		]]>
+	</fx:Script>
+	
+	
+	<s:Label text="Properties" fontWeight="bold"/>
+	<s:Label id="modelName" text="(none)" fontWeight="bold"/>
+	
+	<s:Group id="editorHolder"
+			 width="100%" height="100%">
+	</s:Group>
+</s:Group>

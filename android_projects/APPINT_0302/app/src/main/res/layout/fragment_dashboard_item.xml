@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="#613347">
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"
+        android:id="@+id/relativeLayout"
+        android:padding="10dp">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="SSID"
+            android:id="@+id/tv_ssid"
+            android:textColor="?android:textColorPrimaryInverse"
+            android:layout_centerVertical="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="Signal Strength in dBm"
+            android:id="@+id/tv_signal"
+            android:textColor="?android:textColorPrimaryInverse"
+            android:layout_marginLeft="20dp"
+            android:layout_alignParentTop="false"
+            android:layout_toRightOf="@+id/tv_ssid"
+            android:layout_toEndOf="@+id/tv_ssid"
+            android:layout_alignParentBottom="false"
+            android:layout_centerVertical="true" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Open"
+            android:id="@+id/btn_open"
+            android:layout_centerVertical="true"
+            android:layout_alignParentEnd="true"
+            android:background="@drawable/selector_open_green"
+            android:textColor="#ffffff"
+            android:clickable="true" />
+
+    </RelativeLayout>
+
+</RelativeLayout>

@@ -1,0 +1,360 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:WindowedApplication xmlns:fx="http://ns.adobe.com/mxml/2009" width="1200" height="650"
+					   xmlns:s="library://ns.adobe.com/flex/spark" 
+					   xmlns:mx="library://ns.adobe.com/flex/mx" 
+					   >
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import diagram.controller.DiagramController;
+			import diagram.editors.DiagramEditor;
+			import diagram.enums.DiagramWorldTools;
+			import diagram.factory.DiagramModelFactory;
+			import diagram.model.DiagramLink;
+			import diagram.model.DiagramNode;
+			import diagram.model.DiagramSlot;
+			
+			import mx.collections.ArrayCollection;
+			
+			
+			private var editor:DiagramEditor;
+			
+			private function addEmpty():void {
+				editor = new DiagramEditor();
+				testContainer.addElement(editor);
+				editor.initializeEditor();
+				
+				var dp:ArrayCollection = DiagramModelFactory.dataModels;
+				dataModels.dataProvider = dp;
+				
+				var toolsDp:ArrayCollection = new ArrayCollection();
+				toolsDp.addItem({label:"simple select", tool: DiagramWorldTools.SIMPLE_TOOL});
+				toolsDp.addItem({label:"draw link", tool: DiagramWorldTools.LINKS_TOOL});
+				toolsDp.addItem({label:"multiple selection", tool: DiagramWorldTools.SELECTION_TOOL});
+				toolsDp.addItem({label:"hybrid", tool: DiagramWorldTools.HYBRIDE_TOOL});
+				tools.dataProvider = toolsDp;
+			}
+			
+			
+			private function addForCopy():void  {
+				editor = new DiagramEditor();
+				testContainer.addElement(editor);
+				editor.initializeEditor();
+				var controller:DiagramController = editor.diagramController;
+				
+				
+				// nodes
+				var nodeA:DiagramNode = new DiagramNode();
+				nodeA.x = 100;
+				nodeA.y = 100;
+				nodeA.name = "n1";
+				controller.addModelToSelectedContainer(nodeA);
+				
+				var nodeB:DiagramNode = new DiagramNode();
+				controller.addModelToSelectedContainer(nodeB);
+				nodeB.x = 400;
+				nodeB.y = 100;
+				nodeB.name = "n2";
+				controller.addModelToSelectedContainer(nodeB);
+				
+				var nodeC:DiagramNode = new DiagramNode();
+				nodeC.x = 100;
+				nodeC.y = 300;
+				nodeC.name = "n3";
+				controller.addModelToSelectedContainer(nodeC);
+				
+				var nodeD:DiagramNode = new DiagramNode();
+				nodeD.x = 400;
+				nodeD.y = 300;
+				nodeD.name = "n4";
+				controller.addModelToSelectedContainer(nodeD);
+				
+				
+				// slots
+				var slot:DiagramSlot = new DiagramSlot();
+				slot.x = 10;
+				slot.y = 5;
+				slot.name = "s1";
+				nodeA.addChild(slot);
+				slot = new DiagramSlot();
+				slot.x = 50;
+				slot.y = 25;
+				slot.name = "s2";
+				nodeA.addChild(slot);
+				
+				slot = new DiagramSlot();
+				slot.x = 10;
+				slot.y = 5;
+				slot.name = "s3";
+				nodeB.addChild(slot);
+				slot = new DiagramSlot();
+				slot.x = 10;
+				slot.y = 25;
+				slot.name = "s4";
+				nodeB.addChild(slot);
+				
+				slot = new DiagramSlot();
+				slot.x = 10;
+				slot.y = 5;
+				slot.name = "s5";
+				nodeC.addChild(slot);
+				
+				slot = new DiagramSlot();
+				slot.x = 10;
+				slot.y = 5;
+				slot.name = "s6";
+				nodeD.addChild(slot);
+				slot = new DiagramSlot();
+				slot.x = 50;
+				slot.y = 25;
+				slot.name = "s7";
+				nodeD.addChild(slot);
+				
+				
+				//links
+				var linkAB:DiagramLink = new DiagramLink();
+				linkAB.name = "l1";
+				linkAB.from = nodeA.slots.getItemAt(0) as DiagramSlot;
+				linkAB.to = nodeB.slots.getItemAt(0) as DiagramSlot;
+				controller.addModelToSelectedContainer(linkAB);
+				
+				var linkDC:DiagramLink = new DiagramLink();
+				linkDC.name = "l3";
+				linkDC.from = nodeC.slots.getItemAt(0) as DiagramSlot;
+				linkDC.to = nodeD.slots.getItemAt(0) as DiagramSlot;
+				controller.addModelToSelectedContainer(linkDC);
+				
+				
+				var dp:ArrayCollection = DiagramModelFactory.dataModels;
+				dataModels.dataProvider = dp;
+				
+				var toolsDp:ArrayCollection = new ArrayCollection();
+				toolsDp.addItem({label:"simple select", tool: DiagramWorldTools.SIMPLE_TOOL});
+				toolsDp.addItem({label:"draw link", tool: DiagramWorldTools.LINKS_TOOL});
+				toolsDp.addItem({label:"multiple selection", tool: DiagramWorldTools.SELECTION_TOOL});
+				toolsDp.addItem({label:"hybrid", tool: DiagramWorldTools.HYBRIDE_TOOL});
+				tools.dataProvider = toolsDp;
+			}
+			
+			
+			private function addSomething():void  {
+				editor = new DiagramEditor();
+				testContainer.addElement(editor);
+				editor.initializeEditor();
+				var controller:DiagramController = editor.diagramController;
+				
+				
+				// nodes
+				var nodeA:DiagramNode = new DiagramNode();
+				nodeA.x = 100;
+				nodeA.y = 100;
+				nodeA.name = "n1";
+				controller.addModelToSelectedContainer(nodeA);
+				
+				var nodeB:DiagramNode = new DiagramNode();
+				controller.addModelToSelectedContainer(nodeB);
+				nodeB.x = 100;
+				nodeB.y = 400;
+				nodeB.name = "n2";
+				controller.addModelToSelectedContainer(nodeB);
+				
+				var nodeC:DiagramNode = new DiagramNode();
+				nodeC.x = 500;
+				nodeC.y = 100;
+				nodeC.name = "n3";
+				controller.addModelToSelectedContainer(nodeC);
+				
+				var nodeD:DiagramNode = new DiagramNode();
+				nodeD.x = 300;
+				nodeD.y = 300;
+				nodeD.name = "n4";
+				controller.addModelToSelectedContainer(nodeD);
+				
+				
+				// slots
+				var slot:DiagramSlot = new DiagramSlot();
+				slot.x = 10;
+				slot.y = 5;
+				slot.name = "s1";
+				nodeA.addChild(slot);
+				slot = new DiagramSlot();
+				slot.x = 50;
+				slot.y = 25;
+				slot.name = "s2";
+				nodeA.addChild(slot);
+				
+				slot = new DiagramSlot();
+				slot.x = 10;
+				slot.y = 5;
+				slot.name = "s3";
+				nodeB.addChild(slot);
+				slot = new DiagramSlot();
+				slot.x = 10;
+				slot.y = 25;
+				slot.name = "s4";
+				nodeB.addChild(slot);
+				
+				slot = new DiagramSlot();
+				slot.x = 10;
+				slot.y = 5;
+				slot.name = "s5";
+				nodeC.addChild(slot);
+				
+				slot = new DiagramSlot();
+				slot.x = 10;
+				slot.y = 5;
+				slot.name = "s6";
+				nodeD.addChild(slot);
+				slot = new DiagramSlot();
+				slot.x = 50;
+				slot.y = 25;
+				slot.name = "s7";
+				nodeD.addChild(slot);
+				
+				
+				//links
+				var linkAD:DiagramLink = new DiagramLink();
+				linkAD.name = "l1";
+				linkAD.from = nodeA.slots.getItemAt(nodeA.slots.length-1) as DiagramSlot;
+				linkAD.to = nodeD.slots.getItemAt(0) as DiagramSlot;
+				controller.addModelToSelectedContainer(linkAD);
+				
+				var linkBD:DiagramLink = new DiagramLink();
+				linkBD.name = "l2";
+				linkBD.from = nodeB.slots.getItemAt(nodeB.slots.length - 1) as DiagramSlot;
+				linkBD.to = nodeD.slots.getItemAt(1) as DiagramSlot;
+				controller.addModelToSelectedContainer(linkBD);
+				
+				
+				var linkDC:DiagramLink = new DiagramLink();
+				linkDC.name = "l3";
+				linkDC.from = nodeD.slots.getItemAt(nodeD.slots.length - 1) as DiagramSlot;
+				linkDC.to = nodeC.slots.getItemAt(0) as DiagramSlot;
+				controller.addModelToSelectedContainer(linkDC);
+				
+				
+				var nodeE:DiagramNode = new DiagramNode();
+				nodeE.x = 100;
+				nodeE.y = 250;
+				nodeE.name = "n5";
+				controller.addModelToSelectedContainer(nodeE);
+				
+				slot = new DiagramSlot();
+				slot.x = 10;
+				slot.y = 5;
+				slot.name = "s8";
+				nodeE.addChild(slot);
+				
+				
+				var linkBE:DiagramLink = new DiagramLink();
+				linkBE.name = "l4";
+				linkBE.from = nodeB.slots.getItemAt(0) as DiagramSlot;
+				linkBE.to = nodeE.slots.getItemAt(0) as DiagramSlot;
+				controller.addModelToSelectedContainer(linkBE);
+				
+				
+				var dp:ArrayCollection = DiagramModelFactory.dataModels;
+				dataModels.dataProvider = dp;
+				
+				
+				var toolsDp:ArrayCollection = new ArrayCollection();
+				toolsDp.addItem({label:"simple select", tool: DiagramWorldTools.SIMPLE_TOOL});
+				toolsDp.addItem({label:"draw link", tool: DiagramWorldTools.LINKS_TOOL});
+				toolsDp.addItem({label:"multiple selection", tool: DiagramWorldTools.SELECTION_TOOL});
+				toolsDp.addItem({label:"hybrid", tool: DiagramWorldTools.HYBRIDE_TOOL});
+				tools.dataProvider = toolsDp;
+			}
+			
+			
+			private function changeTool():void {
+				var tool:int = tools.selectedItem.tool;
+				editor.diagramController.selectedTool = tool;
+			}
+			
+			
+			private function addNode():void {
+				// nodes
+				var nodeA:DiagramNode = new DiagramNode();
+				nodeA.x = 500;
+				nodeA.y = 100;
+				nodeA.name = "n1";
+				
+				var slot:DiagramSlot = new DiagramSlot();
+				slot.x = 10;
+				slot.y = 5;
+				slot.name = "s9";
+				nodeA.addChild(slot);
+				
+				slot = new DiagramSlot();
+				slot.x = 10;
+				slot.y = 25;
+				slot.name = "s10";
+				nodeA.addChild(slot);
+				
+				editor.diagramController.addModelToSelectedContainer(nodeA);
+			}
+			
+			
+			private function testFunction():void {
+				var obj:Object = new Object();
+				
+				obj.unu = "unu value";
+				obj.doi = 2;
+				obj.trei = new DiagramNode();
+				
+				trace ("obj " + obj);
+				trace ("unu " + obj.unu);
+				trace ("doi " + obj.doi);
+				trace ("trei " + obj.trei);
+				
+				var node:TestClass = new TestClass();
+				node.unu = "value unu";
+				node.doi = 2;
+				node.trei = new DiagramNode();
+				
+				trace ("node " + node);
+				trace ("unu " + node.unu);
+				trace ("doi " + node.doi);
+				trace ("trei " + node.trei);
+			}
+		]]>
+	</fx:Script>
+	
+	<s:layout>
+		<s:HorizontalLayout/>
+	</s:layout>
+	<s:VGroup>
+		<s:Button label="add empty editor" click="{addEmpty()}"/>
+		<s:Button label="add editor with elements 1" click="{addForCopy()}"/>
+		<s:Button label="add editor with elements 2" click="{addSomething()}"/>
+		<s:Button label="add model to editor" click="{addNode()}"/>
+		<s:Button label="test function" click="{testFunction()}"/>
+		
+		<s:Label text="Drag Component" fontWeight="bold"/>
+		<s:List id="dataModels" 
+				dragEnabled="true"
+				borderAlpha="1">
+			<s:layout>
+				<s:VerticalLayout gap="3"/>
+			</s:layout>
+		</s:List>
+		
+		<s:Label text="Select Tool" fontWeight="bold"/>
+		<s:List id="tools" 
+				borderAlpha="1"
+				change="{changeTool()}">
+			<s:layout>
+				<s:VerticalLayout gap="3"/>
+			</s:layout>
+		</s:List>
+		
+	</s:VGroup>
+	<s:Group>
+		<s:Group id="testContainer" y="20"
+				 width="1000" height="650">
+			
+		</s:Group>
+	</s:Group>
+</s:WindowedApplication>
