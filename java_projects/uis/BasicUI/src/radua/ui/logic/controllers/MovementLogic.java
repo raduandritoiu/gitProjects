@@ -6,7 +6,7 @@ import radua.ui.logic.models.SnapModel;
 import radua.ui.logic.models.snaps.ISnapPoint;
 import radua.ui.logic.models.snaps.SnapResult;
 import radua.ui.logic.models.snaps.SnapResultMove;
-import radua.ui.logic.observers.ObservableEvent;
+import radua.ui.logic.observers.ObservableProperty;
 import radua.ui.logic.utils.Constants;
 
 
@@ -144,13 +144,13 @@ public class MovementLogic
 			if (newRemoteSnap != lastRemoteSnap) {
 				if (lastRemoteSnap != null) {
     				lastRemoteSnap.setSnap(null);
-    				lastRemoteSnap.parent().notifyObservers(ObservableEvent.SNAP_CHANGE, false);
+    				lastRemoteSnap.parent().notifyObservers(ObservableProperty.SNAP, false);
 				}
 				
 				localSnap.setSnap(newRemoteSnap);
 				newRemoteSnap.setSnap(localSnap);
-				localModel.notifyObservers(ObservableEvent.SNAP_CHANGE, true);
-				newRemoteSnap.parent().notifyObservers(ObservableEvent.SNAP_CHANGE, true);
+				localModel.notifyObservers(ObservableProperty.SNAP, true);
+				newRemoteSnap.parent().notifyObservers(ObservableProperty.SNAP, true);
 				
 				// update final snapResult
 				if (newSnapStrength < resultStrength) {
@@ -163,8 +163,8 @@ public class MovementLogic
 				if (!localSnap.canSnap(lastRemoteSnap)) {
 					localSnap.setSnap(null);
     				lastRemoteSnap.setSnap(null);
-    				localModel.notifyObservers(ObservableEvent.SNAP_CHANGE, false);
-    				lastRemoteSnap.parent().notifyObservers(ObservableEvent.SNAP_CHANGE, false);
+    				localModel.notifyObservers(ObservableProperty.SNAP, false);
+    				lastRemoteSnap.parent().notifyObservers(ObservableProperty.SNAP, false);
     			}
 				else if (newSnapStrength < resultStrength) {
 					snapResult = SnapResult.TRUE(localSnap, lastRemoteSnap);

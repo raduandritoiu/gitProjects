@@ -1,4 +1,4 @@
-package radua.ui.display.views.painters.tracks;
+package radua.tracks.display.views.painters;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -6,33 +6,31 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Stroke;
 
+import radua.tracks.logic.models.SplitTrack;
+import radua.tracks.logic.models.TrackModel;
 import radua.ui.display.views.BasicView;
 import radua.ui.display.views.painters.IPainter;
 import radua.ui.logic.basics.IReadablePoint;
-import radua.ui.logic.models.tracks.SplitTrack;
-import radua.ui.logic.models.tracks.TrackModel;
 
 
 public class TrackPainter implements IPainter 
 {
 	public static final TrackPainter Instance = new TrackPainter();
-	
+	private static int STROKE = 3;
 	
 	private TrackPainter() {}
 	
 	@Override
 	public void paint(BasicView<?> view, Graphics g) {
-		if (!view.model().isVisible()) 
-			return;
-
 		TrackModel model = (TrackModel) view.model();
+		
 		// set stroke
         Graphics2D g2d = null;
         Stroke tmp = null;
         if (g instanceof Graphics2D) {
             g2d = (Graphics2D) g;
             tmp = g2d.getStroke();
-            g2d.setStroke(new BasicStroke(2));
+            g2d.setStroke(new BasicStroke(STROKE));
         }
         
 	    g.setColor(Color.BLACK);

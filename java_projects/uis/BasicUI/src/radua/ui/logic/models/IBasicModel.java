@@ -6,20 +6,22 @@ import radua.ui.logic.basics.IReadablePoint;
 import radua.ui.logic.basics.IReadableSize;
 import radua.ui.logic.basics.IWritablePoint;
 import radua.ui.logic.ids.ModelId;
-import radua.ui.logic.observers.IObserver;
-import radua.ui.logic.observers.ObservableEvent;
+import radua.ui.logic.observers.IPropertyObserver;
+import radua.ui.logic.observers.ObservableProperty;
 
 
 public interface IBasicModel 
 {
 	ModelId id();
 	
-	void addObserver(IObserver observer);
-	void removeObserver(IObserver observer);
+	void addObserver(IPropertyObserver observer);
+	void removeObserver(IPropertyObserver observer);
 	void removeObservers();
 
 	Color getColor();
 	void setColor(Color color);
+	boolean isVisible();
+	void visible(boolean visible);
 	boolean isSelected();
 	void select(boolean selected);
 	
@@ -45,7 +47,7 @@ public interface IBasicModel
 	void absolutePoint(IReadablePoint point, IWritablePoint result);
 	void relativeToAbsolute(IReadablePoint point, IWritablePoint result);
 	
-	void notifyObservers(ObservableEvent event, Object value);
+	void notifyObservers(ObservableProperty event, Object value);
 	
 	
 	String debugString(int tabs);

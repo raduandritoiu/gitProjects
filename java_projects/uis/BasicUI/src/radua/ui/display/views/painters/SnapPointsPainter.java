@@ -17,8 +17,10 @@ public class SnapPointsPainter implements IPainter
 	
 	private SnapPointsPainter() {}
 
-	public void paint(BasicView<?> basicView, Graphics g) {
-		ISnapModel model = (ISnapModel) basicView.model();
+	public void paint(BasicView<?> view, Graphics g) {
+		if (!view.model().isVisible()) 
+			return;
+		ISnapModel model = (ISnapModel) view.model();
 		Color snapColor = model.getSnappedColor();
 		Color unsnapColor = model.getUnsnappedColor();
 		for (DrawSnapPoint snapPoint : model.getDrawSnapPoints())

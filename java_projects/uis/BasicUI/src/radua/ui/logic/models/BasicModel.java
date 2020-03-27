@@ -11,32 +11,34 @@ import radua.ui.logic.basics.MPoint;
 import radua.ui.logic.basics.MSize;
 import radua.ui.logic.ids.IdManager;
 import radua.ui.logic.ids.ModelId;
-import radua.ui.logic.observers.IObservable;
-import radua.ui.logic.observers.IObserver;
-import radua.ui.logic.observers.ObservableEvent;
+import radua.ui.logic.observers.IPropertyObservable;
+import radua.ui.logic.observers.IPropertyObserver;
+import radua.ui.logic.observers.ObservableProperty;
 import radua.ui.logic.utils.Calculus;
 
 
-public class BasicModel implements IObservable, IBasicModel
+public class BasicModel implements IPropertyObservable, IBasicModel
 {
 	private final ModelId _id;
 	private final IWritablePoint _position;
 	private final MSize _dimension;
 	protected Color _color;
 	private double _rotation;
+	private boolean _visible;
 	private boolean _selected;
-	private final List<IObserver> _observers;
+	private final List<IPropertyObserver> _observers;
 	
 	
-	public BasicModel(IReadablePoint position, IReadableSize size, Color color) {
-		this(position.x(), position.y(), size.width(), size.height(), color);
+	public BasicModel(IReadablePoint position, IReadableSize size, Color color, boolean visible) {
+		this(position.x(), position.y(), size.width(), size.height(), color, visible);
 	}
-	public BasicModel(double x, double y, double width, double height, Color color) {
+	public BasicModel(double x, double y, double width, double height, Color color, boolean visible) {
 		_id = IdManager.GetModelId();
 		_position = new MPoint(x, y);
 		_dimension = new MSize(width, height);
 		_color = color;
 		_rotation = 0;
+		_visible = true;
 		_selected = false;
 		_observers = new ArrayList<>();
 	}
@@ -47,29 +49,34 @@ public class BasicModel implements IObservable, IBasicModel
 	}
 	
 	
-	public void addObserver(IObserver observer) { _observers.add(observer); }
-	public void removeObserver(IObserver observer) { _observers.remove(observer); }
+	public void addObserver(IPropertyObserver observer) { _observers.add(observer); }
+	public void removeObserver(IPropertyObserver observer) { _observers.remove(observer); }
 	public void removeObservers() { _observers.clear(); }
-	public void notifyObservers(ObservableEvent event, Object value) {
-		for (IObserver observer : _observers) {
+	public void notifyObservers(ObservableProperty event, Object value) {
+		for (IPropertyObserver observer : _observers) {
 			observer.notify(this, event, value);
 		}
 	}
 
-	
 	public Color getColor() { return _color; }
 	public void setColor(Color color) {
 		Color tmp = _color;
 		_color = color;
-		notifyObservers(ObservableEvent.COLOR, tmp);
+		notifyObservers(ObservableProperty.COLOR, tmp);
 	}
 	
+	public boolean isVisible() { return _visible; }
+	public void visible(boolean visible) {
+		Boolean tmp = _visible;
+		_visible = visible;
+		notifyObservers(ObservableProperty.VISIBLE, tmp);
+	}
 	
 	public boolean isSelected() { return _selected; }
 	public void select(boolean selected) {
 		Boolean tmp = _selected;
 		_selected = selected;
-		notifyObservers(ObservableEvent.SELECT, tmp);
+		notifyObservers(ObservableProperty.SELECT, tmp);
 	}
 	
 	
@@ -91,7 +98,7 @@ public class BasicModel implements IObservable, IBasicModel
 		IReadablePoint tmp = _position.clone();
 		_position.moveTo(x, y);
 		moveLogic(tmp);
-		notifyObservers(ObservableEvent.MOVE, tmp);
+		notifyObservers(ObservableProperty.MOVE, tmp);
 	}
 	
 	public void moveBy(IReadablePoint point) { moveBy(point.x(), point.y()); }
@@ -101,7 +108,7 @@ public class BasicModel implements IObservable, IBasicModel
 		IReadablePoint tmp = _position.clone();
 		_position.moveBy(x, y);
 		moveLogic(tmp);
-		notifyObservers(ObservableEvent.MOVE, tmp);
+		notifyObservers(ObservableProperty.MOVE, tmp);
 	}
 	
 	public void resizeTo(IReadableSize dimension) { resizeTo(dimension.width(), dimension.height()); }
@@ -111,7 +118,7 @@ public class BasicModel implements IObservable, IBasicModel
 		IReadableSize tmp = _dimension.clone();
 		_dimension.resizeTo(width, height);
 		resizeLogic(tmp);
-		notifyObservers(ObservableEvent.RESIZE, tmp);
+		notifyObservers(ObservableProperty.RESIZE, tmp);
 	}
 	
 	public void scale(float scale) {
@@ -120,7 +127,7 @@ public class BasicModel implements IObservable, IBasicModel
 		IReadableSize tmp = _dimension.clone();
 		_dimension.scale(scale);
 		resizeLogic(tmp);
-		notifyObservers(ObservableEvent.RESIZE, tmp);
+		notifyObservers(ObservableProperty.RESIZE, tmp);
 	}
 	
 	public void rotateBy(double deltaRotation) { 
@@ -134,7 +141,7 @@ public class BasicModel implements IObservable, IBasicModel
 		double tmp = _rotation;
 		_rotation = rotation;
 		rotateLogic(tmp);
-		notifyObservers(ObservableEvent.ROTATE, new Double(tmp));
+		notifyObservers(ObservableProperty.ROTATE, new Double(tmp));
 	}
 	
 	

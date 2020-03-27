@@ -17,6 +17,9 @@ public class PolygonPainter implements IPainter
 	
 	@Override
 	public void paint(BasicView<?> view, Graphics g) {
+		if (!view.model().isVisible()) 
+			return;
+
 		IReadablePoint[] points = ((IPolygonModel) view.model()).getPolygonPoints();
 		int nPoints = points.length;
 		int xPoints[] = new int[nPoints];

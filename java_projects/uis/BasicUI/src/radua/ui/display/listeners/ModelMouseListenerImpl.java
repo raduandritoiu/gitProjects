@@ -1,19 +1,24 @@
-package radua.ui.controllers;
+package radua.ui.display.listeners;
 
 import java.awt.Component;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 
-import radua.ui.models.IBasicModel;
-import radua.ui.views.BasicView;
+import radua.ui.display.views.BasicView;
+import radua.ui.logic.controllers.MovementLogic;
+import radua.ui.logic.controllers.WorldController;
+import radua.ui.logic.models.IBasicModel;
 
-public class MouseController implements MouseListener, MouseMotionListener
+public class ModelMouseListenerImpl implements MouseListener, MouseMotionListener
 {
 	private final WorldController worldCtrl;
+	private final MovementLogic movementLogic;
 	
-    public MouseController(WorldController worldController) {
+	
+    public ModelMouseListenerImpl(WorldController worldController) {
     	worldCtrl = worldController;
+		movementLogic = new MovementLogic(worldCtrl);
 	}
 
     
@@ -35,7 +40,7 @@ public class MouseController implements MouseListener, MouseMotionListener
     		return;
     	}
     	// update selection
-		updateSelection(((BasicView<?>) comp).getModel(), e.isControlDown());
+		updateSelection(((BasicView<?>) comp).model(), e.isControlDown());
     }
     
     
@@ -45,24 +50,24 @@ public class MouseController implements MouseListener, MouseMotionListener
     	if (!(comp instanceof BasicView)) {
     		return;
     	}
-    	IBasicModel  crtModel = ((BasicView<?>) comp).getModel();
+    	IBasicModel  crtModel = ((BasicView<?>) comp).model();
     	// update selection
 		updateSelection(crtModel, e.isControlDown());
 		
 		// start moving
-		worldCtrl.movingController().startMovement(crtModel, e.getXOnScreen(), e.getYOnScreen());
+		movementLogic.startMovement(crtModel, e.getXOnScreen(), e.getYOnScreen());
     }
     
     @Override
     public void mouseDragged(MouseEvent e) {
     	// continue moving
-    	worldCtrl.movingController().updateMovement(e.getXOnScreen(), e.getYOnScreen());
+    	movementLogic.updateMovement(e.getXOnScreen(), e.getYOnScreen());
     }
  
     @Override
     public void mouseReleased(MouseEvent e) {
     	// end moving
-    	worldCtrl.movingController().endMovement();
+    	movementLogic.endMovement();
     }
     
     

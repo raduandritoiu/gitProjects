@@ -17,7 +17,6 @@ public class WorldController
 	
 	private IModelViewFactory factory;
 	private IStageWrapper stageWrapper;
-	private final MovementLogic movingLogic;
 
 	
 	public WorldController() {
@@ -25,7 +24,6 @@ public class WorldController
 	}
 	public WorldController(IModelViewFactory newFactory) {
 		factory = newFactory;
-		movingLogic = new MovementLogic(this);
 		
 		models = new ArrayList<>();
 		views = new ArrayList<>();
@@ -46,10 +44,6 @@ public class WorldController
 	
 	public void setStageWrapper(IStageWrapper newStageWrapper) {
 		stageWrapper = newStageWrapper;
-	}
-	
-	public MovementLogic movingLogic() {
-		return movingLogic;
 	}
 	
 	
@@ -86,7 +80,6 @@ public class WorldController
 		if (stageWrapper != null) {
 			stageWrapper.addNewView(view);
 		}
-
 		models.add(model);
         views.add(view);
 	}
@@ -105,7 +98,6 @@ public class WorldController
 		crtSelection.remove(model);
 		models.remove(model);
 		views.remove(view);
-		
 		if (stageWrapper != null) {
 			stageWrapper.removeView(view);
 		}
@@ -116,6 +108,7 @@ public class WorldController
 	// ==== Selection ====================================================
 	
 	public void addSelection(IBasicModel selectedModel) {
+		if (selectedModel == null) return;
 		if (crtSelection.contains(selectedModel)) {
 			return;
 		}
@@ -124,44 +117,101 @@ public class WorldController
 	}
 	
 	public void addSelection(List<IBasicModel> newSelection) {
+		if (newSelection == null) return;
+		IBasicModel[] updateSelection = new IBasicModel[newSelection.size()];
+		int i = 0;
 		for (IBasicModel model : newSelection) {
-			if (crtSelection.contains(model)) {
-				continue;
+			if (!crtSelection.contains(model)) {
+				updateSelection[i++] = model;
+				crtSelection.add(model);
 			}
-			crtSelection.add(model);
-			model.select(true);
+		}
+		for (i = 0; i < updateSelection.length; i++) {
+			if (updateSelection[i] == null) break;
+			updateSelection[i].select(true);
 		}
 	}
 	
 	public void setSelection(IBasicModel selectedModel) {
+		// compute old and new
+		IBasicModel[] oldSelection = new IBasicModel[crtSelection.size()];
+		int i = 0;
 		for (IBasicModel model : crtSelection) {
-			if (selectedModel == model) {
-				continue;
+			if (model != selectedModel) {
+				oldSelection[i++] = model;
 			}
-			model.select(false);
 		}
+		boolean changeSelection = !crtSelection.contains(selectedModel);
+		
+		// update selection
 		crtSelection.clear();
-		if (crtSelection.contains(selectedModel)) {
-			return;
+		if (selectedModel != null) {
+			crtSelection.add(selectedModel);
 		}
-		crtSelection.add(selectedModel);
-		selectedModel.select(true);
+
+		// update models
+		for (i = 0; i < oldSelection.length; i++) {
+			if (oldSelection[i] == null) break;
+			oldSelection[i].select(false);
+		}
+		if (changeSelection) {
+			selectedModel.select(true);
+		}
 	}
 	
 	public void setSelection(List<IBasicModel> newSelection) {
+		// compute old and new
+		IBasicModel[] oldSelection = new IBasicModel[crtSelection.size()];
+		int i = 0;
 		for (IBasicModel model : crtSelection) {
-			if (newSelection.contains(model)) {
-				continue;
+			if (newSelection == null || !newSelection.contains(model)) {
+				oldSelection[i++] = model;
 			}
-			model.select(false);
 		}
-		crtSelection.clear();
-		for (IBasicModel model : newSelection) {
-			if (crtSelection.contains(model)) {
-				continue;
+		IBasicModel[] updateSelection = null;
+		if (newSelection != null) {
+			updateSelection = new IBasicModel[newSelection.size()];
+			i = 0;
+			for (IBasicModel model : newSelection) {
+				if (!crtSelection.contains(model)) {
+					updateSelection[i++] = model;
+				}
 			}
-			crtSelection.add(model);
-			model.select(true);
+		}
+		
+		// update selection
+		crtSelection.clear();
+		if (newSelection != null && newSelection.size() > 0) {
+			crtSelection.addAll(newSelection);
+		}
+		
+		// update models
+		for (i = 0; i < oldSelection.length; i++) {
+			if (oldSelection[i] == null) break;
+			oldSelection[i].select(false);
+		}
+		if (updateSelection == null || updateSelection.length == 0) return;
+		for (i = 0; i < updateSelection.length; i++) {
+			if (updateSelection[i] == null) break;
+			updateSelection[i].select(true);
+		}
+	}
+	
+	public void clearSelection() {
+		// compute old and new
+		IBasicModel[] oldSelection = new IBasicModel[crtSelection.size()];
+		int i = 0;
+		for (IBasicModel model : crtSelection) {
+			oldSelection[i++] = model;
+		}
+		
+		// update selection
+		crtSelection.clear();
+		
+		// update models
+		for (i = 0; i < oldSelection.length; i++) {
+			if (oldSelection[i] == null) break;
+			oldSelection[i].select(false);
 		}
 	}
 	
@@ -175,7 +225,7 @@ public class WorldController
 	
 	
 	// ===================================================================
-	// ==== Proxy move/translation =======================================
+	// ==== Proxy move/translation/change ================================
 	
 	private boolean modelNotSnapped(IBasicModel model) {
 		if (model instanceof ISnapModel) {
@@ -188,7 +238,6 @@ public class WorldController
 		}
 		return true;
 	}
-	
 	
 	public void selectionMoveBy(double x, double y) {
 		for (IBasicModel model : crtSelection) {

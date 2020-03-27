@@ -2,8 +2,8 @@ package radua.ui.display.views;
 
 import radua.ui.display.views.painters.SnapPointsPainter;
 import radua.ui.logic.models.ISnapModel;
-import radua.ui.logic.observers.IObservable;
-import radua.ui.logic.observers.ObservableEvent;
+import radua.ui.logic.observers.IPropertyObservable;
+import radua.ui.logic.observers.ObservableProperty;
 
 
 public abstract class SnapView<SNPMDL extends ISnapModel> extends BasicView<SNPMDL>
@@ -25,9 +25,9 @@ public abstract class SnapView<SNPMDL extends ISnapModel> extends BasicView<SNPM
 	
 	@Override
 	@SuppressWarnings("incomplete-switch")
-	public void notify(IObservable observable, ObservableEvent event, Object value) {
+	public void notify(IPropertyObservable observable, ObservableProperty event, Object value) {
 		switch (event) {
-			case SNAP_CHANGE:
+			case SNAP:
 				repaint();
 				break;
 		}

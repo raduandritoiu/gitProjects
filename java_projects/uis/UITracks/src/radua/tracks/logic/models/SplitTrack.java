@@ -1,4 +1,4 @@
-package radua.ui.logic.models.tracks;
+package radua.tracks.logic.models;
 
 import radua.ui.logic.basics.IReadablePoint;
 import radua.ui.logic.basics.MPoint;
@@ -9,10 +9,12 @@ import radua.ui.logic.utils.Constants;
 
 public class SplitTrack extends TrackModel
 {
+	private static final long serialVersionUID = 5835548920634804968L;
+	
+	
 	private Direction _direction;
 	
-	
-	public SplitTrack(int x, int y) {
+	public SplitTrack(double x, double y) {
 		super(new MPoint(x, y), new MPoint(50, 50).scale(SCALE_FACTOR));
 		
 		_direction = Direction.LEFT;
@@ -50,20 +52,47 @@ public class SplitTrack extends TrackModel
 		return ((DirectionalSnapPoint) _snapPoints.get(2)).relativeA();
 	}
 	
-	public Direction direction() { return _direction; }
+	public Direction direction() {
+		return _direction;
+	}
 	
-	public boolean goesLeft() { return _direction == Direction.LEFT; }
+	public boolean goesLeft() {
+		return _direction == Direction.LEFT;
+	}
 	public void goLeft() {
 		_direction = Direction.LEFT; 
 		notifyObservers(ObservableProperty.ALL, null);
 	}
 	
-	public boolean goesRight() { return _direction == Direction.RIGHT; }
+	public boolean goesRight() {
+		return _direction == Direction.RIGHT;
+	}
 	public void goRight() {
 		_direction = Direction.RIGHT;
 		notifyObservers(ObservableProperty.ALL, null);
 	}
 	
+	public void toggleDirection() {
+		if (_direction == Direction.LEFT)
+			goRight();
+		else
+			goRight();
+	}
+	
+	
+	public DirectionalSnapPoint otherEnd(DirectionalSnapPoint crtEnd) {
+		if (crtEnd == _snapPoints.get(1))
+			return (DirectionalSnapPoint) _snapPoints.get(0);
+		if (crtEnd == _snapPoints.get(2))
+			return (DirectionalSnapPoint) _snapPoints.get(0);
+		if (goesLeft())
+			return (DirectionalSnapPoint) _snapPoints.get(1);
+		return (DirectionalSnapPoint) _snapPoints.get(2);
+	}
+
+	
+	// ===============================================================
+	// ===============================================================
 	
 	public static enum Direction {
 		LEFT,

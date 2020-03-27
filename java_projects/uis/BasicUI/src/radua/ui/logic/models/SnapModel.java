@@ -8,7 +8,7 @@ import radua.ui.logic.basics.IReadablePoint;
 import radua.ui.logic.basics.IReadableSize;
 import radua.ui.logic.models.snaps.DrawSnapPoint;
 import radua.ui.logic.models.snaps.ISnapPoint;
-import radua.ui.logic.observers.ObservableEvent;
+import radua.ui.logic.observers.ObservableProperty;
 
 
 public class SnapModel extends BasicModel implements ISnapModel
@@ -18,11 +18,11 @@ public class SnapModel extends BasicModel implements ISnapModel
 	protected final List<ISnapPoint> _snapPoints;
 	
 	
-	public SnapModel(IReadablePoint position, IReadableSize size, Color color, Color unsnapColor, Color snapColor) {
-		this(position.x(), position.y(), size.width(), size.height(), color, unsnapColor, snapColor);
+	public SnapModel(IReadablePoint position, IReadableSize size, Color color, Color unsnapColor, Color snapColor, boolean visible) {
+		this(position.x(), position.y(), size.width(), size.height(), color, unsnapColor, snapColor, visible);
 	}
-	public SnapModel(double x, double y, double width, double height, Color color, Color unsnapColor, Color snapColor) {
-		super(x, y, width, height, color);
+	public SnapModel(double x, double y, double width, double height, Color color, Color unsnapColor, Color snapColor, boolean visible) {
+		super(x, y, width, height, color, visible);
 		_unsnappedColor = unsnapColor;
 		_snappedColor = snapColor;
 		_snapPoints = new ArrayList<ISnapPoint>();
@@ -33,14 +33,14 @@ public class SnapModel extends BasicModel implements ISnapModel
 	public void setunsnappedColor(Color color) { 
 		Color tmp = _unsnappedColor;
 		_unsnappedColor = color;
-		notifyObservers(ObservableEvent.SNAP_CHANGE, tmp);
+		notifyObservers(ObservableProperty.SNAP, tmp);
 	}
 	
 	public Color getSnappedColor() { return _snappedColor; }
 	public void setSnappedColor(Color color) { 
 		Color tmp = _snappedColor;
 		_snappedColor = color;
-		notifyObservers(ObservableEvent.SNAP_CHANGE, tmp);
+		notifyObservers(ObservableProperty.SNAP, tmp);
 	}
 
 	public List<ISnapPoint> snapPoints() {

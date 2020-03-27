@@ -1,4 +1,4 @@
-package radua.ui.display.components;
+package radua.ui.display.views;
 
 import java.awt.Graphics;
 
@@ -18,4 +18,8 @@ public class WorldView extends JComponent
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);		
 	}
+	
+	
+	/** keep this method available */
+	protected void superPaint(Graphics g) { super.paintComponent(g); }
 }

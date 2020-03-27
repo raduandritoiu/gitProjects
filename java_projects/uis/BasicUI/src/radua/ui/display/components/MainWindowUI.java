@@ -7,6 +7,7 @@ import javax.swing.JPanel;
 
 import radua.ui.display.controllers.ModelViewFactory;
 import radua.ui.display.controllers.StageWrapper;
+import radua.ui.display.views.WorldView;
 import radua.ui.logic.controllers.WorldController;
 import radua.ui.logic.models.tracks.CurvedTrack;
 import radua.ui.logic.models.tracks.ReversTrack;
@@ -40,7 +41,7 @@ public class MainWindowUI extends JFrame
     
     void setup()
     {
-    	JComponent mainView = new WorldView();
+    	WorldView mainView = new WorldView();
     	add(mainView);
         addOpsPanel(mainView);
     	

@@ -9,8 +9,8 @@ import radua.ui.display.views.painters.IPainter;
 import radua.ui.logic.ids.IdManager;
 import radua.ui.logic.ids.ViewId;
 import radua.ui.logic.models.IBasicModel;
-import radua.ui.logic.observers.IObservable;
-import radua.ui.logic.observers.ObservableEvent;
+import radua.ui.logic.observers.IPropertyObservable;
+import radua.ui.logic.observers.ObservableProperty;
 import radua.ui.logic.views.IBasicView;
 
 
@@ -52,7 +52,7 @@ public abstract class BasicView<MDL extends IBasicModel> extends JComponent impl
 	
 	
 	@SuppressWarnings("incomplete-switch")
-	public void notify(IObservable observable, ObservableEvent event, Object oldValue) {
+	public void notify(IPropertyObservable observable, ObservableProperty event, Object oldValue) {
 		switch (event) {
 			case MOVE:
 		        setLocation((int) _model.x(), (int) _model.y());
@@ -64,11 +64,14 @@ public abstract class BasicView<MDL extends IBasicModel> extends JComponent impl
 				doRotate(oldValue);
 		        return;
 			case COLOR:
-				doRedrawBack(oldValue);
+				doRedrawBackground(oldValue);
+				return;
+			case VISIBLE:
+				doRedrawBackground(oldValue);
 				return;
 			case SELECT:
 				setFocusable(_model.isSelected());
-				doRedrawBack(oldValue);
+				doRedrawBackground(oldValue);
 				return;
 			case ALL:
 				doRedrawAll(oldValue);
@@ -78,7 +81,7 @@ public abstract class BasicView<MDL extends IBasicModel> extends JComponent impl
 	
 	
 	protected void doRotate(Object oldValue) {}
-	protected void doRedrawBack(Object oldValue) {
+	protected void doRedrawBackground(Object oldValue) {
 		repaint();
 	}
 	protected void doRedrawAll(Object oldValue) {

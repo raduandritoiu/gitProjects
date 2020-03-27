@@ -16,11 +16,11 @@ public class PolygonModel extends BasicModel implements IPolygonModel
 //	public PolygonModel() {
 //		super();
 //	}
-	public PolygonModel(IReadablePoint position, IReadableSize size, Color color) {
-		this(position.x(), position.y(), size.width(), size.height(), color);
+	public PolygonModel(IReadablePoint position, IReadableSize size, Color color, boolean visible) {
+		this(position.x(), position.y(), size.width(), size.height(), color, visible);
 	}
-	public PolygonModel(double x, double y, double width, double height, Color color) {
-		super(x, y, width, height, color);
+	public PolygonModel(double x, double y, double width, double height, Color color, boolean visible) {
+		super(x, y, width, height, color, visible);
 	}
 	
 	

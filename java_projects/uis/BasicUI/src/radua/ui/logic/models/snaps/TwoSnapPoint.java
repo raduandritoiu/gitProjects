@@ -1,12 +1,5 @@
 package radua.ui.logic.models.snaps;
 
-import java.awt.Point;
-import java.util.ArrayList;
-
-import radua.ui.logic.models.SnapModel;
-import radua.ui.logic.utils.Calculus;
-import radua.ui.logic.utils.Constants;
-
 
 public class TwoSnapPoint // extends BasicSnapPoint
 {

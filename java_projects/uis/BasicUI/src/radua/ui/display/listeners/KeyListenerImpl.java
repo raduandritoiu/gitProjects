@@ -4,7 +4,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.List;
 
-import radua.ui.logic.controllers.KeyHelper;
+import radua.ui.logic.controllers.KeyLogic;
 import radua.ui.logic.controllers.WorldController;
 import radua.ui.logic.models.IBasicModel;
 import radua.ui.logic.models.tracks.CurvedTrack;
@@ -15,12 +15,11 @@ import radua.ui.logic.models.tracks.StraightTrack;
 public class KeyListenerImpl implements KeyListener
 {
 	private final WorldController worldCtrl;
-	private final KeyHelper keyHelper;
-	
+	private final KeyLogic keyHelper;
 	
     public KeyListenerImpl(WorldController worldController) {
     	worldCtrl = worldController;
-    	keyHelper = new KeyHelper();
+    	keyHelper = new KeyLogic();
 	}
 
 	@Override
@@ -75,7 +74,6 @@ public class KeyListenerImpl implements KeyListener
 				((SplitTrack) model).goRight();
 			}
 		}
-		
 	}
 
 	@Override

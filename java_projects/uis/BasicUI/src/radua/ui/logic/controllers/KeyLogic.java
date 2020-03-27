@@ -2,10 +2,11 @@ package radua.ui.logic.controllers;
 
 import java.awt.event.KeyEvent;
 
+import radua.ui.logic.models.IBasicModel;
 import radua.ui.logic.utils.Debug;
 
 
-public class KeyHelper {
+public class KeyLogic {
 	private static final int DELTA_MOVE = 1;
 	private static final double DELTA_ROTATION = Math.PI / 6;
 
@@ -47,6 +48,15 @@ public class KeyHelper {
 		// r - 77 for rotate RESET
 		if (e.getKeyCode() == 82) {
 			worldCtrl.selectionResetRotation();
+			return true;
+		}
+		
+		// ==== visible =============
+		// v - 86 for tobble visible
+		if (e.getKeyCode() == 86) {
+			for (IBasicModel model : worldCtrl.getSelection()) {
+				model.visible(!model.isVisible());
+			}
 			return true;
 		}
 		
