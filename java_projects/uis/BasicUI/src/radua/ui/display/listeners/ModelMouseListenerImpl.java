@@ -5,10 +5,10 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 
-import radua.ui.display.views.BasicView;
 import radua.ui.logic.controllers.MovementLogic;
 import radua.ui.logic.controllers.WorldController;
 import radua.ui.logic.models.IBasicModel;
+import radua.ui.views.BasicView;
 
 public class ModelMouseListenerImpl implements MouseListener, MouseMotionListener
 {
@@ -50,7 +50,7 @@ public class ModelMouseListenerImpl implements MouseListener, MouseMotionListene
     	if (!(comp instanceof BasicView)) {
     		return;
     	}
-    	IBasicModel  crtModel = ((BasicView<?>) comp).model();
+    	IBasicModel crtModel = ((BasicView<?>) comp).model();
     	// update selection
 		updateSelection(crtModel, e.isControlDown());
 		

@@ -1,78 +1,35 @@
 package radua.ui.logic.models.snaps;
 
-import java.util.ArrayList;
-
 import radua.ui.logic.basics.IReadablePoint;
-import radua.ui.logic.basics.IWritablePoint;
 import radua.ui.logic.basics.MPoint;
 import radua.ui.logic.models.SnapModel;
 import radua.ui.logic.utils.Calculus;
 import radua.ui.logic.utils.Constants;
 
-public class DirectionalSnapPoint extends BasicSnapPoint
+public class DirectionalSnapPoint extends PositionalSnapPoint
 {
-	private static final double DELTA_SNAP = 30;
-	
-	final IWritablePoint A;
 	final double rotation;
-	IWritablePoint relativeA, absoluteA;
 	
 	
 	public DirectionalSnapPoint(SnapModel parent, IReadablePoint pointA, double rot) { 
 		this(parent, pointA.x(), pointA.y(), rot); 
 	}
 	public DirectionalSnapPoint(SnapModel parent, double x, double y, double rot) {
-		super(parent);
-		A = new MPoint(x, y);
-		relativeA = new MPoint(x, y);
-		absoluteA = new MPoint(x, y);
+		super(parent, x, y);
 		rotation = rot;
 		updatePoints();
 	}
 	
 	
-	public IReadablePoint A() { return A; }
-	public IReadablePoint relativeA() { return relativeA; }
-	public IReadablePoint absoluteA() { return absoluteA; }
-
-	
-	@Override
-	void updatePoints() {
-		_parent.relativePoint(A, relativeA);
-		_parent.absolutePoint(A, absoluteA );
+	protected boolean acceptsTypeForSnap(ISnapPoint peerPoint) {
+		return (peerPoint instanceof DirectionalSnapPoint);
 	}
 	
-	public ArrayList<DrawSnapPoint> getDrawPoints() {
-		ArrayList<DrawSnapPoint> points = new ArrayList<>(2);
-		points.add(new DrawSnapPoint(relativeA.intX(), relativeA.intY(), isSnapped()));
-		return points;
-	}
-
-	public boolean canSnap(ISnapPoint snapPoint) {
-		if (snapPoint.getSnap() != null && snapPoint.getSnap() != this) {
-			return false;
-		}
-		if (!(snapPoint instanceof DirectionalSnapPoint))
-			return false;
-		DirectionalSnapPoint one = (DirectionalSnapPoint) snapPoint;
-		if (Math.abs(absoluteA.x() - one.absoluteA.x()) > DELTA_SNAP)
-			return false;
-		if (Math.abs(absoluteA.y() - one.absoluteA.y()) > DELTA_SNAP)
-			return false;
-		return true;
-	}
 	
-	public double getSnapStength(ISnapPoint snapPoint) {
-		if (!(snapPoint instanceof DirectionalSnapPoint))
-			return Constants.MAX_INF;
-		DirectionalSnapPoint one = (DirectionalSnapPoint) snapPoint;
-		return Calculus.length(absoluteA(), one.absoluteA());
-	}
-	
-	public SnapResultMove getSnapMove(ISnapPoint snapPoint) {
-		if (!(snapPoint instanceof DirectionalSnapPoint))
-			return new SnapResultMove(false, new MPoint(0, 0), 0);
-		DirectionalSnapPoint one = (DirectionalSnapPoint) snapPoint;
+	public SnapResultMove getSnapMove(ISnapPoint peerPoint) {
+		if (!(peerPoint instanceof DirectionalSnapPoint))
+			return SnapResultMove.NONE;
+		DirectionalSnapPoint one = (DirectionalSnapPoint) peerPoint;
 		
 		// compute rotation
 		double destRotation = Calculus.NormalRad(one.rotation + one._parent.rotation() + Constants.RAD_180 - rotation);
@@ -88,11 +45,10 @@ public class DirectionalSnapPoint extends BasicSnapPoint
 	}
 	
 	
-	@Override
 	public String debugString(int tabs) {
 		String str = "";
 		for (int i = 0; i < tabs; i++) str += "\t";
-		str += "OnePoints("+_parent.id()+"."+_id+"): nei("+(_neighbour != null ? _neighbour.id() : "*")+
+		str += "OnePoints("+_parent.id()+"."+_id+"): nei("+(_peer != null ? _peer.id() : "*")+
 			"), A: orig["+A.x()+","+A.y()+"],  rel["+relativeA.x()+","+relativeA.y()+"],  abs["+absoluteA.x()+","+absoluteA.y()+
 			"],  rot("+Calculus.RadToDeg(rotation)+"^),  absRot("+Calculus.RadToDeg(rotation + _parent.rotation())+"^)";
 		return str;

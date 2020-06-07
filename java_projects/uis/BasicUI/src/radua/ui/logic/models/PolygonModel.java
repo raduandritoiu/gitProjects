@@ -1,26 +1,22 @@
 package radua.ui.logic.models;
 
-import java.awt.Color;
-
 import radua.ui.logic.basics.IReadablePoint;
 import radua.ui.logic.basics.IReadableSize;
 import radua.ui.logic.basics.IWritablePoint;
+import radua.ui.logic.basics.MColor;
 
 
-public class PolygonModel extends BasicModel implements IPolygonModel
+public abstract class PolygonModel extends BasicModel implements IPolygonModel
 {
 	protected IReadablePoint[] _originalPoints;
 	protected IWritablePoint[] _drawPoints;
 
 	
-//	public PolygonModel() {
-//		super();
-//	}
-	public PolygonModel(IReadablePoint position, IReadableSize size, Color color, boolean visible) {
-		this(position.x(), position.y(), size.width(), size.height(), color, visible);
+	public PolygonModel(IReadablePoint position, IReadableSize size, boolean visible, MColor color) {
+		this(position.x(), position.y(), size.width(), size.height(), visible, color);
 	}
-	public PolygonModel(double x, double y, double width, double height, Color color, boolean visible) {
-		super(x, y, width, height, color, visible);
+	public PolygonModel(double x, double y, double width, double height, boolean visible, MColor color) {
+		super(x, y, width, height, visible, color);
 	}
 	
 	

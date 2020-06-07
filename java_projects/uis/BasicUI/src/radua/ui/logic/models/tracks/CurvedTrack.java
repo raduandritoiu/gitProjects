@@ -1,6 +1,7 @@
 package radua.ui.logic.models.tracks;
 
 import radua.ui.logic.basics.MPoint;
+import radua.ui.logic.basics.MSize;
 import radua.ui.logic.models.snaps.DirectionalSnapPoint;
 import radua.ui.logic.utils.Constants;
 
@@ -8,11 +9,9 @@ import radua.ui.logic.utils.Constants;
 public class CurvedTrack extends TrackModel
 {
 	public CurvedTrack(double x, double y) {
-		super(new MPoint(x, y), new MPoint(50, 50).moveBy(0, 0).scale(SCALE_FACTOR));
+		super(new MPoint(x, y), new MSize(100, 100).scale(SCALE_FACTOR), 8);
 		
 		int n = 3;
-		_originalPoints = new MPoint[8];
-		
 		_originalPoints[0] = new MPoint(10, 30).moveBy(0, 0).scale(SCALE_FACTOR);
 		_originalPoints[1] = new MPoint(10, 70).moveBy(0, 0).scale(SCALE_FACTOR);
 		_originalPoints[2] = new MPoint(10 + 8*n, 70).moveBy(0, 0).scale(SCALE_FACTOR);
@@ -24,7 +23,6 @@ public class CurvedTrack extends TrackModel
 		
 		_originalPoints[7] = new MPoint(10 + 8*n, 30).moveBy(0, 0).scale(SCALE_FACTOR);
 		
-		_drawPoints = new MPoint[8];
 		for (int i = 0; i < _originalPoints.length; i++) {
 			_drawPoints[i] = new MPoint();
 		}

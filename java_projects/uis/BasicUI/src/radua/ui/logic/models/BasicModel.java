@@ -1,12 +1,12 @@
 package radua.ui.logic.models;
 
-import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 
 import radua.ui.logic.basics.IReadablePoint;
 import radua.ui.logic.basics.IReadableSize;
 import radua.ui.logic.basics.IWritablePoint;
+import radua.ui.logic.basics.MColor;
 import radua.ui.logic.basics.MPoint;
 import radua.ui.logic.basics.MSize;
 import radua.ui.logic.ids.IdManager;
@@ -17,22 +17,22 @@ import radua.ui.logic.observers.ObservableProperty;
 import radua.ui.logic.utils.Calculus;
 
 
-public class BasicModel implements IPropertyObservable, IBasicModel
+public abstract class BasicModel implements IPropertyObservable, IBasicModel
 {
 	private final ModelId _id;
 	private final IWritablePoint _position;
 	private final MSize _dimension;
-	protected Color _color;
+	protected MColor _color;
 	private double _rotation;
 	private boolean _visible;
 	private boolean _selected;
 	private final List<IPropertyObserver> _observers;
 	
 	
-	public BasicModel(IReadablePoint position, IReadableSize size, Color color, boolean visible) {
-		this(position.x(), position.y(), size.width(), size.height(), color, visible);
+	public BasicModel(IReadablePoint position, IReadableSize size, boolean visible, MColor color) {
+		this(position.x(), position.y(), size.width(), size.height(), visible, color);
 	}
-	public BasicModel(double x, double y, double width, double height, Color color, boolean visible) {
+	public BasicModel(double x, double y, double width, double height, boolean visible, MColor color) {
 		_id = IdManager.GetModelId();
 		_position = new MPoint(x, y);
 		_dimension = new MSize(width, height);
@@ -44,9 +44,8 @@ public class BasicModel implements IPropertyObservable, IBasicModel
 	}
 	
 	
-	public ModelId id() {
-		return _id;
-	}
+	public ModelId id() { return _id; }
+	public String type() { return getClass().getSimpleName(); }
 	
 	
 	public void addObserver(IPropertyObserver observer) { _observers.add(observer); }
@@ -58,9 +57,9 @@ public class BasicModel implements IPropertyObservable, IBasicModel
 		}
 	}
 
-	public Color getColor() { return _color; }
-	public void setColor(Color color) {
-		Color tmp = _color;
+	public MColor getColor() { return _color; }
+	public void setColor(MColor color) {
+		MColor tmp = _color;
 		_color = color;
 		notifyObservers(ObservableProperty.COLOR, tmp);
 	}
@@ -152,11 +151,6 @@ public class BasicModel implements IPropertyObservable, IBasicModel
 	
 	public void relativePoint(IReadablePoint point, IWritablePoint result) {
 		Calculus.rotatePoint(point, _rotation, _dimension.width()/2, _dimension.height()/2, result);
-	}
-	
-	public void absolutePoint(IReadablePoint point, IWritablePoint result) {
-		relativePoint(point, result);
-		result.moveBy(_position);
 	}
 	
 	public void relativeToAbsolute(IReadablePoint point, IWritablePoint result) {

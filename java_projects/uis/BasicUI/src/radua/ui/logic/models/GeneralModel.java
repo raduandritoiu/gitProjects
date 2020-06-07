@@ -1,23 +1,24 @@
 package radua.ui.logic.models;
 
-import java.awt.Color;
-
 import radua.ui.logic.basics.IReadablePoint;
 import radua.ui.logic.basics.IReadableSize;
 import radua.ui.logic.basics.IWritablePoint;
+import radua.ui.logic.basics.MColor;
 
 
-public class GeneralModel extends SnapModel implements IGeneralModel
+public abstract class GeneralModel extends SnapModel implements IGeneralModel
 {
-	protected IReadablePoint[] _originalPoints;
-	protected IWritablePoint[] _drawPoints;
+	protected final IReadablePoint[] _originalPoints;
+	protected final IWritablePoint[] _drawPoints;
 
 	
-	public GeneralModel(IReadablePoint position, IReadableSize size, Color color, Color unsnapColor, Color snapColor, boolean visible) {
-		this(position.x(), position.y(), size.width(), size.height(), color, unsnapColor, snapColor, visible);
+	public GeneralModel(IReadablePoint position, IReadableSize size, boolean visible, MColor color, MColor unsnapColor, MColor snapColor, int pointsNo) {
+		this(position.x(), position.y(), size.width(), size.height(), visible, color, unsnapColor, snapColor, pointsNo);
 	}
-	public GeneralModel(double x, double y, double width, double height, Color color, Color unsnapColor, Color snapColor, boolean visible) {
-		super(x, y, width, height, color, unsnapColor, snapColor, visible);
+	public GeneralModel(double x, double y, double width, double height, boolean visible, MColor color, MColor unsnapColor, MColor snapColor, int pointsNo) {
+		super(x, y, width, height, visible, color, unsnapColor, snapColor);
+		_originalPoints = new IReadablePoint[pointsNo];
+		_drawPoints = new IWritablePoint[pointsNo];
 	}
 	
 	

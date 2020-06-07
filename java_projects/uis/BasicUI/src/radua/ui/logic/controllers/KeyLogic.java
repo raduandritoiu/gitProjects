@@ -1,7 +1,6 @@
 package radua.ui.logic.controllers;
 
-import java.awt.event.KeyEvent;
-
+import radua.ui.logic.basics.MKeyPress;
 import radua.ui.logic.models.IBasicModel;
 import radua.ui.logic.utils.Debug;
 
@@ -11,49 +10,49 @@ public class KeyLogic {
 	private static final double DELTA_ROTATION = Math.PI / 6;
 
 	
-	public boolean handleKeyEvent(KeyEvent e, WorldController worldCtrl) {
+	public boolean handleKeyEvent(MKeyPress key, WorldController worldCtrl) {
 		// ==== rotates =============
 		// UP - 38 move model
-		if (e.getKeyCode() == 38) {
+		if (key.keyCode == 38) {
 			worldCtrl.selectionMoveBy(0, -DELTA_MOVE);
 			return true;
 		}
 		// DOWN - 40 move model
-		if (e.getKeyCode() == 40) {
+		if (key.keyCode == 40) {
 			worldCtrl.selectionMoveBy(0, DELTA_MOVE);
 			return true;
 		}
 		// LEFT - 37 move model
-		if (e.getKeyCode() == 37) {
+		if (key.keyCode == 37) {
 			worldCtrl.selectionMoveBy(-DELTA_MOVE, 0);
 			return true;
 		}
 		// RIGHT - 39 move model
-		if (e.getKeyCode() == 39) {
+		if (key.keyCode == 39) {
 			worldCtrl.selectionMoveBy(DELTA_MOVE, 0);
 			return true;
 		}
 		
 		// ==== rotates =============
 		// q - 81 for rotate LEFT
-		if (e.getKeyCode() == 81) {
+		if (key.keyCode == 81) {
 			worldCtrl.selectionRotateBy(-DELTA_ROTATION);
 			return true;
 		}
 		// w - 87 for rotate RIGHT
-		if (e.getKeyCode() == 87) {
+		if (key.keyCode == 87) {
 			worldCtrl.selectionRotateBy(DELTA_ROTATION);
 			return true;
 		}
 		// r - 77 for rotate RESET
-		if (e.getKeyCode() == 82) {
+		if (key.keyCode == 82) {
 			worldCtrl.selectionResetRotation();
 			return true;
 		}
 		
 		// ==== visible =============
 		// v - 86 for tobble visible
-		if (e.getKeyCode() == 86) {
+		if (key.keyCode == 86) {
 			for (IBasicModel model : worldCtrl.getSelection()) {
 				model.visible(!model.isVisible());
 			}
@@ -62,7 +61,7 @@ public class KeyLogic {
 		
 		// ==== debugs =============
 		// p - 80 for debug print
-		if (e.getKeyCode() == 80) {
+		if (key.keyCode == 80) {
 			Debug.printWorldController(worldCtrl);
 			return true;
 		}

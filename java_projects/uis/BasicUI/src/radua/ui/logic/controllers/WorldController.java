@@ -7,27 +7,27 @@ import radua.ui.logic.models.IBasicModel;
 import radua.ui.logic.models.ISnapModel;
 import radua.ui.logic.models.snaps.ISnapPoint;
 import radua.ui.logic.utils.Constants;
-import radua.ui.logic.views.IBasicView;
+import radua.ui.logic.view.IModelView;
 
 public class WorldController 
 {
-	private final List<IBasicModel> models;
-	private final List<IBasicView<?>> views;
-	private final List<IBasicModel> crtSelection;
+	private final List<IBasicModel> _models;
+	private final List<IModelView<?>> _views;
+	private final List<IBasicModel> _crtSelection;
 	
-	private IModelViewFactory factory;
-	private IStageWrapper stageWrapper;
+	private IModelViewFactory _factory;
+	private IStageWrapper _stageWrapper;
 
 	
 	public WorldController() {
 		this(new EmptyViewFactory());
 	}
 	public WorldController(IModelViewFactory newFactory) {
-		factory = newFactory;
+		_factory = newFactory;
 		
-		models = new ArrayList<>();
-		views = new ArrayList<>();
-		crtSelection = new ArrayList<>();
+		_models = new ArrayList<>();
+		_views = new ArrayList<>();
+		_crtSelection = new ArrayList<>();
 	}
 	
 	
@@ -35,15 +35,15 @@ public class WorldController
 	// ====== Built-in sub components ====================================
 	
 	public void setFactory(IModelViewFactory newFactory) {
-		factory = newFactory;
+		_factory = newFactory;
 	}
 	
 	public IModelViewFactory getFactory() {
-		return factory;
+		return _factory;
 	}
 	
 	public void setStageWrapper(IStageWrapper newStageWrapper) {
-		stageWrapper = newStageWrapper;
+		_stageWrapper = newStageWrapper;
 	}
 	
 	
@@ -51,11 +51,11 @@ public class WorldController
 	// ====== Models and Views ===========================================
 	
 	public List<IBasicModel> getModels() {
-		return models;
+		return _models;
 	} 
 	
-	public IBasicView<?> getView(IBasicModel model) {
-		for (IBasicView<?> view : views) {
+	public IModelView<?> getView(IBasicModel model) {
+		for (IModelView<?> view : _views) {
 			if (view.model() == model)
 				return view;
 		}
@@ -67,39 +67,39 @@ public class WorldController
 	// ====== Add and Remove =============================================
 	
 	public final void addModel(IBasicModel model) {
-		IBasicView<?> view = createView(model);
+		IModelView<?> view = createView(model);
 		addModelView(model, view);
 	}
 	
-	public final void addView(IBasicView<?> view) {
+	public final void addView(IModelView<?> view) {
 		IBasicModel model = view.model();
 		addModelView(model, view);
 	}
 	
-	private void addModelView(IBasicModel model, IBasicView<?> view) {
-		if (stageWrapper != null) {
-			stageWrapper.addNewView(view);
+	private void addModelView(IBasicModel model, IModelView<?> view) {
+		if (_stageWrapper != null) {
+			_stageWrapper.addNewView(view);
 		}
-		models.add(model);
-        views.add(view);
+		_models.add(model);
+        _views.add(view);
 	}
 	
-	protected IBasicView<?> createView(IBasicModel model) {
-		return factory.createView(model); 
+	protected IModelView<?> createView(IBasicModel model) {
+		return _factory.createView(model); 
 	}
 	
 	public void removeModel(IBasicModel model) {
-		IBasicView<?> view = getView(model);
+		IModelView<?> view = getView(model);
 		removeView(view);
 	}
 	
-	public void removeView(IBasicView<?> view) {
+	public void removeView(IModelView<?> view) {
 		IBasicModel model = view.model();
-		crtSelection.remove(model);
-		models.remove(model);
-		views.remove(view);
-		if (stageWrapper != null) {
-			stageWrapper.removeView(view);
+		_crtSelection.remove(model);
+		_models.remove(model);
+		_views.remove(view);
+		if (_stageWrapper != null) {
+			_stageWrapper.removeView(view);
 		}
 	}
 	
@@ -109,10 +109,10 @@ public class WorldController
 	
 	public void addSelection(IBasicModel selectedModel) {
 		if (selectedModel == null) return;
-		if (crtSelection.contains(selectedModel)) {
+		if (_crtSelection.contains(selectedModel)) {
 			return;
 		}
-		crtSelection.add(selectedModel);
+		_crtSelection.add(selectedModel);
 		selectedModel.select(true);
 	}
 	
@@ -121,9 +121,9 @@ public class WorldController
 		IBasicModel[] updateSelection = new IBasicModel[newSelection.size()];
 		int i = 0;
 		for (IBasicModel model : newSelection) {
-			if (!crtSelection.contains(model)) {
+			if (!_crtSelection.contains(model)) {
 				updateSelection[i++] = model;
-				crtSelection.add(model);
+				_crtSelection.add(model);
 			}
 		}
 		for (i = 0; i < updateSelection.length; i++) {
@@ -134,19 +134,19 @@ public class WorldController
 	
 	public void setSelection(IBasicModel selectedModel) {
 		// compute old and new
-		IBasicModel[] oldSelection = new IBasicModel[crtSelection.size()];
+		IBasicModel[] oldSelection = new IBasicModel[_crtSelection.size()];
 		int i = 0;
-		for (IBasicModel model : crtSelection) {
+		for (IBasicModel model : _crtSelection) {
 			if (model != selectedModel) {
 				oldSelection[i++] = model;
 			}
 		}
-		boolean changeSelection = !crtSelection.contains(selectedModel);
+		boolean changeSelection = !_crtSelection.contains(selectedModel);
 		
 		// update selection
-		crtSelection.clear();
+		_crtSelection.clear();
 		if (selectedModel != null) {
-			crtSelection.add(selectedModel);
+			_crtSelection.add(selectedModel);
 		}
 
 		// update models
@@ -161,9 +161,9 @@ public class WorldController
 	
 	public void setSelection(List<IBasicModel> newSelection) {
 		// compute old and new
-		IBasicModel[] oldSelection = new IBasicModel[crtSelection.size()];
+		IBasicModel[] oldSelection = new IBasicModel[_crtSelection.size()];
 		int i = 0;
-		for (IBasicModel model : crtSelection) {
+		for (IBasicModel model : _crtSelection) {
 			if (newSelection == null || !newSelection.contains(model)) {
 				oldSelection[i++] = model;
 			}
@@ -173,16 +173,16 @@ public class WorldController
 			updateSelection = new IBasicModel[newSelection.size()];
 			i = 0;
 			for (IBasicModel model : newSelection) {
-				if (!crtSelection.contains(model)) {
+				if (!_crtSelection.contains(model)) {
 					updateSelection[i++] = model;
 				}
 			}
 		}
 		
 		// update selection
-		crtSelection.clear();
+		_crtSelection.clear();
 		if (newSelection != null && newSelection.size() > 0) {
-			crtSelection.addAll(newSelection);
+			_crtSelection.addAll(newSelection);
 		}
 		
 		// update models
@@ -197,16 +197,38 @@ public class WorldController
 		}
 	}
 	
+	public void setSelection(int x1, int y1, int x2, int y2) {
+		if (x1 == x2 || y1 == y2) {
+			clearSelection();
+			return;
+		}
+
+		int xm = x1, xM = x2;
+		int ym = y1, yM = y2;
+		if (x1 > x2) { xm = x2; xM = x1; }
+		if (y1 > y2) { ym = y2; yM = y1; }
+		
+		List<IBasicModel> newSelection = new ArrayList<>();
+		for (IBasicModel model : _models) {
+			if (model.x() > xm &&  model.y() > ym && 
+				model.x() + model.width() < xM &&  model.y() + model.height() < yM) {
+				newSelection.add(model);
+			}
+		}
+		setSelection(newSelection);
+	}
+
+	
 	public void clearSelection() {
 		// compute old and new
-		IBasicModel[] oldSelection = new IBasicModel[crtSelection.size()];
+		IBasicModel[] oldSelection = new IBasicModel[_crtSelection.size()];
 		int i = 0;
-		for (IBasicModel model : crtSelection) {
+		for (IBasicModel model : _crtSelection) {
 			oldSelection[i++] = model;
 		}
 		
 		// update selection
-		crtSelection.clear();
+		_crtSelection.clear();
 		
 		// update models
 		for (i = 0; i < oldSelection.length; i++) {
@@ -216,11 +238,11 @@ public class WorldController
 	}
 	
 	public List<IBasicModel> getSelection() {
-		return crtSelection;
+		return _crtSelection;
 	}
 	
 	public int selectionSize() {
-		return crtSelection.size();
+		return _crtSelection.size();
 	}
 	
 	
@@ -240,7 +262,7 @@ public class WorldController
 	}
 	
 	public void selectionMoveBy(double x, double y) {
-		for (IBasicModel model : crtSelection) {
+		for (IBasicModel model : _crtSelection) {
 			// move only unsnapped models
 			if (modelNotSnapped(model)) {
 				model.moveBy(x, y);
@@ -249,7 +271,7 @@ public class WorldController
 	}
 	
 	public void selectionRotateBy(double rotation) {
-		for (IBasicModel model : crtSelection) {
+		for (IBasicModel model : _crtSelection) {
 			// move only unsnapped models
 			if (modelNotSnapped(model)) {
 				model.rotateBy(rotation);
@@ -258,7 +280,7 @@ public class WorldController
 	}
 	
 	public void selectionRotateTo(double rotation) {
-		for (IBasicModel model : crtSelection) {
+		for (IBasicModel model : _crtSelection) {
 			// move only unsnapped models
 			if (modelNotSnapped(model)) {
 				model.rotateTo(rotation);

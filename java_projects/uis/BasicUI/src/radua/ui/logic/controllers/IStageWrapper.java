@@ -1,8 +1,8 @@
 package radua.ui.logic.controllers;
 
-import radua.ui.logic.views.IBasicView;
+import radua.ui.logic.view.IModelView;
 
 public interface IStageWrapper {
-	void addNewView(IBasicView<?> view);
-	void removeView(IBasicView<?> view);
+	void addNewView(IModelView<?> view);
+	void removeView(IModelView<?> view);
 }

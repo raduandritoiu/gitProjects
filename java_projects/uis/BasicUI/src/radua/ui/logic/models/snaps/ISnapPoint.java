@@ -15,12 +15,13 @@ public interface ISnapPoint
 	void parentResized(IReadableSize oldSize);
 	void parentRotated(double oldRotation);
 	
-	void setSnap(ISnapPoint snapPoint);
-	ISnapPoint getSnap();
+	void setSnapPeer(ISnapPoint snapPoint);
+	ISnapPoint getSnapPeer();
 	boolean isSnapped();
-	boolean canSnap(ISnapPoint snappingPoint);
-	public double getSnapStength(ISnapPoint snapPoint);
-	SnapResultMove getSnapMove(ISnapPoint snappingPoint);
+	
+	boolean canSnap(ISnapPoint peerPoint);
+	public double getSnapStength(ISnapPoint peerPoint);
+	SnapResultMove getSnapMove(ISnapPoint peerPoint);
 	
 	ArrayList<DrawSnapPoint> getDrawPoints();
 	

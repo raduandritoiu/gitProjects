@@ -2,5 +2,6 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="D:/git_repo/my_git_projects/java_projects/external_libs/json-simple-1.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -103,7 +103,7 @@ public class MovementLogic
 				continue;
 				
 			// cache info about last snap
-			ISnapPoint lastRemoteSnap = localSnap.getSnap();
+			ISnapPoint lastRemoteSnap = localSnap.getSnapPeer();
 			ISnapPoint newRemoteSnap = lastRemoteSnap;
 			double newSnapStrength = Constants.MAX_INF;
 			if (lastRemoteSnap != null) {
@@ -143,12 +143,12 @@ public class MovementLogic
 			// update the snap point
 			if (newRemoteSnap != lastRemoteSnap) {
 				if (lastRemoteSnap != null) {
-    				lastRemoteSnap.setSnap(null);
+    				lastRemoteSnap.setSnapPeer(null);
     				lastRemoteSnap.parent().notifyObservers(ObservableProperty.SNAP, false);
 				}
 				
-				localSnap.setSnap(newRemoteSnap);
-				newRemoteSnap.setSnap(localSnap);
+				localSnap.setSnapPeer(newRemoteSnap);
+				newRemoteSnap.setSnapPeer(localSnap);
 				localModel.notifyObservers(ObservableProperty.SNAP, true);
 				newRemoteSnap.parent().notifyObservers(ObservableProperty.SNAP, true);
 				
@@ -161,8 +161,8 @@ public class MovementLogic
 			// test if last snap still snaps
 			else if (lastRemoteSnap != null) {
 				if (!localSnap.canSnap(lastRemoteSnap)) {
-					localSnap.setSnap(null);
-    				lastRemoteSnap.setSnap(null);
+					localSnap.setSnapPeer(null);
+    				lastRemoteSnap.setSnapPeer(null);
     				localModel.notifyObservers(ObservableProperty.SNAP, false);
     				lastRemoteSnap.parent().notifyObservers(ObservableProperty.SNAP, false);
     			}

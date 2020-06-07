@@ -15,7 +15,6 @@ public class SnapResultMove {
 		rotation = nRotation;
 	}
 	
-	
 	public static SnapResultMove NONE = new SnapResultMove(false, new MPoint(0, 0), 0);
 	public static SnapResultMove NONE() { return NONE; }
 }

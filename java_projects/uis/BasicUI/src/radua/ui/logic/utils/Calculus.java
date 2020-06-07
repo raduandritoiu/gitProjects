@@ -44,8 +44,7 @@ public class Calculus
 	
 	
 	public static double computeM(IReadablePoint A, IReadablePoint B) {
-		double m = ((double) (B.y() - A.y())) / ((double) (B.x() - A.x()));
-		return m;
+		return ((double) (B.y() - A.y())) / ((double) (B.x() - A.x()));
 	}
 	
 	

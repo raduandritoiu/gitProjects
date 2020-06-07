@@ -10,7 +10,7 @@ public abstract class BasicSnapPoint implements ISnapPoint
 {
 	protected final SnapId _id;
 	protected final SnapModel _parent;
-	protected ISnapPoint _neighbour;
+	protected ISnapPoint _peer;
 	
 	public BasicSnapPoint(SnapModel parent) {
 		_id = IdManager.GetSnapId();
@@ -23,22 +23,24 @@ public abstract class BasicSnapPoint implements ISnapPoint
 		return _parent;
 	}
 	
-	public void setSnap(ISnapPoint model) {
-		_neighbour = model;
+	
+	public void setSnapPeer(ISnapPoint model) {
+		_peer = model;
 	}
-	public ISnapPoint getSnap() {
-		return _neighbour;
+	public ISnapPoint getSnapPeer() {
+		return _peer;
 	}
 	public boolean isSnapped() {
-		return _neighbour != null;
+		return _peer != null;
 	}
+	
 	
 	public void parentMoved(IReadablePoint oldPosition) { updatePoints(); }
 	public void parentResized(IReadableSize oldSize) { updatePoints(); }
 	public void parentRotated(double oldRotation) { updatePoints(); }
-	abstract void updatePoints();
+	protected abstract void updatePoints();
 	
-	@Override
+	
 	public String toString() {
 		return debugString(0);
 	}

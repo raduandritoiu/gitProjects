@@ -1,6 +1,6 @@
 import javax.swing.JFrame;
 
-import radua.ui.display.components.MainWindowUI;
+import radua.ui.display.main.MainWindowUI;
 
 public class Main 
 {
